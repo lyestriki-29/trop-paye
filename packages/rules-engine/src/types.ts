@@ -48,6 +48,13 @@ export interface DossierSnapshot {
   rentHistory: RentEvent[];
   revisionClause?: boolean;
   revisionQuarter?: string; // "T2" — trimestre IRL de référence
+  /** Origine du trimestre : lu dans le bail, ou déduit du mois de signature (spec §3). */
+  revisionQuarterSource?: "BAIL" | "DEDUCED";
+  /**
+   * Loyers HC estimés depuis des montants charges comprises (charges au barème,
+   * spec questionnaire §2) → les règles chiffrées plafonnent la confiance à MEDIUM.
+   */
+  rentEstimated?: boolean;
   previousTenantRentCents?: number;
   deposit?: DepositInput;
 }

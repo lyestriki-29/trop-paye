@@ -62,6 +62,33 @@ export function mostRecentAnniversaryISO(anchorISO: string, asOfISO: string): st
   return candidate;
 }
 
+/** Trimestre civil d'une date ISO : janv–mars → "T1" … oct–déc → "T4" (spec questionnaire §3). */
+export function quarterFromMonthISO(iso: string): "T1" | "T2" | "T3" | "T4" {
+  const month = Number(iso.slice(5, 7));
+  if (month <= 3) return "T1";
+  if (month <= 6) return "T2";
+  if (month <= 9) return "T3";
+  return "T4";
+}
+
+/**
+ * Anniversaires du bail STRICTEMENT postérieurs à `anchor`, ≤ `asOf` (spec questionnaire §4).
+ * Jour borné au dernier jour du mois (bail du 29 févr. → 28 févr. les années non bissextiles).
+ */
+export function anniversariesBetween(anchorISO: string, asOfISO: string): string[] {
+  const anchor = anchorISO.slice(0, 10);
+  const asOf = asOfISO.slice(0, 10);
+  if (anchor >= asOf) return [];
+  const month1 = Number(anchor.slice(5, 7));
+  const dayOfMonth = Number(anchor.slice(8, 10));
+  const out: string[] = [];
+  for (let year = Number(anchor.slice(0, 4)) + 1; year <= Number(asOf.slice(0, 4)); year++) {
+    const candidate = clampYmd(year, month1, dayOfMonth);
+    if (candidate <= asOf) out.push(candidate);
+  }
+  return out;
+}
+
 export function maxISO(a: string, b: string): string {
   return a.slice(0, 10) > b.slice(0, 10) ? a.slice(0, 10) : b.slice(0, 10);
 }

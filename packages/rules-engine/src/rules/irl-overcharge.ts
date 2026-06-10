@@ -39,22 +39,36 @@ export function evaluateIrlOvercharge(input: RuleInput): RuleResult {
   const { dossier, referentials, asOf } = input;
   const steps: ComputationStep[] = [];
   const todo: string[] = [];
-  const base = (partial: Partial<RuleResult>): RuleResult => ({
-    ruleId: RULE_ID,
-    ruleVersion: RULE_VERSION,
-    outcome: "COMPLIANT",
-    confidence: "MEDIUM",
-    recoverableCents: 0,
-    futureMonthlySavingCents: 0,
-    legalBasis: LEGAL_BASIS,
-    computation: {
+  // Loyers HC estimés depuis du CC (spec questionnaire §2) : audit + plafond MEDIUM.
+  const rentEstimated = dossier.rentEstimated === true;
+  if (rentEstimated) {
+    steps.push({ label: "Loyers hors charges estimés depuis des montants charges comprises" });
+  }
+  // Trimestre déduit du mois de signature (spec questionnaire §3) : trace seule,
+  // pas de double pénalité de confiance (saisie déjà déclarative).
+  if (dossier.revisionQuarterSource === "DEDUCED") {
+    steps.push({ label: "Trimestre IRL déduit du mois de signature du bail" });
+  }
+  const base = (partial: Partial<RuleResult>): RuleResult => {
+    const result: RuleResult = {
       ruleId: RULE_ID,
       ruleVersion: RULE_VERSION,
-      steps,
-      ...(todo.length ? { todoVerifier: todo } : {}),
-    },
-    ...partial,
-  });
+      outcome: "COMPLIANT",
+      confidence: "MEDIUM",
+      recoverableCents: 0,
+      futureMonthlySavingCents: 0,
+      legalBasis: LEGAL_BASIS,
+      computation: {
+        ruleId: RULE_ID,
+        ruleVersion: RULE_VERSION,
+        steps,
+        ...(todo.length ? { todoVerifier: todo } : {}),
+      },
+      ...partial,
+    };
+    if (rentEstimated && result.confidence === "HIGH") result.confidence = "MEDIUM";
+    return result;
+  };
 
   const rents = [...dossier.rentHistory].sort(byDateAsc);
   if (rents.length === 0 || !rents.some((r) => r.type === "REVISION")) {

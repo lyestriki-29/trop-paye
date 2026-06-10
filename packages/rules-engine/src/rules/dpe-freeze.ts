@@ -58,17 +58,26 @@ function rentAt(rents: RentEvent[], dateISO: string): number {
 export function evaluateDpeFreeze(input: RuleInput): RuleResult {
   const { dossier, asOf } = input;
   const steps: ComputationStep[] = [];
-  const base = (partial: Partial<RuleResult>): RuleResult => ({
-    ruleId: RULE_ID,
-    ruleVersion: RULE_VERSION,
-    outcome: "COMPLIANT",
-    confidence: "MEDIUM",
-    recoverableCents: 0,
-    futureMonthlySavingCents: 0,
-    legalBasis: LEGAL_BASIS,
-    computation: { ruleId: RULE_ID, ruleVersion: RULE_VERSION, steps },
-    ...partial,
-  });
+  // Loyers HC estimés depuis du CC (spec questionnaire §2) : audit + plafond MEDIUM.
+  const rentEstimated = dossier.rentEstimated === true;
+  if (rentEstimated) {
+    steps.push({ label: "Loyers hors charges estimés depuis des montants charges comprises" });
+  }
+  const base = (partial: Partial<RuleResult>): RuleResult => {
+    const result: RuleResult = {
+      ruleId: RULE_ID,
+      ruleVersion: RULE_VERSION,
+      outcome: "COMPLIANT",
+      confidence: "MEDIUM",
+      recoverableCents: 0,
+      futureMonthlySavingCents: 0,
+      legalBasis: LEGAL_BASIS,
+      computation: { ruleId: RULE_ID, ruleVersion: RULE_VERSION, steps },
+      ...partial,
+    };
+    if (rentEstimated && result.confidence === "HIGH") result.confidence = "MEDIUM";
+    return result;
+  };
 
   if (!dossier.dpeHistory || dossier.dpeHistory.length === 0) {
     steps.push({ label: "Classe DPE inconnue" });

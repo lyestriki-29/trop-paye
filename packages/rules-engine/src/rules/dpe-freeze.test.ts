@@ -34,6 +34,25 @@ const mk = (
 });
 
 describe("DPE_FREEZE", () => {
+  it("loyers HC estimés depuis CC → confiance plafonnée à MEDIUM + ligne d'audit", () => {
+    const r = evaluateDpeFreeze(
+      mk(
+        {
+          rentEstimated: true,
+          dpeHistory: [dpe("D", "2021-06-01")],
+          rentHistory: [rent("INITIAL", "2022-01-01", 100000)],
+        },
+        "2024-09-01",
+      ),
+    );
+    // Sans le drapeau, « aucune augmentation illégale » conclut en HIGH.
+    expect(r.outcome).toBe("COMPLIANT");
+    expect(r.confidence).toBe("MEDIUM");
+    expect(r.computation.steps.map((s) => s.label)).toContain(
+      "Loyers hors charges estimés depuis des montants charges comprises",
+    );
+  });
+
   it("1. logement non-F/G avec hausse → COMPLIANT", () => {
     const r = evaluateDpeFreeze(
       mk(

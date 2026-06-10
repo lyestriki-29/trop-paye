@@ -171,4 +171,44 @@ describe("IRL_OVERCHARGE", () => {
     expect(r.outcome).toBe("INSUFFICIENT_DATA");
     expect(r.missingData).toEqual(["revisionQuarter"]);
   });
+
+  it("loyers HC estimés depuis CC → confiance plafonnée à MEDIUM + ligne d'audit", () => {
+    const r = evaluateIrlOvercharge(
+      mk(
+        {
+          revisionClause: false,
+          rentEstimated: true,
+          rentHistory: [rent("INITIAL", "2022-01-01", 100000), rent("REVISION", "2023-09-01", 105000)],
+        },
+        "2024-09-01",
+      ),
+    );
+    // Identique au cas 1 (HIGH sans le drapeau) : le montant ne change pas, la confiance si.
+    expect(r.outcome).toBe("IRREGULAR");
+    expect(r.recoverableCents).toBe(60000);
+    expect(r.confidence).toBe("MEDIUM");
+    expect(r.computation.steps.map((s) => s.label)).toContain(
+      "Loyers hors charges estimés depuis des montants charges comprises",
+    );
+  });
+
+  it("trimestre IRL déduit du mois de signature → ligne d'audit, confiance inchangée", () => {
+    const r = evaluateIrlOvercharge(
+      mk(
+        {
+          revisionClause: true,
+          revisionQuarter: "T2",
+          revisionQuarterSource: "DEDUCED",
+          rentHistory: [rent("INITIAL", "2022-01-01", 100000), rent("REVISION", "2024-09-01", 102000)],
+        },
+        "2025-09-01",
+        [irl("2023-T2", 135.0), irl("2024-T2", 140.0)],
+      ),
+    );
+    // Pas de double pénalité (spec questionnaire §3) : seule la trace change.
+    expect(r.confidence).toBe("HIGH");
+    expect(r.computation.steps.map((s) => s.label)).toContain(
+      "Trimestre IRL déduit du mois de signature du bail",
+    );
+  });
 });
