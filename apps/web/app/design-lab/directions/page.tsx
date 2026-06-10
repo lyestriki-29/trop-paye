@@ -1,9 +1,11 @@
 import Link from "next/link";
 
 /**
- * Index du duel P0 — comparateur des 3 directions artistiques.
- * Arbitrage : choisir UNE direction. La gagnante devient la charte v2 ;
- * les perdantes partent dans /design-lab/archive.
+ * Index du duel P0 — synthèse V2 (arbitrée) en tête + les trois directions
+ * d'origine, conservées pour référence. Arbitrage du 2026-06-10 : home D3 +
+ * carte-quittance D1 ; verdict D3 (surligneur + count-up) sur le contenu
+ * quittance D1 ; identité D3 + tampon D1. La V2 devient la charte v2 ;
+ * D1–D3 partiront dans /design-lab/archive.
  */
 
 interface Direction {
@@ -12,7 +14,7 @@ interface Direction {
   partiPris: string;
 }
 
-const DIRECTIONS: Direction[] = [
+const ARCHIVED: Direction[] = [
   {
     id: "d1",
     name: "D1 « Document officiel »",
@@ -43,25 +45,56 @@ export default function DirectionsIndex() {
   return (
     <main className="mx-auto max-w-container px-6 py-12">
       <h1 className="font-display text-2xl font-extrabold tracking-display">
-        Duel P0 · Trois directions artistiques
+        Duel P0 · Synthèse V2
       </h1>
       <p className="mt-2 max-w-2xl text-sm text-ink/60">
-        Deux écrans témoins par direction (home + verdict animé) et une page identité.
-        Critères d'arbitrage : lisibilité, caractère, cohérence avec le positionnement
-        « sérieux mais pas corporate », envie de cliquer.
+        L&apos;arbitrage est rendu : la V2 fusionne la chaleur de D3 et le langage
+        documentaire de D1. Les trois directions du duel restent consultables
+        ci-dessous, archivées pour référence.
       </p>
 
-      <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {DIRECTIONS.map((d) => (
-          <article key={d.id} className="rounded-card border border-line bg-paper p-6">
-            <h2 className="font-display text-lg font-bold">{d.name}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-ink/70">{d.partiPris}</p>
+      <article className="mt-10 rounded-card border-2 border-ink bg-paper p-8">
+        <p className="font-mono text-xs uppercase tracking-widest text-refund-text">
+          Direction retenue
+        </p>
+        <h2 className="mt-3 font-display text-xl font-extrabold tracking-display">
+          V2 Synthèse (arbitrage du 2026-06-10)
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink/70">
+          L&apos;allié chaleureux qui montre la preuve comptable — base D3, quittance et
+          tampon D1.
+        </p>
+        <ul className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
+          {SCREENS.map((s) => (
+            <li key={s.slug}>
+              <Link
+                href={`/design-lab/directions/v2/${s.slug}`}
+                className="text-sm font-semibold text-refund-text underline-offset-2 hover:underline"
+              >
+                {s.label} →
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </article>
+
+      <h2 className="mt-14 font-display text-lg font-bold tracking-display text-ink/70">
+        Directions du duel — archivées pour référence
+      </h2>
+      <div className="mt-5 grid gap-6 md:grid-cols-3">
+        {ARCHIVED.map((d) => (
+          <article key={d.id} className="rounded-card border border-line bg-paper-2 p-6">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-ink/45">
+              Archivée pour référence
+            </p>
+            <h3 className="mt-2 font-display text-lg font-bold text-ink/80">{d.name}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-ink/60">{d.partiPris}</p>
             <ul className="mt-5 space-y-2">
               {SCREENS.map((s) => (
                 <li key={s.slug}>
                   <Link
                     href={`/design-lab/directions/${d.id}/${s.slug}`}
-                    className="text-sm font-medium text-refund-text underline-offset-2 hover:underline"
+                    className="text-sm font-medium text-ink/55 underline-offset-2 hover:underline"
                   >
                     {s.label} →
                   </Link>
@@ -73,8 +106,8 @@ export default function DirectionsIndex() {
       </div>
 
       <p className="mt-12 border-t border-line pt-4 text-xs text-ink/50">
-        Arbitrage : choisir UNE direction. La gagnante devient la charte v2 ; les perdantes
-        partent dans /design-lab/archive.
+        Prochaine étape : la V2 devient la charte v2 du produit ; D1–D3 partent dans
+        /design-lab/archive.
       </p>
     </main>
   );
