@@ -3,3 +3,5 @@ export { evaluateDpeFreeze } from "./rules/dpe-freeze";
 export { evaluateIrlOvercharge } from "./rules/irl-overcharge";
 export { evaluateDepositLate } from "./rules/deposit-late";
 export { evaluateAll } from "./aggregate";
+export { RULE_LABEL, CONFIDENCE_LABEL, OUTCOME_TITLE, VERDICT_DISCLAIMER, formatEur } from "./labels";
+export { mostRecentAnniversaryISO } from "./internal/dates";

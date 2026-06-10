@@ -1,15 +1,7 @@
 import { readFileSync } from "node:fs";
 import { evaluateAll } from "../src/aggregate";
+import { RULE_LABEL, OUTCOME_TITLE, VERDICT_DISCLAIMER, formatEur as eur } from "../src/labels";
 import type { RuleInput, RuleResult } from "../src/types";
-
-const eur = (cents: number): string =>
-  new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(cents / 100);
-
-const RULE_LABEL: Record<string, string> = {
-  DPE_FREEZE: "Gel des loyers (passoire F/G)",
-  IRL_OVERCHARGE: "Révision IRL",
-  DEPOSIT_LATE: "Dépôt de garantie",
-};
 
 function renderRule(r: RuleResult): string {
   const head = `  • ${RULE_LABEL[r.ruleId] ?? r.ruleId} — ${r.outcome} (confiance ${r.confidence})`;
@@ -40,12 +32,7 @@ function main(): void {
     return;
   }
 
-  const title =
-    verdict.outcome === "IRREGULAR"
-      ? "VOUS AVEZ TROP PAYÉ"
-      : verdict.outcome === "COMPLIANT"
-        ? "RIEN À SIGNALER"
-        : "DONNÉES INSUFFISANTES";
+  const title = OUTCOME_TITLE[verdict.outcome];
 
   console.log("");
   console.log(`  ╶─ TropPayé · verdict (${verdict.asOf}) ─╴`);
@@ -64,7 +51,7 @@ function main(): void {
     for (const s of verdict.signals) console.log(`  ⚑ ${s}`);
   }
   console.log("");
-  console.log("  Estimation informative à partir de données publiques — ceci n'est pas un conseil juridique.");
+  console.log(`  ${VERDICT_DISCLAIMER}`);
   console.log("");
 }
 

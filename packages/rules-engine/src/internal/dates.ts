@@ -34,6 +34,34 @@ export function eachMonth(startISO: string, endISO: string): string[] {
   return out;
 }
 
+/** Construit "YYYY-MM-DD" en bornant le jour au dernier jour du mois (29 févr. → 28). */
+function clampYmd(year: number, month1: number, day: number): string {
+  const lastDay = new Date(Date.UTC(year, month1, 0)).getUTCDate();
+  const d = Math.min(day, lastDay);
+  const mm = String(month1).padStart(2, "0");
+  const dd = String(d).padStart(2, "0");
+  return `${year}-${mm}-${dd}`;
+}
+
+/**
+ * Dernier anniversaire (même jour/mois que `anchor`) antérieur ou égal à `asOf`.
+ * Sert à dater un événement de loyer courant non daté (proxy de la date de révision
+ * réelle, inconnue). Si `anchor` ≥ `asOf` (bail signé aujourd'hui/futur), renvoie `asOf`.
+ */
+export function mostRecentAnniversaryISO(anchorISO: string, asOfISO: string): string {
+  const anchor = anchorISO.slice(0, 10);
+  const asOf = asOfISO.slice(0, 10);
+  if (anchor >= asOf) return asOf;
+
+  const month1 = Number(anchor.slice(5, 7));
+  const dayOfMonth = Number(anchor.slice(8, 10));
+  const asOfYear = Number(asOf.slice(0, 4));
+
+  let candidate = clampYmd(asOfYear, month1, dayOfMonth);
+  if (candidate > asOf) candidate = clampYmd(asOfYear - 1, month1, dayOfMonth);
+  return candidate;
+}
+
 export function maxISO(a: string, b: string): string {
   return a.slice(0, 10) > b.slice(0, 10) ? a.slice(0, 10) : b.slice(0, 10);
 }
