@@ -374,6 +374,47 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          consent_at: string
+          consent_text_version: string
+          created_at: string
+          dossier_id: string
+          email: string
+          id: string
+          phone: string | null
+          purpose: string
+        }
+        Insert: {
+          consent_at?: string
+          consent_text_version: string
+          created_at?: string
+          dossier_id: string
+          email: string
+          id?: string
+          phone?: string | null
+          purpose: string
+        }
+        Update: {
+          consent_at?: string
+          consent_text_version?: string
+          created_at?: string
+          dossier_id?: string
+          email?: string
+          id?: string
+          phone?: string | null
+          purpose?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_dossier_id_fkey"
+            columns: ["dossier_id"]
+            isOneToOne: false
+            referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_rules: {
         Row: {
           effective_from: string
