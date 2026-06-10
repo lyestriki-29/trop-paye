@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-ink: #11192b;
+  --color-paper: #fbfbf8;
+  --color-paper-2: #f1f1ec;
+  --color-refund: #0b9e6b;
+  --color-refund-text: #087a52;
+  --color-stamp: #c8322b;
+  --color-line: #d9d9d1;
+}
+
+html {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-body), system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* Montants en euros : chiffres tabulaires (charte §2). */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -18,8 +18,13 @@ dist/
 supabase/.branches/
 supabase/.temp/
 
+# TS build info
+*.tsbuildinfo
+
 # Tests / coverage
 coverage/
+playwright-report/
+test-results/
 
 # Logs & OS
 *.log
