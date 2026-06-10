@@ -73,7 +73,7 @@ export function DpeStep({ draft, setField }: StepProps) {
       {results.length > 0 ? (
         <ul className="space-y-2">
           {results.map((d, i) => (
-            <li key={d.numero || i}>
+            <li key={d.numero || `dpe-${i}-${d.date}-${d.class}`}>
               <button
                 type="button"
                 onClick={() => pick(d)}
@@ -133,4 +133,8 @@ export function DpeStep({ draft, setField }: StepProps) {
   );
 }
 
-export const dpeValid = (): boolean => true; // facultatif (verdict partiel sinon)
+/** Facultatif, MAIS une saisie manuelle exige une date ISO valide (sinon calcul faussé). */
+export const dpeValid = (d: StepProps["draft"]): boolean => {
+  if (d.dpe?.source === "USER_INPUT") return /^\d{4}-\d{2}-\d{2}$/.test(d.dpe.date);
+  return true;
+};

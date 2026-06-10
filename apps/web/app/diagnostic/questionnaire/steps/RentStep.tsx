@@ -24,6 +24,6 @@ export function RentStep({ draft, setField }: StepProps) {
 
 export const rentValid = (d: StepProps["draft"]): boolean =>
   d.initialRentCents !== undefined &&
-  d.initialRentCents >= 0 &&
+  d.initialRentCents > 0 &&
   d.currentRentCents !== undefined &&
-  d.currentRentCents >= 0;
+  d.currentRentCents > 0;

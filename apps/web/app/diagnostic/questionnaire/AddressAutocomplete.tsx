@@ -25,6 +25,7 @@ export function AddressAutocomplete({
     const q = query.trim();
     if (q.length < 3 || q === value?.label) {
       setResults([]);
+      setOpen(false);
       setLoading(false);
       return;
     }
@@ -54,6 +55,9 @@ export function AddressAutocomplete({
             setQuery(e.target.value);
             setOpen(true);
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpen(false);
+          }}
           placeholder="12 rue des Lilas, 75011 Paris"
           className={FIELD_CLASS}
         />
@@ -62,8 +66,8 @@ export function AddressAutocomplete({
         ) : null}
         {open && results.length > 0 ? (
           <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-field border border-line bg-paper shadow-sm">
-            {results.map((r) => (
-              <li key={r.banId || r.label}>
+            {results.map((r, idx) => (
+              <li key={r.banId || `addr-${idx}`}>
                 <button
                   type="button"
                   onClick={() => {

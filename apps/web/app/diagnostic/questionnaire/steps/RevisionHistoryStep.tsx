@@ -71,4 +71,10 @@ export function RevisionHistoryStep({ draft, setField }: StepProps) {
   );
 }
 
-export const revisionHistoryValid = (): boolean => true;
+/** Bloque uniquement les lignes partiellement remplies (date sans montant, ou l'inverse). */
+export const revisionHistoryValid = (d: StepProps["draft"]): boolean =>
+  d.revisions.every((r) => {
+    const hasDate = /^\d{4}-\d{2}-\d{2}$/.test(r.date);
+    const hasRent = r.rentCents > 0;
+    return (hasDate && hasRent) || (!hasDate && !hasRent);
+  });

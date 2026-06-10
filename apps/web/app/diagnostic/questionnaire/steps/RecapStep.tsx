@@ -2,6 +2,7 @@
 
 import { formatEur } from "@troppaye/rules-engine";
 import type { StepProps } from "../use-diagnostic-form";
+import { frenchDate } from "@/lib/format-date";
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -28,7 +29,10 @@ export function RecapStep({ draft }: StepProps) {
         value={draft.furnished === undefined ? "—" : draft.furnished ? "Oui" : "Non"}
       />
       <Row label="DPE" value={dpe} />
-      <Row label="Signature du bail" value={draft.leaseSignedAt ?? "—"} />
+      <Row
+        label="Signature du bail"
+        value={draft.leaseSignedAt ? frenchDate(draft.leaseSignedAt) : "—"}
+      />
       <Row
         label="Loyer de départ"
         value={draft.initialRentCents !== undefined ? formatEur(draft.initialRentCents) : "—"}

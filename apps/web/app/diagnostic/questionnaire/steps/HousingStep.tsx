@@ -14,7 +14,8 @@ export function HousingStep({ draft, setField }: StepProps) {
           onChange={(e) => {
             const raw = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "");
             const n = raw === "" ? undefined : Number.parseFloat(raw);
-            setField("surfaceM2", n !== undefined && Number.isFinite(n) ? n : undefined);
+            const valid = n !== undefined && Number.isFinite(n) && n > 0 && n <= 10000;
+            setField("surfaceM2", valid ? n : undefined);
           }}
           placeholder="45"
           className="mt-1 w-full rounded-field border border-line bg-paper px-4 py-3 font-mono tabular outline-none focus:border-ink focus:ring-2 focus:ring-ink/15"

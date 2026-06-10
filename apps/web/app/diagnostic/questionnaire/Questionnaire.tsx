@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { DiagnosticDraft, StepProps } from "./use-diagnostic-form";
 import { useDiagnosticForm } from "./use-diagnostic-form";
 import { AddressStep, addressValid } from "./steps/AddressStep";
@@ -31,13 +31,14 @@ const STEPS: StepDef[] = [
 ];
 
 export function Questionnaire() {
-  const { draft, setField, hydrated, submit, submitting, error } = useDiagnosticForm();
-  const [i, setI] = useState(0);
+  const { draft, setField, stepIndex, setStepIndex, hydrated, submit, submitting, error } =
+    useDiagnosticForm();
 
   if (!hydrated) {
     return <p className="mt-10 text-ink/50">Chargement…</p>;
   }
 
+  const i = Math.min(Math.max(stepIndex, 0), STEPS.length - 1);
   const step = STEPS[i]!;
   const isLast = i === STEPS.length - 1;
   const canNext = step.valid(draft);
@@ -69,7 +70,7 @@ export function Questionnaire() {
       <div className="mt-8 flex items-center justify-between">
         <button
           type="button"
-          onClick={() => setI((n) => Math.max(0, n - 1))}
+          onClick={() => setStepIndex(Math.max(0, i - 1))}
           disabled={i === 0 || submitting}
           className="rounded-field px-4 py-3 text-sm text-ink/60 hover:text-ink disabled:opacity-0"
         >
@@ -88,7 +89,7 @@ export function Questionnaire() {
         ) : (
           <button
             type="button"
-            onClick={() => setI((n) => Math.min(STEPS.length - 1, n + 1))}
+            onClick={() => setStepIndex(Math.min(STEPS.length - 1, i + 1))}
             disabled={!canNext}
             className="rounded-field bg-ink px-6 py-3 font-medium text-paper transition-colors hover:bg-ink/90 disabled:opacity-40"
           >

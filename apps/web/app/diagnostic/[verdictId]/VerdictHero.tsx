@@ -5,15 +5,7 @@ import { motion, useReducedMotion, useSpring, useTransform } from "motion/react"
 import { CONFIDENCE_LABEL, OUTCOME_TITLE, formatEur, type Confidence, type Outcome } from "@troppaye/rules-engine";
 import { motionTokens } from "@troppaye/shared";
 import { Stamp } from "@/components/brand/Stamp";
-
-function frenchDate(iso: string): string {
-  return new Date(iso.slice(0, 10) + "T00:00:00Z").toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
+import { frenchDate } from "@/lib/format-date";
 
 /** Montant qui s'incrémente (0 → cents), figé si `prefers-reduced-motion`. */
 function CountUp({ cents, className }: { cents: number; className?: string }) {
@@ -24,7 +16,9 @@ function CountUp({ cents, className }: { cents: number; className?: string }) {
   useEffect(() => {
     if (reduce) value.jump(cents);
     else value.set(cents);
-  }, [cents, reduce, value]);
+    // `value` est une MotionValue stable (identité conservée) : hors deps volontairement.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cents, reduce]);
 
   return <motion.span className={className}>{text}</motion.span>;
 }

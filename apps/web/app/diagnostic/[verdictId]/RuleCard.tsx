@@ -1,11 +1,15 @@
 import { CONFIDENCE_LABEL, RULE_LABEL, type RuleResult } from "@troppaye/rules-engine";
 import { Amount } from "@/components/Amount";
+import { frenchDate } from "@/lib/format-date";
 
-/** Champs manquants (clés moteur) → relance en clair. */
+/** Champs manquants (clés moteur) → relance en clair. Exhaustif : aucune clé technique brute. */
 const MISSING_LABEL: Record<string, string> = {
   revisionQuarter: "le trimestre de référence de la révision",
   irl: "l'indice IRL applicable au logement",
   dpe: "le DPE du logement",
+  dpe_surface: "la surface du logement (pour recouper le DPE)",
+  previousTenantRent: "le loyer payé par le locataire précédent",
+  leaveDate: "la date de remise des clés",
 };
 
 const OUTCOME_CHIP: Record<RuleResult["outcome"], { label: string; className: string }> = {
@@ -14,17 +18,9 @@ const OUTCOME_CHIP: Record<RuleResult["outcome"], { label: string; className: st
   INSUFFICIENT_DATA: { label: "À compléter", className: "bg-paper-2 text-ink/60" },
 };
 
-function frenchDate(iso: string): string {
-  return new Date(iso.slice(0, 10) + "T00:00:00Z").toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
-
 export function RuleCard({ rule }: { rule: RuleResult }) {
   const chip = OUTCOME_CHIP[rule.outcome];
+  const missing = (rule.missingData ?? []).map((k) => MISSING_LABEL[k]).filter(Boolean);
 
   // Règle reléguée (anti double-comptage) : on montre, on ne chiffre jamais en cumul.
   if (rule.subsidiaryOf) {
@@ -64,10 +60,9 @@ export function RuleCard({ rule }: { rule: RuleResult }) {
         </div>
       ) : null}
 
-      {rule.missingData?.length ? (
+      {missing.length ? (
         <p className="mt-3 rounded-field bg-stamp/8 px-4 py-3 text-sm text-ink/75">
-          Ajoutez {rule.missingData.map((k) => MISSING_LABEL[k] ?? k).join(", ")} pour chiffrer
-          ce point.
+          Ajoutez {missing.join(", ")} pour chiffrer ce point.
         </p>
       ) : null}
 
