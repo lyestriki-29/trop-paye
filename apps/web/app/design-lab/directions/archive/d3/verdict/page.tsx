@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
 import { DirectionTheme } from "@/app/design-lab/directions/DirectionTheme";
-import { LogoA } from "@/app/design-lab/directions/d3/identite/logos";
+import { LogoA } from "@/app/design-lab/directions/archive/d3/identite/logos";
 import { VerdictSequence } from "./VerdictSequence";
 
 /**
@@ -14,7 +14,7 @@ export default function VerdictD3Page() {
     <DirectionTheme dir="d3">
       <header className="border-b border-line/70 bg-paper">
         <div className="mx-auto flex max-w-container items-center justify-between gap-4 px-6 py-4">
-          <Link href="/design-lab/directions/d3/home" aria-label={`${brand.name} — accueil`}>
+          <Link href="/design-lab/directions/archive/d3/home" aria-label={`${brand.name} — accueil`}>
             <LogoA className="h-6 w-auto" />
           </Link>
           <span className="rounded-badge bg-paper-2 px-3 py-1 text-xs font-medium text-ink/55">

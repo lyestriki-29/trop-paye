@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { brand, formatEUR } from "@troppaye/shared";
-import { LogoA, PastilleTP } from "@/app/design-lab/directions/d3/identite/logos";
+import { LogoA, PastilleTP } from "@/app/design-lab/directions/archive/d3/identite/logos";
 
 /** Scénario témoin (mêmes chiffres que l'écran verdict — données fictives). */
 const DEMO_TOTAL_CENTS = 143700;
@@ -48,7 +48,7 @@ export function HeaderD3() {
     <header className="border-b border-line/70 bg-paper">
       <div className="mx-auto flex max-w-container items-center justify-between gap-6 px-6 py-5">
         <div className="flex items-center gap-4">
-          <Link href="/design-lab/directions/d3/home" aria-label={`${brand.name} — accueil`}>
+          <Link href="/design-lab/directions/archive/d3/home" aria-label={`${brand.name} — accueil`}>
             <LogoA className="h-7 w-auto" />
           </Link>
           <span className="hidden border-l border-line pl-4 text-sm text-ink/55 md:inline">

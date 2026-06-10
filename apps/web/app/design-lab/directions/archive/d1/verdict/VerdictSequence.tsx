@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import { formatEUR } from "@troppaye/shared";
-import { StampMark } from "@/app/design-lab/directions/d1/identite/logos";
+import { StampMark } from "@/app/design-lab/directions/archive/d1/identite/logos";
 
 /** Scénario témoin fixe (plan P0, écran 2) — données fictives. */
 const SCENARIO = {

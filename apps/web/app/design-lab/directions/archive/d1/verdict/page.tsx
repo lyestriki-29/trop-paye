@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { brand } from "@troppaye/shared";
 import { DirectionTheme } from "@/app/design-lab/directions/DirectionTheme";
-import { LogoA } from "@/app/design-lab/directions/d1/identite/logos";
-import { VerdictSequence } from "@/app/design-lab/directions/d1/verdict/VerdictSequence";
+import { LogoA } from "@/app/design-lab/directions/archive/d1/identite/logos";
+import { VerdictSequence } from "@/app/design-lab/directions/archive/d1/verdict/VerdictSequence";
 
 export const metadata: Metadata = {
   title: "D1 « Document officiel » — Verdict témoin",

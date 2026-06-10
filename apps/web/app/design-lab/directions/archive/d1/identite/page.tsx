@@ -7,7 +7,7 @@ import {
   LogoA,
   LogoB,
   StampMark,
-} from "@/app/design-lab/directions/d1/identite/logos";
+} from "@/app/design-lab/directions/archive/d1/identite/logos";
 
 export const metadata: Metadata = {
   title: "D1 « Document officiel » — Identité",

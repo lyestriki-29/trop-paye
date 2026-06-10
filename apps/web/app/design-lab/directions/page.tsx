@@ -93,7 +93,7 @@ export default function DirectionsIndex() {
               {SCREENS.map((s) => (
                 <li key={s.slug}>
                   <Link
-                    href={`/design-lab/directions/${d.id}/${s.slug}`}
+                    href={`/design-lab/directions/archive/${d.id}/${s.slug}`}
                     className="text-sm font-medium text-ink/55 underline-offset-2 hover:underline"
                   >
                     {s.label} →
@@ -106,8 +106,8 @@ export default function DirectionsIndex() {
       </div>
 
       <p className="mt-12 border-t border-line pt-4 text-xs text-ink/50">
-        Prochaine étape : la V2 devient la charte v2 du produit ; D1–D3 partent dans
-        /design-lab/archive.
+        Arbitrage rendu le 2026-06-10 : la V2 est la charte v2 du produit ; D1–D3 sont
+        archivées ci-dessus pour référence.
       </p>
     </main>
   );

@@ -2,16 +2,16 @@ import { DirectionTheme } from "@/app/design-lab/directions/DirectionTheme";
 import {
   SectionHeader,
   SectionHero,
-} from "@/app/design-lab/directions/d2/home/sections-hero";
+} from "@/app/design-lab/directions/archive/d2/home/sections-hero";
 import {
   SectionSteps,
   SectionTrust,
-} from "@/app/design-lab/directions/d2/home/sections-steps";
+} from "@/app/design-lab/directions/archive/d2/home/sections-steps";
 import {
   SectionDpe,
   SectionFaq,
   SectionFinalCta,
-} from "@/app/design-lab/directions/d2/home/sections-more";
+} from "@/app/design-lab/directions/archive/d2/home/sections-more";
 
 /**
  * D2 « Relevé de compte » — home témoin (statique).

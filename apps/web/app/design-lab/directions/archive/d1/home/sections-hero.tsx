@@ -1,5 +1,5 @@
 import { brand, formatEUR } from "@troppaye/shared";
-import { LogoA } from "@/app/design-lab/directions/d1/identite/logos";
+import { LogoA } from "@/app/design-lab/directions/archive/d1/identite/logos";
 
 /** Lignes de la quittance spécimen — fiction cohérente avec le verdict témoin. */
 const SPECIMEN_ROWS = [

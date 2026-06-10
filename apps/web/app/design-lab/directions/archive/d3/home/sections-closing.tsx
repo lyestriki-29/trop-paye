@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { brand } from "@troppaye/shared";
-import { PastilleTP } from "@/app/design-lab/directions/d3/identite/logos";
+import { PastilleTP } from "@/app/design-lab/directions/archive/d3/identite/logos";
 import { AddressField, Marker } from "./sections-hero";
 import { IconArrowRight } from "./sections-steps";
 

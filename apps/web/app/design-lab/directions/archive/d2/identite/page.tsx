@@ -6,7 +6,7 @@ import {
   LogoB,
   MarkTP,
   OgCard,
-} from "@/app/design-lab/directions/d2/identite/logos";
+} from "@/app/design-lab/directions/archive/d2/identite/logos";
 
 /**
  * D2 « Relevé de compte » — page identité.

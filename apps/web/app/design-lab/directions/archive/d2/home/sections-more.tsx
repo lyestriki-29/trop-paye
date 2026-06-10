@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
-import { AddressBar } from "@/app/design-lab/directions/d2/home/sections-hero";
-import { LogoA } from "@/app/design-lab/directions/d2/identite/logos";
+import { AddressBar } from "@/app/design-lab/directions/archive/d2/home/sections-hero";
+import { LogoA } from "@/app/design-lab/directions/archive/d2/identite/logos";
 
 /**
  * D2 home — passoires, FAQ (2 extraits sûrs), CTA final sur fond ink, footer.

@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { brand } from "@troppaye/shared";
-import { AddressField } from "@/app/design-lab/directions/d1/home/sections-hero";
-import { SectionKicker } from "@/app/design-lab/directions/d1/home/sections-process";
-import { LogoA } from "@/app/design-lab/directions/d1/identite/logos";
+import { AddressField } from "@/app/design-lab/directions/archive/d1/home/sections-hero";
+import { SectionKicker } from "@/app/design-lab/directions/archive/d1/home/sections-process";
+import { LogoA } from "@/app/design-lab/directions/archive/d1/identite/logos";
 
 interface DpeRow {
   letter: string;

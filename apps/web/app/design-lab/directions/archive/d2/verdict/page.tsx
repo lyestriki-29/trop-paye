@@ -1,5 +1,5 @@
 import { DirectionTheme } from "@/app/design-lab/directions/DirectionTheme";
-import { VerdictSequence } from "@/app/design-lab/directions/d2/verdict/VerdictSequence";
+import { VerdictSequence } from "@/app/design-lab/directions/archive/d2/verdict/VerdictSequence";
 
 /**
  * D2 « Relevé de compte » — verdict témoin.

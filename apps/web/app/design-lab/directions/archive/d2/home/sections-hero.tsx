@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
-import { LogoA } from "@/app/design-lab/directions/d2/identite/logos";
+import { LogoA } from "@/app/design-lab/directions/archive/d2/identite/logos";
 
 /**
  * D2 home — header + hero centré + stat d'appui « 1 sur 6 » en très gros mono.

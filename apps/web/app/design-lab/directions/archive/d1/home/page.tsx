@@ -5,9 +5,9 @@ import {
   Faq,
   FinalCta,
   Passoires,
-} from "@/app/design-lab/directions/d1/home/sections-bottom";
-import { D1Header, D1Hero } from "@/app/design-lab/directions/d1/home/sections-hero";
-import { Confiance, HowItWorks } from "@/app/design-lab/directions/d1/home/sections-process";
+} from "@/app/design-lab/directions/archive/d1/home/sections-bottom";
+import { D1Header, D1Hero } from "@/app/design-lab/directions/archive/d1/home/sections-hero";
+import { Confiance, HowItWorks } from "@/app/design-lab/directions/archive/d1/home/sections-process";
 
 export const metadata: Metadata = {
   title: "D1 « Document officiel » — Home témoin",
