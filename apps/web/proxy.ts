@@ -7,7 +7,9 @@ import { createServerClient } from "@supabase/ssr";
  * et Server Actions). Runtime Node.
  */
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  // Une seule réponse, construite une fois : setAll y dépose les cookies de refresh
+  // sans la reconstruire (évite de perdre d'éventuels en-têtes posés en amont).
+  const response = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,10 +20,10 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          for (const { name, value } of cookiesToSet) request.cookies.set(name, value);
-          response = NextResponse.next({ request });
-          for (const { name, value, options } of cookiesToSet)
+          for (const { name, value, options } of cookiesToSet) {
+            request.cookies.set(name, value);
             response.cookies.set(name, value, options);
+          }
         },
       },
     },

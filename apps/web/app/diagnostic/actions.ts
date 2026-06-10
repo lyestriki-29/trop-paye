@@ -12,7 +12,10 @@ import { diagnosticSchema, toSnapshot } from "@/lib/diagnostic/schema";
 const SESSION_COOKIE = "tp_session";
 
 export async function searchAddressAction(query: string): Promise<AddressSuggestion[]> {
-  return completeAddress(query);
+  // Garde-fou anti-abus : trop court = bruit, trop long = requête forgée. On ne propage pas.
+  const q = query.trim();
+  if (q.length < 3 || q.length > 200) return [];
+  return completeAddress(q);
 }
 
 export async function lookupDpeAction(input: {
@@ -20,10 +23,16 @@ export async function lookupDpeAction(input: {
   label?: string;
 }): Promise<DpeResult[]> {
   if (input.numero) {
-    const d = await dpeByNumber(input.numero);
+    const numero = input.numero.trim();
+    if (numero.length === 0 || numero.length > 64) return [];
+    const d = await dpeByNumber(numero);
     return d ? [d] : [];
   }
-  if (input.label) return dpeByAddress(input.label);
+  if (input.label) {
+    const label = input.label.trim();
+    if (label.length < 3 || label.length > 200) return [];
+    return dpeByAddress(label);
+  }
   return [];
 }
 
@@ -48,6 +57,7 @@ export async function submitDiagnostic(raw: unknown): Promise<SubmitResult> {
     token = crypto.randomUUID();
     jar.set(SESSION_COOKIE, token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30,

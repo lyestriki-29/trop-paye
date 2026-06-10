@@ -117,6 +117,8 @@ class AnthropicLLMProvider implements LLMProvider {
       system: SYSTEM,
       thinking: { type: "adaptive" },
       output_config: { effort: "high" },
+      // web_search est un *server tool* Anthropic : exécuté côté API, aucun handler
+      // local à fournir. Le modèle peut faire plusieurs tours (stop_reason=pause_turn).
       tools: [{ type: "web_search_20260209", name: "web_search" }],
       messages,
     });
