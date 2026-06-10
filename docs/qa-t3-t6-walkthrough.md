@@ -56,3 +56,18 @@ Connexion = magic link local : le lien s'affiche dans les logs `supabase` (Inbuc
   le copy-deck validé avant toute prod. Barème 25 % = placeholder verrouillé.
 - **[AVOCAT]** : effet d'une baisse de loyer sur le plafond IRL (moteur) — à valider.
 - Emails = outbox (table `outbox_emails`) ; LRE + paiements = mock derrière ports.
+
+## Durcissement différé (revue adversariale — à planifier)
+
+Corrigés dans ce push : erreurs d'insert/état incohérent, idempotence (claim + transitions
+atomiques anti double-validation/paiement), garde-fou `recovery_state` atomique, en-têtes
+sécurité pièces, `timingSafeEqual` cron, vérif HMAC de signature, `access_logs` admin.
+
+Restent (défense en profondeur, non bloquants pour la démo) :
+- **Hashage du `session_token`** en base (actuellement en clair ; risque seulement en cas de
+  compromission BD — le cookie est httpOnly/secure). Hasher avant stockage + à la comparaison.
+- **Versioning/rotation des clés** `PIECES_ENCRYPTION_KEY` / `SIGNATURE_SECRET` (colonne
+  `key_version` + multi-clés) pour permettre une rotation sans re-chiffrer l'historique.
+- **Atomicité multi-tables stricte** via fonctions RPC Postgres (les écritures sont déjà
+  error-checkées + protégées par un claim atomique, mais le tout-ou-rien complet exige une
+  transaction serveur).
