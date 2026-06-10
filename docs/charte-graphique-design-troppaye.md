@@ -1,246 +1,181 @@
 # TropPayé — Charte graphique, motion design & contenu organique
-### Document de référence design pour Claude Code — v1.0, juin 2026
+### Document de référence design pour Claude Code — **v2.0, arbitrage du 2026-06-10**
+### (v1 « document officiel » conservée dans l'historique git ; directions du duel archivées dans /design-lab/directions/archive)
 
 ---
 
 ## 1. Direction artistique
 
-### Le concept : « le document officiel qui se retourne contre l'abus »
+### Le concept v2 : « l'allié chaleureux qui montre la preuve comptable »
 
-L'univers visuel de TropPayé est ancré dans le monde réel du sujet :
-la quittance, le bail, le relevé, le courrier recommandé, le tampon
-administratif. On en détourne les codes : ce vocabulaire visuel de
-l'administration — habituellement subi par le locataire — devient SON
-arme. Le rendu visé est premium-fintech : sobre, précis, beaucoup de
-blanc, une exécution irréprochable, et UNE signature mémorable.
+Issu du duel P0 (3 directions complètes, arbitrées par Lyes) : la **chaleur
+humaine** de l'allié (base D3) porte l'enveloppe — accueil, langage, boutons,
+générosité des espacements — tandis que le **langage documentaire** (D1) reste
+la grammaire exclusive des PREUVES : carte-quittance à filets, références de
+dossier en mono, lignes de calcul, tampon. L'émotion fait entrer, le document
+fait signer. Le rendu visé reste premium : exécution irréprochable, détails
+finis, et DES signatures mémorables (voir ci-dessous).
 
-### La signature de marque : le tampon « TROP PAYÉ »
+### Les trois signatures de marque
 
-Un tampon encreur rouge, légèrement incliné (-6°), bords imparfaits
-d'encrage, qui « claque » sur le verdict. C'est à la fois :
-- le logo secondaire (le logotype principal reste typographique),
-- le moment-clé du parcours (l'animation du verdict),
-- l'élément récurrent des images OG et des vidéos organiques,
-- un actif déclinable physiquement (stickers, vrai tampon pour la presse).
+1. **Le surligneur jaune** (`accent`) — le coup de Stabilo de l'étudiant qui
+   révise et du juriste qui pointe la ligne fautive. Usage : mots-clés du hero,
+   ligne fautive d'une quittance, balayage du montant au verdict. Signature
+   d'interaction PRODUIT, utilisable partout avec parcimonie.
+2. **La carte-quittance** — toute preuve chiffrée vit dans une carte style
+   document : en-tête mono petites capitales (« RÉF. DOSSIER TP-… »), filets
+   1 px `line`, lignes libellé/montant, total en `refund`. Jamais un chiffre
+   important hors de ce langage.
+3. **Le tampon « TROP PAYÉ »** — double filet rouge `stamp`, incliné −6°,
+   bords d'encrage imparfaits. Règle d'usage STRICTE : uniquement le verdict
+   gagné, les réseaux sociaux et les images OG. Jamais dans le tunnel de
+   mandat, le dashboard, les courriers, ni la home.
 
-Règle d'usage : le tampon apparaît UNIQUEMENT au moment du verdict
-irrégulier et dans les contenus sociaux. Jamais dans le tunnel de
-mandat, le dashboard ou les courriers (registre sobre).
-
-### Ce qu'on refuse (anti-références)
-Le look "IA générique" (fond crème + serif + terracotta ; fond noir +
-vert acide ; gabarit journal à filets), les illustrations 3D
-corporate, les photos de stock de gens souriants, les dégradés violets
-SaaS, le ton "startup disruptive".
+### Ce qu'on refuse (anti-références, inchangé)
+Le look "IA générique" (fond crème + serif + terracotta ; fond noir + vert
+acide ; gabarit journal à filets), les illustrations 3D corporate, les photos
+de stock, les dégradés violets SaaS, le ton "startup disruptive".
 
 ---
 
-## 2. Design tokens
+## 2. Design tokens (v2 — palette chaude)
 
-### Couleurs (packages/shared/brand.ts → exporter aussi en CSS variables)
+### Couleurs (variables CSS en canaux RGB, consommées par Tailwind)
 
-| Token | Hex | Usage |
-|---|---|---|
-| `ink` | #11192B | Texte principal, fonds inversés — encre bleu nuit |
-| `paper` | #FBFBF8 | Fond principal — blanc papier (PAS crème) |
-| `paper-2` | #F1F1EC | Fonds de cartes, zones de formulaire |
-| `refund` | #0B9E6B | LE vert de l'argent récupéré : montants, succès, courbe du compteur |
-| `stamp` | #C8322B | Rouge tampon — réservé au tampon, aux alertes de prescription et aux erreurs |
-| `line` | #D9D9D1 | Filets, bordures 1px |
+| Token | Hex | Canaux | Usage |
+|---|---|---|---|
+| `ink` | #2A2118 | 42 33 24 | Texte principal, fonds inversés — brun-noir chaud |
+| `paper` | #FFFEFB | 255 254 251 | Fond principal — blanc à peine chaud (PAS crème) |
+| `paper-2` | #FAF4EC | 250 244 236 | Fonds de cartes, zones de formulaire |
+| `refund` | #0C8F63 | 12 143 99 | LE vert de l'argent récupéré (gros montants, fonds sombres) |
+| `refund-text` | #0A7351 | 10 115 81 | Variante AA du vert pour le texte courant sur fond clair |
+| `stamp` | #D64545 | 214 69 69 | Rouge tampon chaud — tampon, alertes prescription, erreurs |
+| `line` | #EAE1D6 | 234 225 214 | Filets, bordures 1 px |
+| `accent` | #FFD84D | 255 216 77 | Le surligneur jaune — fonds de marquage, texte `ink` par-dessus |
 
-Ratios : paper domine (~80 %), ink pour le texte, refund apparaît
-chaque fois qu'un montant en faveur du locataire s'affiche (cohérence :
-vert = votre argent), stamp avec parcimonie extrême.
-Contrastes AA minimum partout (vérifier refund sur paper pour le texte :
-utiliser une variante foncée `refund-text` #087A52 pour le texte courant).
+Ratios : paper domine, ink pour le texte, refund à chaque montant en faveur du
+locataire, accent en marquage ponctuel (jamais en aplat de section), stamp avec
+parcimonie extrême. Contrastes AA partout ; sur `accent`, texte `ink`
+obligatoire (jamais de blanc ni de vert sur jaune) ; `refund` pur réservé aux
+grands corps/fonds sombres, `refund-text` pour le texte courant.
 
 ### Typographie
 
 | Rôle | Police | Usage |
 |---|---|---|
-| Display | **Bricolage Grotesque** (Google Fonts, 600-800) | Titres, hero, montants géants — caractère affirmé sans agressivité |
-| Body | **Public Sans** (400/500/600) | Texte courant — lisible, légèrement institutionnel (c'est la police de l'administration US : clin d'œil parfait) |
-| Data | **Spline Sans Mono** (400/500) | TOUS les montants, dates, références de dossier, calculs, audit trail — le mono dit "preuve comptable" |
+| Display | **Outfit** (600/700/800) | Titres, hero, CTA — géométrique chaleureuse |
+| Body | **Figtree** (400/500/600) | Texte courant — ronde, lisible, amicale |
+| Data | **Spline Sans Mono** (400/500) | TOUS les montants, dates, réfs de dossier, calculs — le mono dit « preuve comptable » |
 
-Échelle : 12 / 14 / 16 / 20 / 28 / 40 / 64 (hero) — interlignage généreux
-(1.6 body), tracking légèrement serré sur le display (-0.02em).
-Règle signature : tout montant en euros est en Spline Sans Mono,
-chiffres tabulaires, couleur `refund` quand il est en faveur du locataire.
+Échelle : 12 / 14 / 16 / 20 / 28 / 40 / 64 (hero) — interlignage 1.6 body,
+tracking -0.02em sur le display. Règle signature inchangée : tout montant en
+euros est en Spline Sans Mono, chiffres tabulaires (`.tabular`), `refund` quand
+il est en faveur du locataire.
 
 ### Grille, formes, ombres
-Conteneur max 1120px, grille 12 colonnes, espacement base 4px.
-Radius : 8px (cartes), 4px (champs), 999px (badges d'étape).
-Ombres quasi nulles : préférer les filets 1px `line` (langage "document").
-Les cartes importantes (verdict, dossier) ont un style "quittance" :
-fond paper, filet, en-tête avec référence de dossier en mono — comme un
-document officiel.
+Conteneur max 1120 px, grille 12 colonnes, base 4 px. Radius : 8 px (cartes),
+4 px (champs), 999 px (badges ET boutons principaux — la pilule est un marqueur
+v2). Ombres : douces et autorisées sur les cartes-preuves (grammaire chaleureuse,
+ex. `shadow-xl` sur la quittance du hero) ; les filets 1 px restent le langage
+des documents. Les cartes importantes gardent le style « quittance » :
+en-tête avec référence en mono, filets, total mis en évidence.
 
 ### Iconographie & illustration
-Icônes : Lucide, 1.5px de trait, couleur ink. Illustrations : pas de
-3D ni de personnages ; à la place, des "documents stylisés" (bail,
-quittance, courrier AR) traités en aplats ink/line sur paper, et des
-détails du monde réel (le coin d'un AR, la liasse de quittances).
+Icônes : Lucide, 1.5 px, couleur ink. Illustrations : pas de 3D ni de
+personnages ; des « documents stylisés » (bail, quittance, courrier AR) en
+aplats ink/line sur paper, et des détails du monde réel (coin d'AR, liasse de
+quittances, coup de surligneur).
 
 ---
 
-## 3. Logo (brief pour la création)
+## 3. Logo (arbitré)
 
-- **Logotype principal** : "TropPayé" en Bricolage Grotesque 800,
-  ink, avec l'accent du "é" traité en `refund` (le petit signal vert =
-  l'argent qui revient). Déclinaison une ligne / empilé.
-- **Logo secondaire / favicon** : le tampon — "TP" ou "TROP PAYÉ" dans
-  un cadre arrondi double filet rouge, incliné, texture d'encrage.
-- **Variantes** : monochrome ink, blanc sur ink, tampon seul.
-- À générer : SVG du logotype, du tampon (avec masque de texture pour
-  l'effet encrage), favicon, et OG template intégrant les deux.
-- Claude Code produira 3 propositions de logotype + 2 de tampon dans
-  /design-lab pour arbitrage avant adoption.
-
----
-
-## 4. Motion design (Framer Motion)
-
-Principe : la sobriété partout, l'orchestration sur UN moment — le
-verdict. `prefers-reduced-motion` respecté systématiquement (variantes
-sans mouvement, fondu simple).
-
-### Le moment signature : la séquence du verdict (1,8 s)
-1. La carte-quittance du logement se construit (fade + slide 12px)
-2. Les lignes de calcul s'impriment une à une (stagger 80ms, style
-   ticket de caisse, montants en mono)
-3. Le tampon TROP PAYÉ claque : scale 1.4→1 + rotation -6°, spring
-   raide (stiffness 600), légère secousse de la carte (1px, 100ms)
-4. Le montant total démarre un count-up (0 → 1 437 €, easing out,
-   1s, en `refund`, taille 64)
-5. Le CTA "Récupérer mes 1 437 €" apparaît (le montant DANS le bouton)
-
-### Micro-interactions (discrètes, 150-250ms)
-- Champs de formulaire : focus ring ink 2px, label flottant
-- Étapes du questionnaire : transition slide horizontale + barre de
-  progression qui s'anime
-- Dashboard : la frise de suivi remplit son segment à chaque nouvelle
-  étape (ligne qui se dessine + badge qui "pop")
-- Compteur public de la home : count-up au scroll-into-view (une fois)
-- Upload : la pièce déposée se "classe" dans le dossier (translation
-  vers la checklist + coche)
-- Hover des cartes guides : élévation du filet (line → ink), pas d'ombre
-
-### Scroll de la home
-Révélations sobres au scroll (fade + 16px, once), pas de parallaxe ni
-d'effets continus. La home doit donner une impression de précision,
-pas de spectacle — le spectacle, c'est le verdict.
+- **Logotype principal** : « TropPayé » en **Outfit 800**, ink, avec le
+  **surligneur `accent` sous « Payé »** (le marqueur jaune = l'argent repéré).
+  Référence : `LogoA` de /design-lab/directions/v2/identite.
+- **Marque secondaire** : le **tampon** « TROP PAYÉ » (double filet `stamp`,
+  texture d'encrage feTurbulence, −6°) — réservé verdict gagné + réseaux + OG.
+- **Favicon** : pastille « TP » fond `accent`, texte ink (le tampon est réservé).
+- **Gabarit OG** : logotype + montant surligné `accent` + tampon claqué au coin
+  bas droit (cf. aperçu v2/identite).
+- Variantes : monochrome ink, blanc sur ink.
 
 ---
 
-## 5. Usine à contenu organique : package Remotion
+## 4. Motion design (motion v12) — amendé v2
 
-`packages/video` — Remotion (React) pour générer les vidéos sociales
-de façon programmatique à partir des données réelles (anonymisées) :
-chaque dossier gagné peut devenir un contenu en 1 commande.
+Principes : la sobriété en continu, la matière partout, l'orchestration sur
+DEUX moments — **l'entrée du hero** (une fois) et **le verdict** (le sommet).
+`prefers-reduced-motion` respecté systématiquement (fondu simple, montants
+affichés sans count-up).
 
-### Compositions à créer (formats 9:16 1080×1920 et 1:1)
-1. **VerdictReveal** (8-12s) : adresse floutée tapée → scan des lignes
-   de calcul → tampon TROP PAYÉ → count-up du montant → gimmick de fin
-   "Trop payé ? Tape l'adresse !" + logo. Props : montant, type
-   d'irrégularité, ville. C'est LE format à industrialiser.
-2. **HookLoop** (5-7s) : un hook texte de la banque (brand.ts) en
-   typographie cinétique (mots qui claquent au rythme), fond ink,
-   accents refund/stamp, boucle parfaite pour les pubs.
-3. **Témoignage** (15-20s) : citations d'un dossier gagné, habillage
-   quittance, montants en mono, tampon final.
-4. **StatPunch** (6s) : une stat choc ("1,4 million de loyers
-   illégaux") en compteur + source + CTA.
+### L'entrée du site (amendement v2, acté quel que soit l'écran)
+Reveal du hero au premier chargement : stagger 0,6–0,9 s, **CSS keyframes pur**
+(jamais gaté sur l'hydratation React — le LCP ne doit pas attendre), une seule
+fois. Pas d'écran splash.
 
-### Infrastructure
-- `pnpm video:render VerdictReveal --props=dossier.json` → MP4
-- Plus tard : route back-office "générer la vidéo de ce dossier"
-  (render Lambda ou file locale sur le VPS)
-- Les compositions consomment les MÊMES tokens (brand.ts) que le site :
-  cohérence totale site/vidéos. Sous-titres intégrés par défaut
-  (le son est coupé sur les feeds).
+### Le moment signature : la séquence du verdict (~1,8 s, grammaire v2)
+1. La carte-quittance se pose (fade + slide 12 px)
+2. L'en-tête document puis les lignes de calcul s'impriment (stagger 80 ms, mono)
+3. Le **surligneur `accent` balaie** le montant total (width 0→100 %, 400 ms)
+4. Count-up du total (0 → montant, 1 s, ease-out, 64 px, `refund`)
+5. Le CTA pilule apparaît, le montant DANS le bouton (« Récupérer mes 1 437 € »)
+6. Le **tampon** claque UNIQUEMENT sur l'écran de verdict gagné (scale 1.4→1,
+   −6°, spring raide) — optionnel selon l'écran, jamais ailleurs
 
----
-
-## 6. Dashboard client (spécification UX)
-
-Modèle mental : **le suivi de colis**. Le locataire doit comprendre où
-en est son dossier en 3 secondes, comme un tracking Colissimo.
-
-### Écran principal `/espace`
-- En-tête : référence dossier (mono), adresse, montant en jeu (refund)
-- **Frise verticale de progression** (le cœur de l'écran) :
-  Dossier validé → Courrier envoyé (+ n° AR, date) → AR signé par le
-  bailleur → Relance → Réponse reçue → Accord / Transmission avocat →
-  Paiement reçu → **Reversé sur votre compte**.
-  Chaque étape : badge, date, libellé en langage humain ("Votre
-  propriétaire a reçu le courrier le 12/03"), pièce jointe consultable.
-  Étape courante animée (pulse discret), étapes futures en line.
-- Carte "Prochaine étape" : ce qui va se passer + qui agit + délai
-  estimé ("Sans réponse d'ici le 02/04, nous envoyons la relance —
-  vous n'avez rien à faire").
-- Carte montants : trop-perçu réclamé / récupéré / votre part / notre
-  commission — transparence totale, en mono.
-- Pièces : checklist des documents (fournis ✓ / manquants avec CTA
-  d'upload), aperçu des courriers envoyés en PDF.
-- Messagerie : fil simple, réponses de l'équipe, bandeau "nous ne
-  donnons pas de conseil juridique personnalisé" + bouton d'escalade.
-
-### Notifications
-Email à CHAQUE changement d'étape (objet : "Votre dossier avance :
-le courrier a été remis à votre propriétaire") — la transparence est
-le produit autant que le résultat.
+### Micro-interactions (150-250 ms) — DENSITÉ OBLIGATOIRE (v2)
+Tout élément interactif a un état hover/focus/active travaillé. Champs : focus
+ring ink 2 px, label flottant. Étapes du questionnaire : slide + barre de
+progression animée. Compteur public : count-up au scroll-into-view (une fois).
+Upload : la pièce se « classe » dans le dossier. Cartes : élévation du filet
+(line → ink) ou ombre douce. Reveals au scroll : fade + 16 px, once, sur CHAQUE
+section (sobre mais systématique).
 
 ---
 
-## 7. Questionnaire & collecte de documents (spécification UX)
+## 5. Densité & effet waouh (nouveau, exigence produit)
 
-Principes : une question par écran, langage humain, autosave continu,
-reprise par magic link, montrer la progression ET le bénéfice
-("plus que 2 questions avant votre estimation").
+Les écrans témoins du duel étaient volontairement légers ; le produit final ne
+l'est PAS. Standard v2 : **dense, habité, fini**.
 
-### Phase diagnostic (anonyme, 2 min)
-1. Adresse (autocomplétion BAN) → en arrière-plan : DPE + zonages
-2. "Votre logement" : confirmation visuelle du DPE trouvé ("Est-ce
-   bien votre logement ? 42 m², 3e étage" — Oui/Non), sinon n° DPE ou
-   "je ne sais pas" (parcours dégradé)
-3. "Votre bail" : date de signature, meublé/vide, loyer hors charges
-   (aides de saisie : "où trouver ce montant sur votre bail ?")
-4. "Les augmentations" : votre loyer a-t-il augmenté ? quand ?
-   combien ? (timeline interactive simple : ajouter une augmentation)
-5. → VERDICT (email demandé ici pour recevoir le détail)
-
-### Phase mandat (après verdict, 5 min)
-Checklist dynamique pilotée par `missingData` du moteur :
-- Bail (PDF/photo — obligatoire)
-- 2 dernières quittances (obligatoire)
-- Quittance d'avant l'augmentation contestée (si module IRL/DPE)
-- État des lieux de sortie + preuve de remise des clés (module dépôt)
-- DPE (optionnel si trouvé via ADEME)
-Upload par drag & drop ET photo mobile (caméra), formats jpg/png/pdf,
-compression côté client, chaque pièce rattachée à son exigence avec
-statut (reçue / illisible / validée). Puis récapitulatif → barème en
-clair avec slider d'exemple → signature électronique → confirmation
-avec la frise du dashboard déjà initialisée (étape 1 verte : effet
-"c'est parti").
+- **Chaque section porte au moins un artefact riche** : carte-quittance
+  spécimen, chiffre animé, détail du monde réel, coup de surligneur — jamais
+  un simple titre + paragraphe + bouton flottant dans le vide.
+- **La preuve est la décoration** : plutôt qu'illustrer, montrer la matière
+  réelle (quittances, calculs, compteur, extraits de loi sourcés).
+- **Le waouh vient de la précision** : alignements parfaits, tabular-nums,
+  transitions finies, états vides/chargement/erreur dessinés — pas de
+  parallaxe gratuite ni d'effets continus.
+- **Hiérarchie éditoriale affirmée** : gros display contrasté, kickers mono,
+  numérotation, rythme vertical varié (sections pleines/aérées alternées).
+- Le grand spectacle reste le VERDICT — c'est lui qui doit décrocher le
+  « waouh » final et le partage.
 
 ---
 
-## 8. Process de travail avec Claude Code : les variantes
+## 6. Usine à contenu organique : package Remotion
 
-Règle à inscrire dans le CLAUDE.md : **pour toute section UI nouvelle
-ou retravaillée, produire 2 à 3 variantes comparables** avant
-intégration.
+(Inchangé v1, tokens v2.) `packages/video` — compositions VerdictReveal,
+HookLoop, Témoignage, StatPunch + Explainer/Teaser/DemoScreen (spec refonte
+P4). Les compositions consomment les MÊMES tokens que le site (palette v2,
+Outfit/Figtree via @remotion/google-fonts). Sous-titres intégrés par défaut.
+Banque de hooks : `brand.ts` + `docs/hooks-cible-etudiants-paris.md`.
 
-- Route dédiée `/design-lab` (protégée en prod) : liste des sections,
-  chaque section affiche ses variantes côte à côte (desktop) ou
-  empilées (mobile) avec un libellé du parti pris de chacune
-  ("V1 : hero centré sur le simulateur / V2 : hero preuve sociale /
-  V3 : hero tampon plein écran").
-- Chaque variante respecte STRICTEMENT les tokens — les variantes
-  divergent par la composition, la hiérarchie et le contenu, jamais
-  par des couleurs/polices hors charte.
-- Après arbitrage, la variante retenue est promue dans la page réelle
-  et les autres archivées dans /design-lab/archive (mémoire des essais).
-- Sections concernées d'office : hero, section "comment ça marche",
-  carte verdict, pricing/barème, frise dashboard, page guide type,
-  logotype et tampon.
+---
+
+## 7. Dashboard client & questionnaire (spécifications UX)
+
+(Inchangé v1 sur le fond — modèle mental « suivi de colis » pour /espace, une
+question par écran pour le diagnostic, autosave, magic link — à exécuter avec
+la grammaire v2 : cartes-quittance pour les montants, surligneur pour l'étape
+courante, pilules pour les CTA.)
+
+---
+
+## 8. Process de travail : les variantes /design-lab
+
+(Inchangé.) Pour toute section UI nouvelle ou retravaillée : 2 à 3 variantes
+comparables dans /design-lab, arbitrage Lyes, promotion de la retenue,
+archivage des autres dans /design-lab/archive (mémoire des essais — D1, D2,
+D3 du duel y sont conservées). Sections d'office restantes pour la refonte :
+« comment ça marche », barème/slider, page guide type.
