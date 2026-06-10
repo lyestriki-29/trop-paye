@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { animate, useInView, useReducedMotion } from "motion/react";
 import { centsToEuros, formatEUR } from "@troppaye/shared";
 
 /**
@@ -9,6 +8,7 @@ import { centsToEuros, formatEUR } from "@troppaye/shared";
  * SSR et `prefers-reduced-motion` affichent directement les valeurs finales
  * (le count-up ne démarre qu'à l'apparition, en euros entiers — pas de
  * décimales qui sautillent). Copy deck §1, mot pour mot.
+ * Vanilla IntersectionObserver + rAF — pas de lib d'animation (TBT home).
  */
 export function CompteurPublic({
   recoveredCents,
@@ -18,24 +18,34 @@ export function CompteurPublic({
   inProgressCount: number;
 }) {
   const ref = useRef<HTMLParagraphElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const reduced = useReducedMotion();
-  const played = useRef(false);
   // null = valeurs finales (état SSR, reduced-motion et fin d'animation).
   const [progress, setProgress] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!inView || played.current) return;
-    played.current = true;
-    if (reduced) return; // valeurs finales déjà affichées
-    const controls = animate(0, 1, {
-      duration: 1,
-      ease: "easeOut",
-      onUpdate: (p) => setProgress(p),
-      onComplete: () => setProgress(null),
-    });
-    return () => controls.stop();
-  }, [inView, reduced]);
+    const el = ref.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect(); // une seule lecture du compteur
+        const start = performance.now();
+        const tick = (now: number) => {
+          const t = Math.min((now - start) / 1000, 1);
+          // easeOut cubique, parité visuelle avec l'ancien animate() motion.
+          setProgress(t < 1 ? 1 - (1 - t) ** 3 : null);
+          if (t < 1) raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      },
+      { rootMargin: "-60px" },
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const euros = Math.round(centsToEuros(recoveredCents) * (progress ?? 1));
   const count = Math.round(inProgressCount * (progress ?? 1));

@@ -46,10 +46,35 @@ body {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: none; }
 }
+/* .reveal-1 porte le H1 = élément LCP : translation seule, JAMAIS d'opacity 0
+   (un H1 masqué au premier paint cède le LCP au logo, qui attend sa police). */
+@keyframes tp-reveal-slide {
+  from { transform: translateY(16px); }
+  to { transform: none; }
+}
 .reveal-1, .reveal-2, .reveal-3 { animation: tp-reveal 0.45s ease-out both; }
+.reveal-1 { animation-name: tp-reveal-slide; }
 .reveal-2 { animation-delay: 0.18s; }
 .reveal-3 { animation-delay: 0.36s; }
 @media (prefers-reduced-motion: reduce) {
   /* Contenu visible immédiatement, sans translation. */
   .reveal-1, .reveal-2, .reveal-3 { animation: none; }
+}
+
+/* Reveal au scroll (charte §4) — CSS pur, déclenché par l'observer unique de
+   RevealInit (data-reveal="in"). L'état caché n'existe que si le JS tourne ET
+   sans reduced-motion : no-JS, vieux navigateurs et reduced-motion voient le
+   contenu statique, jamais masqué. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.5s ease-out var(--reveal-delay, 0s),
+      transform 0.5s ease-out var(--reveal-delay, 0s);
+  }
+  [data-reveal="in"] {
+    opacity: 1;
+    transform: none;
+  }
 }

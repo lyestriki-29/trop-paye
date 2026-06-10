@@ -1,11 +1,10 @@
-"use client";
-
-import type { ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import type { CSSProperties, ReactNode } from "react";
 
 /**
- * Reveal au scroll charte §4 (fade + 16 px, once, sobre mais systématique) ;
- * `prefers-reduced-motion` → contenu statique, aucune translation.
+ * Reveal au scroll charte §4 (fade + 16 px, once, sobre mais systématique) —
+ * composant SERVEUR : pose `data-reveal` + le délai en custom property, la
+ * transition vit dans globals.css et l'observer unique de RevealInit passe
+ * l'état à "in". Zéro lib d'animation côté home (TBT).
  */
 export function Reveal({
   delay = 0,
@@ -16,16 +15,13 @@ export function Reveal({
   className?: string;
   children: ReactNode;
 }) {
-  const reduced = useReducedMotion();
   return (
-    <motion.div
+    <div
+      data-reveal=""
       className={className}
-      initial={reduced ? false : { opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={reduced ? { duration: 0 } : { duration: 0.5, delay, ease: "easeOut" }}
+      style={delay ? ({ "--reveal-delay": `${delay}s` } as CSSProperties) : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { CtaFinal } from "@/components/home/CtaFinal";
 import { Faq } from "@/components/home/Faq";
 import { Hero } from "@/components/home/Hero";
 import { Passoires } from "@/components/home/Passoires";
+import { RevealInit } from "@/components/home/RevealInit";
 import { Steps } from "@/components/home/Steps";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
@@ -25,6 +26,7 @@ export default async function Home() {
         <Faq />
         <CtaFinal />
       </main>
+      <RevealInit />
       <SiteFooter />
     </>
   );
