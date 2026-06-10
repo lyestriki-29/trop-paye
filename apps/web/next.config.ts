@@ -3,7 +3,11 @@ import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
 
 // Monorepo : charge le .env.local de la RACINE (source unique) en plus de apps/web.
-loadEnvConfig(path.resolve(process.cwd(), "..", ".."));
+// forceReload=true (4e arg) est OBLIGATOIRE : Next appelle déjà loadEnvConfig sur
+// apps/web (sans .env) au démarrage, ce qui remplit le cache interne de @next/env.
+// Sans forceReload, notre appel retombe sur ce cache vide et le .env.local racine
+// n'est jamais lu → variables NEXT_PUBLIC_* indéfinies et proxy.ts/Supabase plantent.
+loadEnvConfig(path.resolve(process.cwd(), "..", ".."), process.env.NODE_ENV !== "production", undefined, true);
 
 const nextConfig: NextConfig = {
   output: "standalone",
