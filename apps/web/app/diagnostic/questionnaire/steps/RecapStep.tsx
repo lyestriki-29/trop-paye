@@ -1,7 +1,9 @@
 "use client";
 
+import { quarterFromMonthISO } from "@troppaye/rules-engine";
 import { formatEUR } from "@troppaye/shared";
 import type { StepProps } from "../use-diagnostic-form";
+import { effectiveRevisions } from "../use-diagnostic-form";
 import { frenchDate } from "@/lib/format-date";
 
 /** Ligne du récap — `mono` pour montants, dates et valeurs chiffrées (charte §2). */
@@ -20,6 +22,15 @@ export function RecapStep({ draft }: StepProps) {
     : draft.dpe
       ? `Classe ${draft.dpe.class}`
       : "Non renseigné";
+  const cc = draft.rentInputMode === "CC";
+  const rentSuffix = cc ? " (charges comprises)" : "";
+  const revisionsCount = effectiveRevisions(draft, new Date().toISOString().slice(0, 10)).length;
+  // Trimestre saisi, ou déduit du mois de signature (spec §3).
+  const quarter = draft.revisionQuarter
+    ? draft.revisionQuarter
+    : draft.revisionQuarterUnknown && draft.leaseSignedAt
+      ? `${quarterFromMonthISO(draft.leaseSignedAt)} (déduit de la signature)`
+      : undefined;
 
   return (
     <dl>
@@ -36,25 +47,30 @@ export function RecapStep({ draft }: StepProps) {
         mono
       />
       <Row
-        label="Loyer de départ"
+        label={`Loyer de départ${rentSuffix}`}
         value={draft.initialRentCents !== undefined ? formatEUR(draft.initialRentCents) : "—"}
         mono
       />
       <Row
-        label="Loyer actuel"
+        label={`Loyer actuel${rentSuffix}`}
         value={draft.currentRentCents !== undefined ? formatEUR(draft.currentRentCents) : "—"}
         mono
       />
+      {cc ? (
+        <Row
+          label={draft.chargesEstimated ? "Charges mensuelles (estimées)" : "Charges mensuelles"}
+          value={draft.chargesCents !== undefined ? formatEUR(draft.chargesCents) : "—"}
+          mono
+        />
+      ) : null}
       <Row
         label="Clause de révision"
         value={
           draft.revisionClause === undefined ? "Je ne sais pas" : draft.revisionClause ? "Oui" : "Non"
         }
       />
-      {draft.revisionQuarter ? <Row label="Trimestre IRL" value={draft.revisionQuarter} mono /> : null}
-      {draft.revisions.length > 0 ? (
-        <Row label="Hausses saisies" value={`${draft.revisions.length}`} mono />
-      ) : null}
+      {quarter ? <Row label="Trimestre IRL" value={quarter} mono /> : null}
+      {revisionsCount > 0 ? <Row label="Hausses saisies" value={`${revisionsCount}`} mono /> : null}
     </dl>
   );
 }

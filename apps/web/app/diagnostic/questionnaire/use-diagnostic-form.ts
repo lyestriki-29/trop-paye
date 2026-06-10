@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { anniversariesBetween } from "@troppaye/rules-engine";
 import type { AddressSuggestion } from "@/lib/providers/geo";
 import { submitDiagnostic } from "@/app/diagnostic/actions";
 
@@ -34,7 +35,44 @@ export interface DiagnosticDraft {
   currentRentCents?: number;
   revisionClause?: boolean;
   revisionQuarter?: string;
+  /** « Je ne sais pas » (spec §3) : trimestre déduit du mois de signature côté serveur. */
+  revisionQuarterUnknown?: boolean;
   revisions: { date: string; rentCents: number }[];
+  /** Mode de saisie des loyers (spec §2) : HC par défaut, CC = charges comprises. */
+  rentInputMode?: "HC" | "CC";
+  chargesCents?: number;
+  /** true tant que la valeur pré-remplie au barème n'a pas été modifiée (spec §2). */
+  chargesEstimated?: boolean;
+  /** Éditeur des hausses (spec §4) : par anniversaire de bail, ou libre (repli). */
+  revisionsMode?: "ANNIVERSARY" | "FREE";
+  /** Montants saisis par date d'anniversaire (mode ANNIVERSARY). */
+  anniversaryRents?: Record<string, number>;
+  /** Anniversaires explicitement marqués « Pas de hausse cette année ». */
+  noIncreaseDates?: string[];
+}
+
+/** Mode effectif de l'éditeur de hausses : anniversaire si la date de bail est connue. */
+export function revisionsEditorMode(d: DiagnosticDraft): "ANNIVERSARY" | "FREE" {
+  if (!d.leaseSignedAt) return "FREE";
+  return d.revisionsMode ?? "ANNIVERSARY";
+}
+
+/**
+ * Hausses réellement soumises au diagnostic : lignes anniversaire renseignées
+ * (mode ANNIVERSARY — les dates obsolètes d'un bail modifié sont élaguées par
+ * recalcul) ou lignes libres complètes (mode FREE).
+ */
+export function effectiveRevisions(
+  d: DiagnosticDraft,
+  asOf: string,
+): { date: string; rentCents: number }[] {
+  if (revisionsEditorMode(d) === "ANNIVERSARY" && d.leaseSignedAt) {
+    const rents = d.anniversaryRents ?? {};
+    return anniversariesBetween(d.leaseSignedAt, asOf)
+      .map((date) => ({ date, rentCents: rents[date] ?? 0 }))
+      .filter((r) => r.rentCents > 0);
+  }
+  return d.revisions.filter((r) => /^\d{4}-\d{2}-\d{2}$/.test(r.date) && r.rentCents > 0);
 }
 
 const EMPTY: DiagnosticDraft = { revisions: [] };
@@ -61,10 +99,14 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
     leaseSignedAt: draft.leaseSignedAt,
     initialRentCents: draft.initialRentCents,
     currentRentCents: draft.currentRentCents,
-    // Ignore les lignes de révision incomplètes (date manquante ou montant nul/négatif).
-    revisions: draft.revisions.filter((r) => /^\d{4}-\d{2}-\d{2}$/.test(r.date) && r.rentCents > 0),
+    // Lignes anniversaire ou libres, incomplètes ignorées (cf. effectiveRevisions).
+    revisions: effectiveRevisions(draft, new Date().toISOString().slice(0, 10)),
     revisionClause: draft.revisionClause,
     revisionQuarter: draft.revisionQuarter,
+    revisionQuarterUnknown: draft.revisionQuarterUnknown,
+    rentInputMode: draft.rentInputMode,
+    chargesCents: draft.rentInputMode === "CC" ? draft.chargesCents : undefined,
+    chargesEstimated: draft.rentInputMode === "CC" ? draft.chargesEstimated : undefined,
   };
 }
 

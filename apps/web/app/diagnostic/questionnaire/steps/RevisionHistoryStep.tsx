@@ -2,9 +2,12 @@
 
 import { Button } from "@/components/ui/Button";
 import type { StepProps } from "../use-diagnostic-form";
+import { revisionsEditorMode } from "../use-diagnostic-form";
 import { DateField, MoneyField } from "../fields";
+import { AnniversaryRows } from "./AnniversaryRows";
 
-export function RevisionHistoryStep({ draft, setField }: StepProps) {
+/** Éditeur libre historique (repli sans date de bail, ou cas atypique — spec §4). */
+function FreeRows({ draft, setField }: StepProps) {
   const rows = draft.revisions;
 
   function update(i: number, patch: Partial<{ date: string; rentCents: number }>) {
@@ -16,12 +19,6 @@ export function RevisionHistoryStep({ draft, setField }: StepProps) {
 
   return (
     <div className="space-y-5">
-      <p className="text-sm text-ink/60">
-        Facultatif. Si vous connaissez les hausses datées de votre loyer, ajoutez-les : le
-        calcul sera plus précis. Sinon, passez — nous estimerons à partir des loyers de départ
-        et actuel.
-      </p>
-
       {rows.map((r, i) => (
         <div key={i} className="flex items-start gap-2">
           <div className="flex-1">
@@ -61,10 +58,63 @@ export function RevisionHistoryStep({ draft, setField }: StepProps) {
   );
 }
 
-/** Bloque uniquement les lignes partiellement remplies (date sans montant, ou l'inverse). */
-export const revisionHistoryValid = (d: StepProps["draft"]): boolean =>
-  d.revisions.every((r) => {
+export function RevisionHistoryStep({ draft, setField }: StepProps) {
+  const mode = revisionsEditorMode(draft);
+
+  return (
+    <div className="space-y-5">
+      <p className="text-sm text-ink/60">
+        Facultatif. Si vous connaissez les hausses datées de votre loyer, ajoutez-les : le
+        calcul sera plus précis. Sinon, passez — nous estimerons à partir des loyers de départ
+        et actuel.
+      </p>
+      {draft.rentInputMode === "CC" ? (
+        /* TODO_COPY — rappel du mode CC sur les hausses (hors copy deck §2). */
+        <p className="text-xs text-ink/55">
+          Indiquez des montants charges comprises, comme vos loyers.
+        </p>
+      ) : null}
+
+      {mode === "ANNIVERSARY" && draft.leaseSignedAt ? (
+        <>
+          <AnniversaryRows leaseSignedAt={draft.leaseSignedAt} draft={draft} setField={setField} />
+          {/* Cas atypique (renouvellement, avenant…) → mode libre (spec §4). */}
+          <button
+            type="button"
+            onClick={() => setField("revisionsMode", "FREE")}
+            className="text-sm text-ink/55 underline-offset-2 hover:underline"
+          >
+            Mes hausses ne suivent pas les anniversaires — saisir librement
+          </button>
+        </>
+      ) : (
+        <>
+          <FreeRows draft={draft} setField={setField} />
+          {draft.leaseSignedAt ? (
+            <button
+              type="button"
+              onClick={() => setField("revisionsMode", "ANNIVERSARY")}
+              className="block text-sm text-ink/55 underline-offset-2 hover:underline"
+            >
+              Revenir aux années anniversaire de mon bail
+            </button>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Mode anniversaire : toujours valide (une ligne est renseignée, marquée « pas de
+ * hausse », ou laissée vide). Mode libre : bloque uniquement les lignes
+ * partiellement remplies (date sans montant, ou l'inverse).
+ */
+export const revisionHistoryValid = (d: StepProps["draft"]): boolean => {
+  if (revisionsEditorMode(d) === "ANNIVERSARY") return true;
+  return d.revisions.every((r) => {
     const hasDate = /^\d{4}-\d{2}-\d{2}$/.test(r.date);
     const hasRent = r.rentCents > 0;
     return (hasDate && hasRent) || (!hasDate && !hasRent);
   });
+};
