@@ -19,6 +19,17 @@ npx lighthouse http://localhost:3005/ --chrome-flags="--headless=new" \
 Conditions recommandées : machine au repos (arrêter dev servers et Docker non nécessaires),
 3 runs, garder la médiane.
 
+**Pièges de mesure (vécus le 2026-06-11) — vérifier AVANT de croire les scores :**
+1. **Serveur orphelin** : tuer tout node sur le port AVANT de relancer
+   (`Get-NetTCPConnection -LocalPort 3005`) — deux serveurs peuvent co-écouter
+   sous Windows et l'ancien sert un HTML dont les chunks n'existent plus.
+2. **CSS 200 ?** `curl -s localhost:3005/ | grep -o '/_next/[^\"]*\.css'` puis
+   curl le fichier — un 404/500 = page non stylée = LCP/scores faux.
+3. **Filmstrip** : extraire `screenshot-thumbnails` du JSON et REGARDER une
+   vignette — c'est ce qui a révélé une page sans CSS (logo géant = faux LCP).
+4. Supabase local wedgé (Kong 499 / PostgREST « statement timeout ») fait
+   pendre le prerender ISR de la home au build → `docker restart supabase_rest_Trop-paye`.
+
 ## Mesures du 2026-06-10 (machine chargée : 2 dev servers + 3 piles Supabase)
 
 | Catégorie | Score | Cible |
@@ -29,6 +40,21 @@ Conditions recommandées : machine au repos (arrêter dev servers et Docker non 
 | SEO | 100 | ✅ |
 
 Détail perf : LCP 3,7 s · TBT 680 ms · CLS 0.
+
+## Mesures du 2026-06-11 — après la passe perf (machine toujours chargée : 3 piles Supabase)
+
+| Catégorie | Runs | Médiane | Cible |
+|---|---|---|---|
+| Performance | 72 / 75 / 85 | **75** (était 68) | ≥ 90 ⏳ machine calme |
+| Accessibilité | — | 96 | ✅ |
+| Bonnes pratiques | — | 96 | ✅ |
+| SEO | — | 100 | ✅ |
+
+Détail perf (médiane) : LCP 3,2-3,4 s (élément = H1 ✓) · TBT 630 ms (360 ms sur
+le run le moins perturbé) · CLS 0. Fait : motion retiré du bundle home (reveal
+CSS + compteur vanilla), H1 LCP en translation seule. Restant = éval framework
+(~220 KB, plancher Next/React) amplifiée par la charge machine et le ×4 CPU
+simulé → **re-mesurer sur machine calme avant toute optimisation de plus**.
 
 ## Pistes de la passe perf (avant re-mesure)
 
