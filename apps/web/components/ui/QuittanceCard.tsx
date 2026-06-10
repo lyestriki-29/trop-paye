@@ -13,40 +13,56 @@ export interface QuittanceCardProps {
   reference: string; // ex. « Réf. dossier TP-2026-0117 »
   kind: string; // ex. « Quittance de loyer » / « Verdict »
   meta?: string; // ligne mono optionnelle (adresse, date)
-  rows: ReadonlyArray<QuittanceRow>;
+  /** Optionnel : la séquence verdict imprime ses lignes animées en `children`. */
+  rows?: ReadonlyArray<QuittanceRow>;
   total?: { label: string; cents: number };
   children?: ReactNode; // annotations, CTA, mentions
+  /** Espacement généreux du moment verdict (séquence signature, charte §4). */
+  spotlight?: boolean;
   className?: string;
 }
 
-export function QuittanceCard({ reference, kind, meta, rows, total, children, className }: QuittanceCardProps) {
+export function QuittanceCard({
+  reference,
+  kind,
+  meta,
+  rows = [],
+  total,
+  children,
+  spotlight = false,
+  className,
+}: QuittanceCardProps) {
   return (
     <section className={`overflow-hidden rounded-card border border-line bg-paper ${className ?? ""}`}>
-      <header className="flex items-center justify-between gap-4 border-b border-line bg-paper-2 px-5 py-3 font-mono text-[11px] uppercase tracking-widest text-ink/55">
+      <header
+        className={`flex items-center justify-between gap-4 border-b border-line bg-paper-2 py-3 font-mono text-[11px] uppercase tracking-widest text-ink/55 ${spotlight ? "px-7 sm:px-12" : "px-5"}`}
+      >
         <span>{reference}</span>
         <span>{kind}</span>
       </header>
-      <div className="px-5 py-5">
+      <div className={spotlight ? "p-7 sm:p-12" : "px-5 py-5"}>
         {meta ? <p className="font-mono text-xs text-ink/55">{meta}</p> : null}
-        <dl className={meta ? "mt-4" : ""}>
-          {rows.map((row) => (
-            <div
-              key={row.label}
-              className={
-                row.highlight
-                  ? "-mx-2 flex items-baseline justify-between gap-6 rounded-field bg-accent px-2 py-2.5"
-                  : "flex items-baseline justify-between gap-6 border-b border-dashed border-line py-2.5"
-              }
-            >
-              <dt className={`text-sm ${row.highlight ? "font-medium text-ink" : "text-ink/70"}`}>
-                {row.label}
-              </dt>
-              <dd className="tabular whitespace-nowrap font-mono text-sm text-ink">
-                {row.cents !== undefined ? formatEUR(row.cents, { decimals: true }) : row.text}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        {rows.length > 0 ? (
+          <dl className={meta ? "mt-4" : ""}>
+            {rows.map((row) => (
+              <div
+                key={row.label}
+                className={
+                  row.highlight
+                    ? "-mx-2 flex items-baseline justify-between gap-6 rounded-field bg-accent px-2 py-2.5"
+                    : "flex items-baseline justify-between gap-6 border-b border-dashed border-line py-2.5"
+                }
+              >
+                <dt className={`text-sm ${row.highlight ? "font-medium text-ink" : "text-ink/70"}`}>
+                  {row.label}
+                </dt>
+                <dd className="tabular whitespace-nowrap font-mono text-sm text-ink">
+                  {row.cents !== undefined ? formatEUR(row.cents, { decimals: true }) : row.text}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
         {total ? (
           <div className="mt-4 flex items-end justify-between gap-6 border-t-2 border-ink pt-4">
             <p className="text-sm font-medium text-ink/80">{total.label}</p>

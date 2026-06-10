@@ -9,6 +9,8 @@ export interface VerdictForSession {
   verdict: VerdictGlobal;
   addressLabel: string;
   dossierId: string;
+  /** N° ADEME du DPE (copy deck « confiance élevée ») — null si non renseigné. */
+  dpeNumber: string | null;
 }
 
 /**
@@ -35,11 +37,16 @@ export async function getVerdictForSession(verdictId: string): Promise<VerdictFo
 
   const { data: dossier } = await admin
     .from("dossiers")
-    .select("session_token, address_label")
+    .select("session_token, address_label, dpe_number")
     .eq("id", v.dossier_id)
     .single();
   if (!dossier || !dossier.session_token || dossier.session_token !== token) return null;
 
   const verdict: VerdictGlobal = mapVerdictRow(v);
-  return { verdict, addressLabel: dossier.address_label ?? "", dossierId: v.dossier_id };
+  return {
+    verdict,
+    addressLabel: dossier.address_label ?? "",
+    dossierId: v.dossier_id,
+    dpeNumber: dossier.dpe_number ?? null,
+  };
 }

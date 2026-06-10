@@ -3,7 +3,7 @@ import { Amount } from "@/components/Amount";
 import { frenchDate } from "@/lib/format-date";
 
 /** Champs manquants (clés moteur) → relance en clair. Exhaustif : aucune clé technique brute. */
-const MISSING_LABEL: Record<string, string> = {
+export const MISSING_LABEL: Record<string, string> = {
   revisionQuarter: "le trimestre de référence de la révision",
   irl: "l'indice IRL applicable au logement",
   dpe: "le DPE du logement",

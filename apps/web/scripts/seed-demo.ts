@@ -6,6 +6,7 @@
 import path from "node:path";
 import { loadEnvConfig } from "@next/env";
 import { createClient } from "@supabase/supabase-js";
+import { seedVerdictStates, VERDICT_SESSION_TOKEN } from "./seed-verdict-states";
 
 loadEnvConfig(path.resolve(process.cwd(), "../.."));
 
@@ -125,6 +126,12 @@ async function main() {
 
   console.log(`Seed démo : ${DEMOS.length} dossiers créés pour ${CLIENT_EMAIL}.`);
   console.log(`Connexion (magic link local) : ${ADMIN_EMAIL} / ${CLIENT_EMAIL}.`);
+
+  // Les 4 états de la page verdict (P2 Task 6) — accès par cookie de session anonyme.
+  const verdictLines = await seedVerdictStates(admin, clientId, asOf);
+  console.log("\nPages verdict de démo (poser le cookie tp_session dans DevTools → Application) :");
+  console.log(`Cookie : tp_session=${VERDICT_SESSION_TOKEN}`);
+  for (const line of verdictLines) console.log(line);
 }
 
 main().then(
