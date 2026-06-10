@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { env } from "@/lib/env";
+import { safeRelativePath } from "@/lib/safe-redirect";
 
 export interface LoginState {
   error?: string;
@@ -16,7 +17,7 @@ export async function sendMagicLink(_prev: LoginState, formData: FormData): Prom
   const parsed = emailSchema.safeParse(String(formData.get("email") ?? "").trim());
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Email invalide" };
 
-  const next = String(formData.get("next") ?? "/espace");
+  const next = safeRelativePath(String(formData.get("next") ?? ""));
   const supabase = await getSupabaseServer();
   const { error } = await supabase.auth.signInWithOtp({
     email: parsed.data,
