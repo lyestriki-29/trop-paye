@@ -1,4 +1,9 @@
+import path from "node:path";
+import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
+
+// Monorepo : charge le .env.local de la RACINE (source unique) en plus de apps/web.
+loadEnvConfig(path.resolve(process.cwd(), "..", ".."));
 
 const nextConfig: NextConfig = {
   output: "standalone",
