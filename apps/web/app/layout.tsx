@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree, Outfit, Spline_Sans_Mono } from "next/font/google";
 import { brand } from "@troppaye/shared";
+import { Analytics } from "@/components/Analytics";
 import { env } from "@/lib/env";
 import "./globals.css";
 
@@ -40,7 +41,10 @@ export default function RootLayout({
       lang="fr"
       className={`${display.variable} ${body.variable} ${mono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

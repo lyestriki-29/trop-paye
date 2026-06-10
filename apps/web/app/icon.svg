@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Pastille TP (charte v2 §3) : fond accent, monogramme ink — favicon réel (P3). -->
+  <rect width="64" height="64" rx="18" fill="#FFD84D"/>
+  <text x="32" y="43" font-size="30" font-weight="800" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" fill="#2A2118">TP</text>
+</svg>

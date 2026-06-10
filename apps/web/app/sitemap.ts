@@ -1,13 +1,25 @@
 import type { MetadataRoute } from "next";
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getSupabasePublic } from "@/lib/supabase/public";
 import { env } from "@/lib/env";
 
-export const dynamic = "force-dynamic";
+/** ISR : régénéré toutes les 5 min (client public sans cookies, RLS published). */
+export const revalidate = 300;
+
+/** Pages publiques indexables (P3) — /legal volontairement exclu (noindex). */
+const STATIC_PATHS = [
+  "/",
+  "/diagnostic",
+  "/comment-ca-marche",
+  "/resultats",
+  "/a-propos",
+  "/partenaires",
+  "/presse",
+  "/guides",
+] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Lecture publique : client anon (RLS `articles_read_published`), pas de service_role.
   const base = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
-  const { data } = await (await getSupabaseServer())
+  const { data } = await getSupabasePublic()
     .from("articles")
     .select("slug, published_at")
     .eq("status", "PUBLISHED");
@@ -17,10 +29,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: a.published_at ?? undefined,
   }));
 
-  return [
-    { url: `${base}/` },
-    { url: `${base}/diagnostic` },
-    { url: `${base}/guides` },
-    ...guides,
-  ];
+  return [...STATIC_PATHS.map((p) => ({ url: `${base}${p}` })), ...guides];
 }
