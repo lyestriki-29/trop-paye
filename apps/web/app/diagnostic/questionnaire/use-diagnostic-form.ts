@@ -14,6 +14,13 @@ export interface DpeDraft {
   numero?: string;
   surfaceM2?: number;
   source: "ADEME_API" | "USER_INPUT";
+  /** Descripteurs ADEME (spec questionnaire §1) — affichage UNIQUEMENT, ignorés par le zod serveur. */
+  etage?: number;
+  complementLogement?: string;
+  batiment?: string;
+  residence?: string;
+  typeBatiment?: string;
+  anneeConstruction?: number;
 }
 
 export interface DiagnosticDraft {

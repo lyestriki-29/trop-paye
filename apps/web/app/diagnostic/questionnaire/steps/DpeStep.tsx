@@ -43,6 +43,12 @@ export function DpeStep({ draft, setField }: StepProps) {
       numero: d.numero || undefined,
       surfaceM2: d.surfaceM2,
       source: "ADEME_API",
+      etage: d.etage,
+      complementLogement: d.complementLogement,
+      batiment: d.batiment,
+      residence: d.residence,
+      typeBatiment: d.typeBatiment,
+      anneeConstruction: d.anneeConstruction,
     });
     setResults([]);
     setSearched(false);

@@ -7,9 +7,28 @@ export interface DpeResult {
   date: string; // ISO
   surfaceM2?: number;
   adresseBan?: string;
+  /** Champs descriptifs (spec questionnaire §1) — distinguer les logements d'une même adresse. */
+  etage?: number;
+  complementLogement?: string;
+  batiment?: string;
+  residence?: string;
+  typeBatiment?: string;
+  anneeConstruction?: number;
 }
 
-const SELECT = "numero_dpe,etiquette_dpe,date_etablissement_dpe,surface_habitable_logement,adresse_ban";
+const SELECT = [
+  "numero_dpe",
+  "etiquette_dpe",
+  "date_etablissement_dpe",
+  "surface_habitable_logement",
+  "adresse_ban",
+  "numero_etage_appartement",
+  "complement_adresse_logement",
+  "complement_adresse_batiment",
+  "nom_residence",
+  "type_batiment",
+  "annee_construction",
+].join(",");
 
 interface AdemeLine {
   numero_dpe?: string;
@@ -17,6 +36,25 @@ interface AdemeLine {
   date_etablissement_dpe?: string;
   surface_habitable_logement?: number;
   adresse_ban?: string;
+  numero_etage_appartement?: number | string;
+  complement_adresse_logement?: string;
+  complement_adresse_batiment?: string;
+  nom_residence?: string;
+  type_batiment?: string;
+  annee_construction?: number;
+}
+
+/** Chaîne ADEME nettoyée : trim, vide → undefined. */
+function text(v: string | undefined): string | undefined {
+  const t = v?.trim();
+  return t ? t : undefined;
+}
+
+/** Étage ADEME (number ou string) → entier ≥ 0, sinon undefined. */
+function floor(v: number | string | undefined): number | undefined {
+  if (v === undefined || v === "") return undefined;
+  const n = typeof v === "number" ? v : Number.parseInt(v, 10);
+  return Number.isInteger(n) && n >= 0 ? n : undefined;
 }
 
 function mapLine(l: AdemeLine): DpeResult | null {
@@ -27,6 +65,12 @@ function mapLine(l: AdemeLine): DpeResult | null {
     date: l.date_etablissement_dpe.slice(0, 10),
     surfaceM2: l.surface_habitable_logement,
     adresseBan: l.adresse_ban,
+    etage: floor(l.numero_etage_appartement),
+    complementLogement: text(l.complement_adresse_logement),
+    batiment: text(l.complement_adresse_batiment),
+    residence: text(l.nom_residence),
+    typeBatiment: text(l.type_batiment),
+    anneeConstruction: l.annee_construction,
   };
 }
 

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { QuittanceCard, type QuittanceRow } from "@/components/ui/QuittanceCard";
+import { dpeDescriptorParts } from "@/lib/diagnostic/dpe-label";
 import { frenchDate } from "@/lib/format-date";
 import type { DpeDraft } from "../use-diagnostic-form";
 
@@ -16,8 +17,11 @@ export function DpeSelectedCard({ dpe, onClear }: { dpe: DpeDraft; onClear: () =
     { label: "Classe énergie", text: dpe.class, highlight: true },
     { label: "Établi le", text: frenchDate(dpe.date) },
   ];
-  if (dpe.surfaceM2 !== undefined) {
-    rows.push({ label: "Surface habitable", text: `${dpe.surfaceM2} m²` });
+  // Libellé fin (spec questionnaire §1) : type/étage/bât./surface/résidence, absents omis.
+  const descriptor = dpeDescriptorParts(dpe).join(" · ");
+  if (descriptor) rows.push({ label: "Logement", text: descriptor });
+  if (dpe.anneeConstruction !== undefined) {
+    rows.push({ label: "Construit en", text: String(dpe.anneeConstruction) });
   }
 
   return (

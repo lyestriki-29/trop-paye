@@ -1,6 +1,7 @@
 "use client";
 
 import type { DpeResult } from "@/lib/providers/dpe";
+import { dpeDescriptorParts } from "@/lib/diagnostic/dpe-label";
 import { frenchDate } from "@/lib/format-date";
 
 /**
@@ -37,10 +38,14 @@ export function DpeSearchResults({
                 onClick={() => onPick(d)}
                 className="flex w-full items-center justify-between gap-4 rounded-card border border-line bg-paper px-4 py-3.5 text-left text-sm transition hover:border-ink/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
+                {/* Libellé descriptif (spec questionnaire §1) : distinguer les logements
+                    d'une même adresse — champs absents omis. */}
                 <span>
                   Classe <strong>{d.class}</strong>
-                  {d.surfaceM2 ? <> · {d.surfaceM2} m²</> : null} · DPE établi le{" "}
-                  {frenchDate(d.date)}
+                  {dpeDescriptorParts(d).map((p) => (
+                    <span key={p}> · {p}</span>
+                  ))}{" "}
+                  · établi le {frenchDate(d.date)}
                 </span>
                 <span className="shrink-0 font-medium text-refund-text">C&apos;est bien lui</span>
               </button>
