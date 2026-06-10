@@ -4,6 +4,7 @@ import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
 import { prescriptionInfo } from "@/lib/diagnostic/prescription";
 import { RuleCard } from "./RuleCard";
+import { ShareActions } from "./ShareActions";
 import { VerdictSequenceLive, type SequenceLine } from "./VerdictSequenceLive";
 import { VerdictUnquantified } from "./VerdictUnquantified";
 import { VerdictCompliant } from "./VerdictCompliant";
@@ -53,17 +54,21 @@ export function VerdictView({
 
       <main className="mx-auto max-w-2xl px-6 py-10 sm:py-14">
         {irregular ? (
-          <VerdictSequenceLive
-            reference={shortRef}
-            addressLabel={addressLabel}
-            lines={lines}
-            totalRecoverableCents={verdict.totalRecoverableCents}
-            futureMonthlySavingCents={verdict.totalFutureMonthlySavingCents}
-            confidence={verdict.confidence}
-            dpeNumber={dpeNumber}
-            prescription={prescriptionInfo(verdict.results, verdict.asOf)}
-            mandateHref={`/mandat/${dossierId}`}
-          />
+          <>
+            <VerdictSequenceLive
+              reference={shortRef}
+              addressLabel={addressLabel}
+              lines={lines}
+              totalRecoverableCents={verdict.totalRecoverableCents}
+              futureMonthlySavingCents={verdict.totalFutureMonthlySavingCents}
+              confidence={verdict.confidence}
+              dpeNumber={dpeNumber}
+              prescription={prescriptionInfo(verdict.results, verdict.asOf)}
+              mandateHref={`/mandat/${dossierId}`}
+            />
+            {/* Partage (Task 7) : un tiers n'ouvrira que le teaser anonymisé + OG. */}
+            <ShareActions amountCents={verdict.totalRecoverableCents} />
+          </>
         ) : unquantified ? (
           <VerdictUnquantified signals={verdict.signals} addressLabel={addressLabel} />
         ) : verdict.outcome === "COMPLIANT" ? (

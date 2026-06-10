@@ -11,6 +11,9 @@ loadEnvConfig(path.resolve(process.cwd(), "..", ".."), process.env.NODE_ENV !== 
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Les TTF de l'image OG sont lus via fs à l'exécution : sans ce tracing,
+  // le build standalone ne les embarque pas (ENOENT en prod).
+  outputFileTracingIncludes: { "/api/og/[verdictId]": ["./assets/fonts/**/*"] },
   // Le moteur et la marque sont des packages TS du monorepo → à transpiler.
   transpilePackages: ["@troppaye/shared", "@troppaye/rules-engine"],
   images: { remotePatterns: [] },

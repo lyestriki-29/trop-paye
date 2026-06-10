@@ -1,8 +1,14 @@
 import path from "node:path";
 import { defineConfig } from "vitest/config";
 
-/** Tests unitaires des libs pures (lib/**) — pas de composant React ici. */
+/**
+ * Tests unitaires des libs pures (lib/**) et des Route Handlers (app/api/**) —
+ * pas de rendu de composant React ici (la route OG rend via satori, hors DOM).
+ */
 export default defineConfig({
+  // Next impose `jsx: preserve` dans tsconfig ; pour importer la route OG (.tsx),
+  // oxc doit transformer le JSX vers le runtime React automatique.
+  oxc: { jsx: { runtime: "automatic" } },
   resolve: {
     alias: {
       "@": path.resolve(__dirname),
@@ -14,7 +20,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["lib/**/*.test.ts"],
+    include: ["lib/**/*.test.ts", "app/api/**/*.test.ts"],
     environment: "node",
   },
 });

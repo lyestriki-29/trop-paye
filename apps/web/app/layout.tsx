@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Figtree, Outfit, Spline_Sans_Mono } from "next/font/google";
 import { brand } from "@troppaye/shared";
+import { env } from "@/lib/env";
 import "./globals.css";
 
 const display = Outfit({
@@ -25,6 +26,8 @@ const mono = Spline_Sans_Mono({
 });
 
 export const metadata: Metadata = {
+  // Base des URLs relatives des metadata (image OG /api/og/[verdictId], etc.).
+  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: `${brand.name} — ${brand.baseline}`,
   description: brand.hero.subtitle,
 };

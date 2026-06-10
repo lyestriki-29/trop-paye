@@ -1,26 +1,64 @@
+import type { Metadata } from "next";
+import { brand, formatEUR } from "@troppaye/shared";
 import { getVerdictForSession } from "@/lib/diagnostic/verdict-read";
+import { getVerdictTeaser } from "@/lib/diagnostic/verdict-teaser";
 import { VerdictView } from "./VerdictView";
 import { VerdictUnavailable } from "./VerdictUnavailable";
+import { TeaserView } from "./TeaserView";
 
 export const dynamic = "force-dynamic";
 
-export default async function VerdictPage({
-  params,
-}: {
+interface VerdictPageProps {
   params: Promise<{ verdictId: string }>;
-}) {
-  const { verdictId } = await params;
-  const data = await getVerdictForSession(verdictId);
-  // Introuvable ou session absente/étrangère → écran dédié (pas de notFound()
-  // générique). Le teaser public pour les tiers arrive avec la Task 7.
-  if (!data) return <VerdictUnavailable />;
+}
 
-  return (
-    <VerdictView
-      verdict={data.verdict}
-      addressLabel={data.addressLabel}
-      dossierId={data.dossierId}
-      dpeNumber={data.dpeNumber}
-    />
-  );
+/**
+ * OG/Twitter (plan P2 Task 7 Step 4) — UNIQUEMENT pour un verdict chiffré, à
+ * partir du teaser anonymisé : jamais l'adresse, jamais le détail du dossier.
+ */
+export async function generateMetadata({ params }: VerdictPageProps): Promise<Metadata> {
+  const { verdictId } = await params;
+  const teaser = await getVerdictTeaser(verdictId);
+  if (!teaser || teaser.amountCents === null) return {};
+
+  // TODO_COPY — phrase de partage (gabarit OG validé / étude concurrence).
+  const title = `J'ai vérifié mon loyer : ${formatEUR(teaser.amountCents)} à récupérer`;
+  const description = brand.hero.subtitle;
+  const ogImage = `/api/og/${verdictId}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      siteName: brand.name,
+      type: "website",
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [ogImage] },
+  };
+}
+
+export default async function VerdictPage({ params }: VerdictPageProps) {
+  const { verdictId } = await params;
+
+  // Propriétaire (cookie de session du diagnostic) → verdict complet.
+  const data = await getVerdictForSession(verdictId);
+  if (data) {
+    return (
+      <VerdictView
+        verdict={data.verdict}
+        addressLabel={data.addressLabel}
+        dossierId={data.dossierId}
+        dpeNumber={data.dpeNumber}
+      />
+    );
+  }
+
+  // Tiers (session absente ou étrangère) MAIS verdict existant → teaser public
+  // anonymisé. Verdict inexistant → écran dédié (pas de notFound() générique).
+  const teaser = await getVerdictTeaser(verdictId);
+  if (!teaser) return <VerdictUnavailable />;
+  return <TeaserView teaser={teaser} />;
 }
