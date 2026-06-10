@@ -7,9 +7,11 @@ import { VerdictHero } from "./VerdictHero";
 export function VerdictView({
   verdict,
   addressLabel,
+  dossierId,
 }: {
   verdict: VerdictGlobal;
   addressLabel: string;
+  dossierId: string;
 }) {
   const irregular = verdict.outcome === "IRREGULAR";
 
@@ -61,13 +63,12 @@ export function VerdictView({
           <p className="mt-1 text-sm text-paper/75">
             Nous préparons le courrier et suivons la démarche pour vous, commission au succès.
           </p>
-          <button
-            type="button"
-            disabled
-            className="mt-4 rounded-field bg-paper px-6 py-3 font-medium text-ink disabled:opacity-60"
+          <Link
+            href={`/mandat/${dossierId}`}
+            className="mt-4 inline-block rounded-field bg-paper px-6 py-3 font-medium text-ink hover:bg-paper-2"
           >
-            Bientôt disponible
-          </button>
+            Lancer la récupération
+          </Link>
         </section>
       ) : null}
 

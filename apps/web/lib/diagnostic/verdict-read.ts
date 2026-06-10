@@ -1,12 +1,14 @@
-import type { Confidence, Outcome, RuleResult, VerdictGlobal } from "@troppaye/rules-engine";
+import type { VerdictGlobal } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getSessionToken } from "./session";
+import { mapVerdictRow } from "./verdict-map";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface VerdictForSession {
   verdict: VerdictGlobal;
   addressLabel: string;
+  dossierId: string;
 }
 
 /**
@@ -38,14 +40,6 @@ export async function getVerdictForSession(verdictId: string): Promise<VerdictFo
     .single();
   if (!dossier || !dossier.session_token || dossier.session_token !== token) return null;
 
-  const verdict: VerdictGlobal = {
-    outcome: v.outcome as Outcome,
-    confidence: v.confidence as Confidence,
-    totalRecoverableCents: v.total_recoverable_cents,
-    totalFutureMonthlySavingCents: v.total_future_monthly_saving_cents,
-    results: (v.results as unknown as RuleResult[]) ?? [],
-    signals: (v.signals as unknown as string[]) ?? [],
-    asOf: v.as_of,
-  };
-  return { verdict, addressLabel: dossier.address_label ?? "" };
+  const verdict: VerdictGlobal = mapVerdictRow(v);
+  return { verdict, addressLabel: dossier.address_label ?? "", dossierId: v.dossier_id };
 }

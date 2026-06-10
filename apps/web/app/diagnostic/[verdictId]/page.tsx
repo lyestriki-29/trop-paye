@@ -13,5 +13,7 @@ export default async function VerdictPage({
   const data = await getVerdictForSession(verdictId);
   if (!data) notFound();
 
-  return <VerdictView verdict={data.verdict} addressLabel={data.addressLabel} />;
+  return (
+    <VerdictView verdict={data.verdict} addressLabel={data.addressLabel} dossierId={data.dossierId} />
+  );
 }
