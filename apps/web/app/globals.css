@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  /* Canaux RGB (format requis par rgb(var() / <alpha-value>) côté Tailwind). */
-  --color-ink: 17 25 43; /* #11192B */
-  --color-paper: 251 251 248; /* #FBFBF8 */
-  --color-paper-2: 241 241 236; /* #F1F1EC */
-  --color-refund: 11 158 107; /* #0B9E6B */
-  --color-refund-text: 8 122 82; /* #087A52 */
-  --color-stamp: 200 50 43; /* #C8322B */
-  --color-line: 217 217 209; /* #D9D9D1 */
-  /* Accent par direction (D1 : rouge tampon). */
-  --color-accent: 200 50 43;
+  /* Canaux RGB (format requis par rgb(var() / <alpha-value>) côté Tailwind).
+     Charte v2 « palette chaude » — arbitrage du 2026-06-10. */
+  --color-ink: 42 33 24; /* #2A2118 */
+  --color-paper: 255 254 251; /* #FFFEFB */
+  --color-paper-2: 250 244 236; /* #FAF4EC */
+  --color-refund: 12 143 99; /* #0C8F63 */
+  --color-refund-text: 10 115 81; /* #0A7351 */
+  --color-stamp: 214 69 69; /* #D64545 */
+  --color-line: 234 225 214; /* #EAE1D6 */
+  --color-accent: 255 216 77; /* #FFD84D — le surligneur jaune */
 }
 
 html {

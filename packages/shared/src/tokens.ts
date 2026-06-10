@@ -4,13 +4,14 @@
  */
 
 export const colors = {
-  ink: "#11192B", // texte principal, fonds inversés — encre bleu nuit
-  paper: "#FBFBF8", // fond principal — blanc papier (PAS crème)
-  paper2: "#F1F1EC", // fonds de cartes, zones de formulaire
-  refund: "#0B9E6B", // vert de l'argent récupéré : montants, succès
-  refundText: "#087A52", // variante foncée pour le texte courant (contraste AA)
-  stamp: "#C8322B", // rouge tampon — alertes prescription, erreurs
-  line: "#D9D9D1", // filets, bordures 1px
+  ink: "#2A2118", // texte principal, fonds inversés — brun-noir chaud
+  paper: "#FFFEFB", // fond principal — blanc à peine chaud (PAS crème)
+  paper2: "#FAF4EC", // fonds de cartes, zones de formulaire
+  refund: "#0C8F63", // LE vert de l'argent récupéré (gros montants, fonds sombres)
+  refundText: "#0A7351", // variante AA du vert pour le texte courant sur fond clair
+  stamp: "#D64545", // rouge tampon chaud — tampon, alertes prescription, erreurs
+  line: "#EAE1D6", // filets, bordures 1 px
+  accent: "#FFD84D", // le surligneur jaune — texte ink obligatoire par-dessus
 } as const;
 
 export type ColorToken = keyof typeof colors;
@@ -41,15 +42,22 @@ export const motionTokens = {
   microMs: { min: 150, max: 250 } as const,
 } as const;
 
-/** Émet les CSS custom properties à injecter dans :root (globals.css). */
+/** « #2A2118 » → « 42 33 24 » (canaux RGB du format rgb(var() / <alpha-value>)). */
+function hexToChannels(hex: string): string {
+  const int = Number.parseInt(hex.slice(1), 16);
+  return `${(int >> 16) & 0xff} ${(int >> 8) & 0xff} ${int & 0xff}`;
+}
+
+/** Émet les CSS custom properties à injecter dans :root (mêmes canaux que globals.css). */
 export function cssVariables(): string {
   return [
-    `--color-ink: ${colors.ink};`,
-    `--color-paper: ${colors.paper};`,
-    `--color-paper-2: ${colors.paper2};`,
-    `--color-refund: ${colors.refund};`,
-    `--color-refund-text: ${colors.refundText};`,
-    `--color-stamp: ${colors.stamp};`,
-    `--color-line: ${colors.line};`,
+    `--color-ink: ${hexToChannels(colors.ink)};`,
+    `--color-paper: ${hexToChannels(colors.paper)};`,
+    `--color-paper-2: ${hexToChannels(colors.paper2)};`,
+    `--color-refund: ${hexToChannels(colors.refund)};`,
+    `--color-refund-text: ${hexToChannels(colors.refundText)};`,
+    `--color-stamp: ${hexToChannels(colors.stamp)};`,
+    `--color-line: ${hexToChannels(colors.line)};`,
+    `--color-accent: ${hexToChannels(colors.accent)};`,
   ].join("\n");
 }
