@@ -8,8 +8,7 @@ import { completeAddress, type AddressSuggestion } from "@/lib/providers/geo";
 import { dpeByAddress, dpeByNumber, type DpeResult } from "@/lib/providers/dpe";
 import { getReferentials } from "@/lib/referentials";
 import { diagnosticSchema, toSnapshot } from "@/lib/diagnostic/schema";
-
-const SESSION_COOKIE = "tp_session";
+import { SESSION_COOKIE } from "@/lib/diagnostic/session";
 
 export async function searchAddressAction(query: string): Promise<AddressSuggestion[]> {
   // Garde-fou anti-abus : trop court = bruit, trop long = requête forgée. On ne propage pas.
@@ -43,9 +42,9 @@ export async function submitDiagnostic(raw: unknown): Promise<SubmitResult> {
   if (!parsed.success) return { error: "Données du diagnostic incomplètes." };
   const input = parsed.data;
 
-  const snapshot = toSnapshot(input);
-  const referentials = await getReferentials();
   const asOf = new Date().toISOString().slice(0, 10);
+  const snapshot = toSnapshot(input, asOf);
+  const referentials = await getReferentials();
   const verdict = evaluateAll({ dossier: snapshot, referentials, asOf });
 
   const admin = getSupabaseAdmin();
