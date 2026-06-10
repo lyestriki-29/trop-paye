@@ -1,8 +1,28 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Figtree, IBM_Plex_Mono, Inter, Inter_Tight, Outfit } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Figtree,
+  IBM_Plex_Mono,
+  Inter,
+  Inter_Tight,
+  Outfit,
+  Public_Sans,
+} from "next/font/google";
 import "./directions.css";
 
+const d1Display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-d1-display",
+  weight: ["600", "700", "800"],
+  display: "swap",
+});
+const d1Body = Public_Sans({
+  subsets: ["latin"],
+  variable: "--font-d1-body",
+  weight: ["400", "500", "600"],
+  display: "swap",
+});
 const d2Display = Inter_Tight({
   subsets: ["latin"],
   variable: "--font-d2-display",
@@ -35,7 +55,7 @@ const d3Body = Figtree({
 });
 
 export default function DirectionsLayout({ children }: { children: ReactNode }) {
-  const fontVars = `${d2Display.variable} ${d2Body.variable} ${d2Mono.variable} ${d3Display.variable} ${d3Body.variable}`;
+  const fontVars = `${d1Display.variable} ${d1Body.variable} ${d2Display.variable} ${d2Body.variable} ${d2Mono.variable} ${d3Display.variable} ${d3Body.variable}`;
   return (
     <div className={fontVars}>
       <nav className="border-b border-line bg-paper-2 px-6 py-2 text-xs text-ink/60">

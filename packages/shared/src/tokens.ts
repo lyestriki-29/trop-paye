@@ -17,8 +17,8 @@ export const colors = {
 export type ColorToken = keyof typeof colors;
 
 export const fonts = {
-  display: "Bricolage Grotesque", // titres, hero, montants géants (600-800)
-  body: "Public Sans", // texte courant (400/500/600)
+  display: "Outfit", // titres, hero, CTA (600/700/800) — géométrique chaleureuse
+  body: "Figtree", // texte courant (400/500/600) — ronde, lisible, amicale
   mono: "Spline Sans Mono", // montants, dates, références, audit trail (400/500)
 } as const;
 

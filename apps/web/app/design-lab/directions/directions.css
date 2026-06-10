@@ -10,6 +10,9 @@
   --color-stamp: 200 50 43; /* #C8322B */
   --color-line: 217 217 209; /* #D9D9D1 */
   --color-accent: 200 50 43; /* accent D1 = rouge tampon */
+  --font-display: var(--font-d1-display);
+  --font-body: var(--font-d1-body);
+  /* mono : hérite de Spline Sans Mono (continuité des montants) */
 }
 
 .theme-d2 {

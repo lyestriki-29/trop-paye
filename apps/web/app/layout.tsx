@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
-import {
-  Bricolage_Grotesque,
-  Public_Sans,
-  Spline_Sans_Mono,
-} from "next/font/google";
+import { Figtree, Outfit, Spline_Sans_Mono } from "next/font/google";
 import { brand } from "@troppaye/shared";
 import "./globals.css";
 
-const display = Bricolage_Grotesque({
+const display = Outfit({
   subsets: ["latin"],
   variable: "--font-display",
   weight: ["600", "700", "800"],
   display: "swap",
 });
 
-const body = Public_Sans({
+const body = Figtree({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "600"],
