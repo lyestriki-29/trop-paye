@@ -6,11 +6,10 @@ import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
 
-/* TODO P3 : pointer /comment-ca-marche et /resultats (ancres home en attendant). */
 const NAV = [
-  { label: "Comment ça marche", href: "/#comment-ca-marche" },
+  { label: "Comment ça marche", href: "/comment-ca-marche" },
   { label: "Guides", href: "/guides" },
-  { label: "Résultats", href: "/#resultats" },
+  { label: "Résultats", href: "/resultats" },
 ] as const;
 
 /** Glyphes Lucide inlinés (menu / x) — `lucide-react` absent du workspace. */

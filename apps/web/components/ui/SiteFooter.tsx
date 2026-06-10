@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
 
-/* TODO P3 : pointer /comment-ca-marche et /resultats (ancres home en attendant). */
 const NAV = [
-  { label: "Comment ça marche", href: "/#comment-ca-marche" },
+  { label: "Comment ça marche", href: "/comment-ca-marche" },
   { label: "Guides", href: "/guides" },
-  { label: "Résultats", href: "/#resultats" },
-  /* TODO P3 : page /legal à créer. */
+  { label: "Résultats", href: "/resultats" },
+  { label: "À propos", href: "/a-propos" },
+  { label: "Partenaires", href: "/partenaires" },
+  { label: "Presse", href: "/presse" },
   { label: "Mentions légales", href: "/legal" },
 ] as const;
 

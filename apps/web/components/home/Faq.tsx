@@ -11,9 +11,8 @@ const FAQ: ReadonlyArray<{ q: string; a: ReactNode }> = [
         Rien d&apos;avance, jamais. Si nous récupérons de l&apos;argent, notre commission est
         de 25 % des sommes récupérées. Si nous ne récupérons rien, vous ne payez rien. Le
         barème détaillé est{" "}
-        {/* TODO P3 : pointer /comment-ca-marche (barème détaillé) dès que la page existe. */}
         <Link
-          href="/#comment-ca-marche"
+          href="/comment-ca-marche#bareme"
           className="font-medium text-refund-text underline underline-offset-2"
         >
           ici
