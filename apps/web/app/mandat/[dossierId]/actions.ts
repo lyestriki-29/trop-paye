@@ -141,13 +141,17 @@ export async function uploadPiece(formData: FormData): Promise<ActionResult> {
     encrypted: true,
   });
 
-  await maybeAdvanceToReview(dossierId, dossier.status as DossierStatus);
+  await maybeAdvanceToReview(dossierId, dossier.status as DossierStatus, user.email ?? null);
   revalidatePath(`/mandat/${dossierId}`);
   return { ok: true };
 }
 
 /** Socle minimal de pièces fourni (bail + au moins une quittance) → passage en IN_REVIEW. */
-async function maybeAdvanceToReview(dossierId: string, status: DossierStatus): Promise<void> {
+async function maybeAdvanceToReview(
+  dossierId: string,
+  status: DossierStatus,
+  userEmail: string | null,
+): Promise<void> {
   if (status !== "MANDATE_PENDING") return;
   const admin = getSupabaseAdmin();
   const { data: pieces } = await admin.from("pieces").select("kind").eq("dossier_id", dossierId);
@@ -155,5 +159,14 @@ async function maybeAdvanceToReview(dossierId: string, status: DossierStatus): P
   if (kinds.has("bail") && kinds.has("quittance")) {
     assertTransition("MANDATE_PENDING", "IN_REVIEW");
     await admin.from("dossiers").update({ status: "IN_REVIEW" }).eq("id", dossierId);
+    if (userEmail) {
+      await queueEmail({
+        dossierId,
+        toEmail: userEmail,
+        subject: "Votre dossier TropPayé est en étude",
+        body: "Nous avons bien reçu vos pièces. Votre dossier passe en étude.",
+        template: "review_started",
+      });
+    }
   }
 }
