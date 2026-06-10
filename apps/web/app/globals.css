@@ -3,18 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --color-ink: #11192b;
-  --color-paper: #fbfbf8;
-  --color-paper-2: #f1f1ec;
-  --color-refund: #0b9e6b;
-  --color-refund-text: #087a52;
-  --color-stamp: #c8322b;
-  --color-line: #d9d9d1;
+  /* Canaux RGB (format requis par rgb(var() / <alpha-value>) côté Tailwind). */
+  --color-ink: 17 25 43; /* #11192B */
+  --color-paper: 251 251 248; /* #FBFBF8 */
+  --color-paper-2: 241 241 236; /* #F1F1EC */
+  --color-refund: 11 158 107; /* #0B9E6B */
+  --color-refund-text: 8 122 82; /* #087A52 */
+  --color-stamp: 200 50 43; /* #C8322B */
+  --color-line: 217 217 209; /* #D9D9D1 */
+  /* Accent par direction (D1 : rouge tampon). */
+  --color-accent: 200 50 43;
 }
 
 html {
-  background-color: var(--color-paper);
-  color: var(--color-ink);
+  background-color: rgb(var(--color-paper));
+  color: rgb(var(--color-ink));
   -webkit-font-smoothing: antialiased;
 }
 

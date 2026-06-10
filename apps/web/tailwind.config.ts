@@ -6,11 +6,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#11192B",
-        paper: { DEFAULT: "#FBFBF8", 2: "#F1F1EC" },
-        refund: { DEFAULT: "#0B9E6B", text: "#087A52" },
-        stamp: "#C8322B",
-        line: "#D9D9D1",
+        ink: "rgb(var(--color-ink) / <alpha-value>)",
+        paper: {
+          DEFAULT: "rgb(var(--color-paper) / <alpha-value>)",
+          2: "rgb(var(--color-paper-2) / <alpha-value>)",
+        },
+        refund: {
+          DEFAULT: "rgb(var(--color-refund) / <alpha-value>)",
+          text: "rgb(var(--color-refund-text) / <alpha-value>)",
+        },
+        stamp: "rgb(var(--color-stamp) / <alpha-value>)",
+        line: "rgb(var(--color-line) / <alpha-value>)",
+        accent: "rgb(var(--color-accent) / <alpha-value>)",
       },
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],
