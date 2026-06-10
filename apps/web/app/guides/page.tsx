@@ -1,17 +1,30 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getSupabaseServer } from "@/lib/supabase/server";
-import { Logo } from "@/components/brand/Logo";
+import { Reveal } from "@/components/home/Reveal";
+import { RevealInit } from "@/components/home/RevealInit";
+import { SiteFooter } from "@/components/ui/SiteFooter";
+import { SiteHeader } from "@/components/ui/SiteHeader";
+import { getSupabasePublic } from "@/lib/supabase/public";
 
 export const metadata: Metadata = {
+  /* TODO_COPY — title/description SEO à valider (socle P3). */
   title: "Guides — TropPayé",
   description: "Vos droits de locataire expliqués simplement : gel DPE, IRL, dépôt de garantie.",
+  alternates: { canonical: "/guides" },
 };
 
-export const dynamic = "force-dynamic";
+/** ISR (spec P3 : guides quasi zéro JS, rendu statique) — client public sans cookies. */
+export const revalidate = 300;
+
+const TOPIC_LABEL: Record<string, string> = {
+  dpe: "Gel DPE",
+  irl: "Révision IRL",
+  depot: "Dépôt de garantie",
+  encadrement: "Encadrement",
+};
 
 export default async function GuidesIndex() {
-  const supabase = await getSupabaseServer();
+  const supabase = getSupabasePublic();
   const { data: articles } = await supabase
     .from("articles")
     .select("slug, title, excerpt, topic, published_at")
@@ -19,30 +32,50 @@ export default async function GuidesIndex() {
     .order("published_at", { ascending: false });
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <Link href="/">
-        <Logo className="text-lg" />
-      </Link>
-      <h1 className="mt-10 font-display text-[32px] font-extrabold tracking-display">Guides</h1>
-      <p className="mt-3 text-lg text-ink/70">
-        Vos droits, expliqués simplement. Chaque guide cite ses sources.
-      </p>
+    <>
+      <SiteHeader />
+      <main className="mx-auto max-w-container px-6 pb-24 pt-14 sm:pt-20">
+        <Reveal>
+          <h1 className="font-display text-2xl font-extrabold leading-tight tracking-display sm:text-hero">
+            Guides
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/70">
+            Vos droits, expliqués simplement. Chaque guide cite ses sources.
+          </p>
+        </Reveal>
 
-      <ul className="mt-8 divide-y divide-line border-y border-line">
-        {(articles ?? []).map((a) => (
-          <li key={a.slug} className="py-5">
-            <Link href={`/guides/${a.slug}`} className="group block">
-              <h2 className="font-display text-lg font-bold tracking-display group-hover:text-refund-text">
-                {a.title}
-              </h2>
-              {a.excerpt ? <p className="mt-1 text-ink/70">{a.excerpt}</p> : null}
-            </Link>
-          </li>
-        ))}
-        {(articles ?? []).length === 0 ? (
-          <li className="py-8 text-center text-ink/50">Les premiers guides arrivent bientôt.</li>
-        ) : null}
-      </ul>
-    </main>
+        <ul className="mt-12 grid gap-6 md:grid-cols-2">
+          {(articles ?? []).map((a, i) => (
+            <Reveal key={a.slug} delay={0.05 + (i % 4) * 0.06} className="h-full">
+              <li className="h-full">
+                <Link
+                  href={`/guides/${a.slug}`}
+                  className="group flex h-full flex-col rounded-card border border-line bg-paper p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+                >
+                  {a.topic ? (
+                    <p className="font-mono text-xs font-medium uppercase tracking-widest text-ink/45">
+                      {TOPIC_LABEL[a.topic] ?? a.topic}
+                    </p>
+                  ) : null}
+                  <h2 className="mt-2 font-display text-lg font-bold leading-snug tracking-display group-hover:text-refund-text">
+                    {a.title}
+                  </h2>
+                  {a.excerpt ? (
+                    <p className="mt-2 leading-relaxed text-ink/70">{a.excerpt}</p>
+                  ) : null}
+                </Link>
+              </li>
+            </Reveal>
+          ))}
+          {(articles ?? []).length === 0 ? (
+            <li className="rounded-card border border-dashed border-line bg-paper-2 p-8 text-ink/50 md:col-span-2">
+              Les premiers guides arrivent bientôt.
+            </li>
+          ) : null}
+        </ul>
+      </main>
+      <RevealInit />
+      <SiteFooter />
+    </>
   );
 }
