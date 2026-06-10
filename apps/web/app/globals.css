@@ -40,3 +40,16 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Reveal d'entrée du hero (charte v2 §4) — CSS pur, une fois, jamais gaté sur React. */
+@keyframes tp-reveal {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.reveal-1, .reveal-2, .reveal-3 { animation: tp-reveal 0.45s ease-out both; }
+.reveal-2 { animation-delay: 0.18s; }
+.reveal-3 { animation-delay: 0.36s; }
+@media (prefers-reduced-motion: reduce) {
+  /* Contenu visible immédiatement, sans translation. */
+  .reveal-1, .reveal-2, .reveal-3 { animation: none; }
+}
