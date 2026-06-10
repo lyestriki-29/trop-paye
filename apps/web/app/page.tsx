@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
+
+/** ISR : home statique, rafraîchie toutes les 5 min (le compteur public arrive en Task 3). */
+export const revalidate = 300;
 import { QuittanceCard } from "@/components/ui/QuittanceCard";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";

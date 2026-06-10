@@ -66,6 +66,10 @@ git commit -m "feat(design-lab): variantes comment-ca-marche x2 + bareme/slider 
 
 **STOP : demander l'arbitrage de Lyes (1 variante par section) avant Tasks 3 et 8.**
 
+> **Arbitrage rendu (2026-06-10) : Variante A pour les deux sections** — « comment ça marche »
+> = 3 cartes + artefacts documentaires ; barème = carte-quittance. Les variantes B partent en
+> archive lors de la promotion (Tasks 3 et 8).
+
 ---
 
 ### Task 2: Perf préalable — rendu statique des surfaces publiques
