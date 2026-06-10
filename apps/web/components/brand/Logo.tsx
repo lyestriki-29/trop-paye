@@ -4,7 +4,7 @@ export function Logo({ className }: { className?: string }) {
     <span
       className={`font-display font-extrabold tracking-display text-ink ${className ?? ""}`}
     >
-      TropPay<span style={{ color: "var(--color-refund)" }}>é</span>
+      TropPay<span className="text-refund">é</span>
     </span>
   );
 }
