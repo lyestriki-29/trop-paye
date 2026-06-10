@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { brand } from "@troppaye/shared";
 import { requireAuthPage } from "@/lib/auth/guards";
 import { claimDossierForUser } from "@/lib/dossier/claim";
 import { getDossierDetail } from "@/lib/dossier/read";
 import { Logo } from "@/components/brand/Logo";
+import { Confirmation } from "./Confirmation";
 import { MandateForm } from "./MandateForm";
 import { PiecesUpload } from "./PiecesUpload";
 
@@ -25,41 +27,48 @@ export default async function MandatePage({
 
   const { dossier, verdict, pieces } = detail;
   const missing = [...new Set((verdict?.results ?? []).flatMap((r) => r.missingData ?? []))];
+  /** Référence courte : 8 premiers caractères (comme le PDF de mandat, actions.ts),
+      préfixe « TP- » de la grammaire documentaire (charte §1, QuittanceCard). */
+  const dossierRef = `TP-${dossierId.slice(0, 8).toUpperCase()}`;
 
   return (
-    <main className="mx-auto max-w-xl px-6 py-12">
-      <Link href="/" className="inline-block">
-        <Logo className="text-xl" />
-      </Link>
-
-      {dossier.status === "DIAGNOSED" ? (
-        <MandateForm
-          dossierId={dossierId}
-          addressLabel={dossier.address_label ?? ""}
-          recoverableCents={verdict?.totalRecoverableCents ?? 0}
-        />
-      ) : dossier.status === "MANDATE_PENDING" ? (
-        <PiecesUpload
-          dossierId={dossierId}
-          pieces={pieces.map((p) => ({ id: p.id, kind: p.kind, status: p.status }))}
-          missingData={missing}
-        />
-      ) : (
-        <section className="mt-10">
-          <h1 className="font-display text-2xl font-extrabold tracking-display">
-            Dossier transmis
-          </h1>
-          <p className="mt-3 text-ink/70">
-            Votre dossier est en cours d'étude. Suivez son avancement dans votre espace.
-          </p>
-          <Link
-            href={`/espace/${dossierId}`}
-            className="mt-6 inline-block rounded-field bg-ink px-6 py-3 font-medium text-paper hover:bg-ink/90"
-          >
-            Voir mon dossier
+    <>
+      {/* Chrome tunnel allégé : logotype + référence en mono (grammaire documentaire §1). */}
+      <header className="border-b border-line/70 bg-paper">
+        <div className="mx-auto flex max-w-xl items-center justify-between gap-4 px-6 py-4">
+          <Link href="/" aria-label={`${brand.name} — accueil`}>
+            <Logo className="text-xl" />
           </Link>
-        </section>
-      )}
-    </main>
+          {/* TODO_COPY — libellé de référence hors deck (en-tête type quittance). */}
+          <span className="tabular font-mono text-[11px] uppercase tracking-widest text-ink/55">
+            Réf. dossier {dossierRef}
+          </span>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-xl px-6 pb-16 sm:pb-20">
+        {dossier.status === "DIAGNOSED" ? (
+          <MandateForm
+            dossierId={dossierId}
+            dossierRef={dossierRef}
+            addressLabel={dossier.address_label ?? ""}
+            recoverableCents={verdict?.totalRecoverableCents ?? 0}
+          />
+        ) : dossier.status === "MANDATE_PENDING" ? (
+          <PiecesUpload
+            dossierId={dossierId}
+            pieces={pieces.map((p) => ({
+              id: p.id,
+              kind: p.kind,
+              status: p.status,
+              reason: p.reason,
+            }))}
+            missingData={missing}
+          />
+        ) : (
+          <Confirmation dossierId={dossierId} dossierRef={dossierRef} status={dossier.status} />
+        )}
+      </main>
+    </>
   );
 }

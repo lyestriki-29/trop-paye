@@ -2,15 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Amount } from "@/components/Amount";
+import { Button } from "@/components/ui/Button";
+import { Field } from "@/components/ui/Field";
+import { BaremeMandat } from "./BaremeMandat";
 import { signMandate } from "./actions";
 
+/**
+ * Écran mandat (dossier DIAGNOSED) : barème variante A arbitrée + signature
+ * maison (mock) — restyle charte v2, flux `signMandate` inchangé.
+ */
 export function MandateForm({
   dossierId,
+  dossierRef,
   addressLabel,
   recoverableCents,
 }: {
   dossierId: string;
+  dossierRef: string;
   addressLabel: string;
   recoverableCents: number;
 }) {
@@ -35,68 +43,59 @@ export function MandateForm({
   const canSign = name.trim().length >= 2 && consent && !pending;
 
   return (
-    <div className="mt-8">
-      <h1 className="font-display text-2xl font-extrabold tracking-display">Votre mandat</h1>
-      <p className="mt-2 text-ink/60">
-        Nous engageons la démarche amiable en votre nom. Commission au succès uniquement.
+    <div className="mt-10">
+      {/* Copy deck §3 — Signature : titre + texte mot pour mot. [AVOCAT] */}
+      <h1 className="font-display text-2xl font-extrabold tracking-display">
+        Dernière étape : votre mandat
+      </h1>
+      <p className="mt-3 max-w-prose leading-relaxed text-ink/70">
+        Ce mandat nous autorise à réclamer et encaisser les sommes pour votre compte, sur un
+        compte dédié et contrôlé. Vous restez maître de votre dossier à tout moment.
       </p>
 
-      <div className="mt-6 rounded-card border border-line bg-paper-2 p-5 text-sm">
-        <div className="flex justify-between border-b border-line py-2">
-          <span className="text-ink/60">Logement</span>
-          <span className="text-right font-medium">{addressLabel || "—"}</span>
-        </div>
-        <div className="flex justify-between border-b border-line py-2">
-          <span className="text-ink/60">Trop-perçu estimé</span>
-          <Amount cents={recoverableCents} favorable className="font-medium" />
-        </div>
-        <div className="flex justify-between py-2">
-          <span className="text-ink/60">Commission (succès)</span>
-          <span className="font-mono tabular font-medium">25 %</span>
-        </div>
-      </div>
+      <BaremeMandat
+        dossierRef={dossierRef}
+        addressLabel={addressLabel}
+        recoverableCents={recoverableCents}
+      />
 
-      <p className="mt-4 rounded-field bg-stamp/8 px-4 py-3 text-xs text-ink/70">
+      {/* Signature maison (mock) — avertissement existant conservé. [AVOCAT] */}
+      <p className="mt-10 rounded-field bg-stamp/8 px-4 py-3 text-xs leading-relaxed text-ink/70">
         [AVOCAT] Document généré à partir d'un brouillon non validé — à ne pas utiliser en
         production. Un PDF est figé puis scellé (empreinte + preuve) au moment de la signature.
       </p>
 
-      <label className="mt-6 block">
-        <span className="text-sm font-medium text-ink/80">Vos nom et prénom (signature)</span>
-        <input
-          type="text"
+      <div className="mt-6 border-t border-line pt-8">
+        {/* TODO_COPY — libellé du champ hors deck (existant conservé). */}
+        <Field
+          id="signer-name"
+          label="Vos nom et prénom (signature)"
           value={name}
           onChange={(e) => setName(e.target.value)}
           autoComplete="name"
-          placeholder="Camille Martin"
-          className="mt-1 w-full rounded-field border border-line bg-paper px-4 py-3 outline-none focus:border-ink focus:ring-2 focus:ring-ink/15"
         />
-      </label>
 
-      <label className="mt-4 flex items-start gap-3 text-sm text-ink/75">
-        <input
-          type="checkbox"
-          checked={consent}
-          onChange={(e) => setConsent(e.target.checked)}
-          className="mt-1"
-        />
-        <span>
-          Je consens expressément à signer ce mandat par signature électronique simple et à
-          confier à TropPayé la démarche amiable décrite ci-dessus. [AVOCAT — texte de
-          consentement à valider.]
-        </span>
-      </label>
+        <label className="mt-5 flex items-start gap-3 text-sm leading-relaxed text-ink/75">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            className="mt-1 h-4 w-4 shrink-0 accent-ink"
+          />
+          <span>
+            Je consens expressément à signer ce mandat par signature électronique simple et à
+            confier à TropPayé la démarche amiable décrite ci-dessus. [AVOCAT — texte de
+            consentement à valider.]
+          </span>
+        </label>
 
-      {error ? <p className="mt-3 text-sm text-stamp">{error}</p> : null}
+        {error ? <p className="mt-4 text-sm text-stamp">{error}</p> : null}
 
-      <button
-        type="button"
-        onClick={onSign}
-        disabled={!canSign}
-        className="mt-6 w-full rounded-field bg-refund px-6 py-3 font-medium text-paper transition-colors hover:bg-refund-text disabled:opacity-40"
-      >
-        {pending ? "Signature…" : "Signer mon mandat"}
-      </button>
+        {/* TODO_COPY — libellés du bouton hors deck (existants conservés). */}
+        <Button onClick={onSign} disabled={!canSign} className="mt-6 w-full">
+          {pending ? "Signature…" : "Signer mon mandat"}
+        </Button>
+      </div>
     </div>
   );
 }
