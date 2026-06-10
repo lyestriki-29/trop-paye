@@ -1,0 +1,14 @@
+{
+  "dossier": {
+    "dpeHistory": [
+      { "class": "F", "date": "2021-06-01", "source": "ADEME_API", "numero": "2275E1234567A", "surfaceM2": 32 }
+    ],
+    "rentHistory": [
+      { "type": "INITIAL", "date": "2022-01-01", "rentCents": 85000, "source": "quittance" },
+      { "type": "REVISION", "date": "2023-09-01", "rentCents": 89000, "source": "quittance" }
+    ],
+    "surfaceM2": 32
+  },
+  "referentials": { "irl": [], "shieldRatePct": 3.5 },
+  "asOf": "2024-09-01"
+}

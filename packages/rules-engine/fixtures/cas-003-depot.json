@@ -1,0 +1,14 @@
+{
+  "dossier": {
+    "dpeHistory": [],
+    "rentHistory": [],
+    "deposit": {
+      "depositCents": 90000,
+      "monthlyRentCents": 75000,
+      "edlConforme": true,
+      "leaveDate": "2024-01-15"
+    }
+  },
+  "referentials": { "irl": [], "shieldRatePct": 3.5 },
+  "asOf": "2024-04-20"
+}

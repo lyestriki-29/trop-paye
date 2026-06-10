@@ -1,0 +1,22 @@
+{
+  "dossier": {
+    "dpeHistory": [
+      { "class": "D", "date": "2021-01-01", "source": "ADEME_API", "surfaceM2": 45 }
+    ],
+    "rentHistory": [
+      { "type": "INITIAL", "date": "2022-01-01", "rentCents": 70000, "source": "quittance" },
+      { "type": "REVISION", "date": "2024-09-01", "rentCents": 71000, "source": "quittance" }
+    ],
+    "revisionClause": true,
+    "revisionQuarter": "T2",
+    "surfaceM2": 45
+  },
+  "referentials": {
+    "irl": [
+      { "quarter": "2023-T2", "value": 135.0, "verified": false },
+      { "quarter": "2024-T2", "value": 140.0, "verified": false }
+    ],
+    "shieldRatePct": 3.5
+  },
+  "asOf": "2025-01-01"
+}
