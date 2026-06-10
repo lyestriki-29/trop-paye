@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "@troppaye/shared": ["./packages/shared/src/index.ts"],
+      "@troppaye/shared/*": ["./packages/shared/src/*"],
+      "@troppaye/rules-engine": ["./packages/rules-engine/src/index.ts"],
+      "@troppaye/rules-engine/*": ["./packages/rules-engine/src/*"]
+    }
+  }
+}

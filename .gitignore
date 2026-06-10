@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Builds
+.next/
+out/
+build/
+dist/
+.turbo/
+
+# Env & secrets — NE JAMAIS COMMITTER
+.env
+.env.*
+!.env.example
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Tests / coverage
+coverage/
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# Tooling
+.tokenade/

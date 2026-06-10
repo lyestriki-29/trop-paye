@@ -1,0 +1,25 @@
+{
+  "name": "troppaye",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @troppaye/web dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "verdict": "pnpm --filter @troppaye/rules-engine verdict",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > apps/web/lib/supabase/database.types.ts"
+  },
+  "devDependencies": {
+    "supabase": "^2.20.5",
+    "typescript": "^5.6.3"
+  }
+}
