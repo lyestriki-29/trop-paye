@@ -17,7 +17,7 @@ export function Stamp({
       viewBox="0 0 200 200"
       role="img"
       aria-label="Tampon Trop Payé"
-      className={className}
+      className={`text-stamp ${className ?? ""}`}
     >
       <defs>
         <filter id="tp-ink-rough" x="-10%" y="-10%" width="120%" height="120%">
@@ -34,7 +34,7 @@ export function Stamp({
       <g
         transform="rotate(-6 100 100)"
         fill="none"
-        stroke="#c8322b"
+        stroke="currentColor"
         filter="url(#tp-ink-rough)"
         opacity="0.92"
       >
@@ -48,7 +48,7 @@ export function Stamp({
           fontWeight="800"
           fontSize="33"
           letterSpacing="2"
-          fill="#c8322b"
+          fill="currentColor"
           stroke="none"
         >
           TROP
@@ -61,7 +61,7 @@ export function Stamp({
           fontWeight="800"
           fontSize="33"
           letterSpacing="2"
-          fill="#c8322b"
+          fill="currentColor"
           stroke="none"
         >
           PAYÉ
