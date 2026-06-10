@@ -1,0 +1,35 @@
+/* Thèmes du duel P0 — scopés, zéro impact hors /design-lab/directions. */
+
+.theme-d1 {
+  /* Hérite de :root (charte v1) — accent = rouge tampon. */
+}
+
+.theme-d2 {
+  /* « Relevé de compte » — data-fintech froide, preuve par les chiffres. */
+  --color-ink: 13 18 32; /* #0D1220 */
+  --color-paper: 255 255 255; /* #FFFFFF */
+  --color-paper-2: 245 247 250; /* #F5F7FA */
+  --color-refund: 0 179 116; /* #00B374 */
+  --color-refund-text: 0 115 74; /* #00734A */
+  --color-stamp: 229 72 77; /* #E5484D */
+  --color-line: 226 230 238; /* #E2E6EE */
+  --color-accent: 0 179 116; /* accent = le vert compteur */
+  --font-display: var(--font-d2-display);
+  --font-body: var(--font-d2-body);
+  --font-mono: var(--font-d2-mono);
+}
+
+.theme-d3 {
+  /* « De votre côté » — allié humain, chaleur maîtrisée. */
+  --color-ink: 42 33 24; /* #2A2118 */
+  --color-paper: 255 254 251; /* #FFFEFB */
+  --color-paper-2: 250 244 236; /* #FAF4EC */
+  --color-refund: 12 143 99; /* #0C8F63 */
+  --color-refund-text: 10 115 81; /* #0A7351 */
+  --color-stamp: 214 69 69; /* #D64545 */
+  --color-line: 234 225 214; /* #EAE1D6 */
+  --color-accent: 255 216 77; /* #FFD84D — le surligneur jaune */
+  --font-display: var(--font-d3-display);
+  --font-body: var(--font-d3-body);
+  /* mono : hérite de Spline Sans Mono (continuité des montants) */
+}
