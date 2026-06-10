@@ -5,8 +5,15 @@ export function shiftISO(
   opts: { years?: number; months?: number; days?: number },
 ): string {
   const d = new Date(iso.slice(0, 10) + "T00:00:00Z");
-  if (opts.years) d.setUTCFullYear(d.getUTCFullYear() + opts.years);
-  if (opts.months) d.setUTCMonth(d.getUTCMonth() + opts.months);
+  const monthDelta = (opts.months ?? 0) + (opts.years ?? 0) * 12;
+  if (monthDelta !== 0) {
+    // Décalage de mois SANS débordement : 31 janv. + 1 mois = 28/29 févr. (pas 2/3 mars).
+    const day = d.getUTCDate();
+    d.setUTCDate(1);
+    d.setUTCMonth(d.getUTCMonth() + monthDelta);
+    const lastDay = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+    d.setUTCDate(Math.min(day, lastDay));
+  }
   if (opts.days) d.setUTCDate(d.getUTCDate() + opts.days);
   return d.toISOString().slice(0, 10);
 }

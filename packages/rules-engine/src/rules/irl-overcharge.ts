@@ -19,8 +19,20 @@ const day = (iso: string): string => iso.slice(0, 10);
 const byDateAsc = (a: { date: string }, b: { date: string }): number =>
   a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
 
-function irlValue(ref: Referentials, year: number, q: string): IrlIndexEntry | undefined {
-  return ref.irl.find((e) => e.quarter === `${year}-${q}`);
+/**
+ * Dernier indice publié du trimestre de référence à une année donnée (ou avant).
+ * Évite d'utiliser un indice futur/non encore publié, et tolère un seed partiel.
+ * TODO_VERIFIER [AVOCAT] : règle exacte de l'indice applicable (calendrier de publication INSEE).
+ */
+function irlForYearOrBefore(ref: Referentials, year: number, q: string): IrlIndexEntry | undefined {
+  let best: IrlIndexEntry | undefined;
+  for (const e of ref.irl) {
+    const parts = e.quarter.split("-");
+    if (parts[1] !== q || parts[0] === undefined) continue;
+    const y = Number(parts[0]);
+    if (y <= year && (best === undefined || y > Number(best.quarter.split("-")[0]))) best = e;
+  }
+  return best;
 }
 
 export function evaluateIrlOvercharge(input: RuleInput): RuleResult {
@@ -83,8 +95,10 @@ export function evaluateIrlOvercharge(input: RuleInput): RuleResult {
       });
     }
     const yearN = Number(day(ev.date).slice(0, 4));
-    const irlN = irlValue(referentials, yearN, q);
-    const irlPrev = irlValue(referentials, yearN - 1, q);
+    const irlN = irlForYearOrBefore(referentials, yearN, q);
+    const irlPrev = irlN
+      ? irlForYearOrBefore(referentials, Number(irlN.quarter.split("-")[0]) - 1, q)
+      : undefined;
     if (!irlN || !irlPrev) {
       return base({ outcome: "INSUFFICIENT_DATA", confidence: "LOW", missingData: ["irl"] });
     }

@@ -154,8 +154,13 @@ export function evaluateDpeFreeze(input: RuleInput): RuleResult {
     future = Math.max(0, rentAt(rents, asOf) - firstHike.frozenCents);
   }
 
+  // Un DPE établi APRÈS la hausse ne qualifie que par inférence (le DPE opposable est
+  // celui en vigueur au moment des faits) → on ne dépasse pas MEDIUM. [AVOCAT]
+  const retroactiveDpe = day(firstHike.governing.date) > firstHike.date;
   const confidence =
-    firstHike.governing.source === "ADEME_API" && firstHike.source === "quittance"
+    !retroactiveDpe &&
+    firstHike.governing.source === "ADEME_API" &&
+    firstHike.source === "quittance"
       ? "HIGH"
       : "MEDIUM";
 
