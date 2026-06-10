@@ -40,17 +40,27 @@ export async function validateDossier(dossierId: string): Promise<AdminResult> {
     .order("computed_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (verdict?.confidence === "LOW") {
+  if (!verdict) return { error: "Aucun verdict calculé pour ce dossier." };
+  if (verdict.confidence === "LOW") {
     return { error: "Confiance LOW : validation bloquée tant que le dossier n'est pas consolidé." };
   }
 
   assertTransition("IN_REVIEW", "RECOVERY");
-  await admin.from("dossiers").update({ status: "RECOVERY", recovery_state: "SCHEDULED" }).eq("id", dossierId);
+  // Transition atomique : seul le premier appel concurrent passe (évite la double planification).
+  const { data: claimed } = await admin
+    .from("dossiers")
+    .update({ status: "RECOVERY", recovery_state: "SCHEDULED" })
+    .eq("id", dossierId)
+    .eq("status", "IN_REVIEW")
+    .select("id")
+    .maybeSingle();
+  if (!claimed) return { error: "Dossier déjà traité." };
 
   const j0 = new Date().toISOString().slice(0, 10);
-  await admin
+  const { error: actErr } = await admin
     .from("actions")
     .insert(actionScheduleFor(j0).map((s) => ({ dossier_id: dossierId, type: s.type, scheduled_at: s.scheduled_at })));
+  if (actErr) return { error: "Impossible de planifier la séquence de relance." };
 
   refresh(dossierId);
   return { ok: true };
@@ -136,6 +146,18 @@ export async function recordPayment(dossierId: string, amountCents: number): Pro
   }
 
   const admin = getSupabaseAdmin();
+  // On verrouille d'abord la transition vers WON de façon ATOMIQUE : un seul appel concurrent
+  // gagne, ce qui empêche le double encaissement / double reversement.
+  assertTransition(status, "WON");
+  const { data: claimed } = await admin
+    .from("dossiers")
+    .update({ status: "WON", recovery_state: "LOCKED" })
+    .eq("id", dossierId)
+    .in("status", ["RECOVERY", "ESCALATED"])
+    .select("id")
+    .maybeSingle();
+  if (!claimed) return { error: "Dossier déjà clôturé (paiement déjà enregistré ?)." };
+
   const { data: mandate } = await admin
     .from("mandates")
     .select("fee_rate_bps")
@@ -149,18 +171,17 @@ export async function recordPayment(dossierId: string, amountCents: number): Pro
   const incoming = await payment.recordIncoming(dossierId, amountCents);
   const out = await payment.payout(dossierId, tenant);
 
-  await admin.from("fund_movements").insert([
+  const { error: fErr } = await admin.from("fund_movements").insert([
     { dossier_id: dossierId, direction: "IN", amount_cents: amountCents, reference: incoming.reference },
     { dossier_id: dossierId, direction: "OUT_FEE", amount_cents: fee, reference: incoming.reference },
     { dossier_id: dossierId, direction: "OUT_TENANT", amount_cents: tenant, reference: out.reference },
   ]);
-  await admin.from("actions").insert([
+  const { error: aErr } = await admin.from("actions").insert([
     { dossier_id: dossierId, type: "PAYMENT_RECEIVED", executed_at: new Date().toISOString() },
     { dossier_id: dossierId, type: "PAYOUT_SENT", executed_at: new Date().toISOString() },
   ]);
+  if (fErr || aErr) return { error: "Encaissement enregistré partiellement — à vérifier." };
 
-  assertTransition(status, "WON");
-  await admin.from("dossiers").update({ status: "WON", recovery_state: "LOCKED" }).eq("id", dossierId);
   refresh(dossierId);
   return { ok: true };
 }

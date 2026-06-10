@@ -15,6 +15,8 @@ import { queueEmail } from "@/lib/notify";
 
 const MAX_PIECE_BYTES = 10 * 1024 * 1024;
 const PIECE_KINDS = ["bail", "quittance", "dpe", "edl", "rib", "autre"] as const;
+const FEE_RATE_BPS = 2500; // 25 % — source unique du barème (figé dans le PDF à la signature)
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export type ActionResult = { ok: true } | { error: string };
 
@@ -35,6 +37,14 @@ export const signMandate = withAuth(signSchema, async (input, { user }): Promise
   if (!dossier || dossier.user_id !== user.id) return { error: "Dossier introuvable." };
   if (dossier.status !== "DIAGNOSED") return { error: "Le mandat ne peut pas être signé à cette étape." };
 
+  // Garde anti double-signature (back-button / rejeu) : un mandat déjà signé n'est pas réécrit.
+  const { data: existing } = await admin
+    .from("mandates")
+    .select("status")
+    .eq("dossier_id", input.dossierId)
+    .maybeSingle();
+  if (existing?.status === "SIGNED") return { error: "Ce mandat est déjà signé." };
+
   const { data: verdict } = await admin
     .from("verdicts")
     .select("total_recoverable_cents")
@@ -50,7 +60,7 @@ export const signMandate = withAuth(signSchema, async (input, { user }): Promise
     tenantName: input.signerName,
     tenantAddress: dossier.address_label ?? "—",
     recoverableAmount: formatEur(verdict?.total_recoverable_cents ?? 0),
-    feeRatePct: "25",
+    feeRatePct: String(FEE_RATE_BPS / 100),
   });
   const pdf = await renderLegalPdf(markdown);
 
@@ -71,14 +81,15 @@ export const signMandate = withAuth(signSchema, async (input, { user }): Promise
   const { data: mandate, error: mErr } = await admin
     .from("mandates")
     .upsert(
-      { dossier_id: input.dossierId, status: "SIGNED", fee_rate_bps: 2500, signed_at: consentedAt, pdf_url: path },
+      { dossier_id: input.dossierId, status: "SIGNED", fee_rate_bps: FEE_RATE_BPS, signed_at: consentedAt, pdf_url: path },
       { onConflict: "dossier_id" },
     )
     .select("id")
     .single();
   if (mErr || !mandate) return { error: "Échec de l'enregistrement du mandat." };
 
-  await admin.from("signature_proofs").insert({
+  // La preuve est indispensable (valeur juridique) : si elle échoue, on ne transitionne pas.
+  const { error: proofErr } = await admin.from("signature_proofs").insert({
     dossier_id: input.dossierId,
     mandate_id: mandate.id,
     signer_name: proof.signerName,
@@ -88,6 +99,7 @@ export const signMandate = withAuth(signSchema, async (input, { user }): Promise
     user_agent: proof.userAgent ?? null,
     consented_at: proof.consentedAt,
   });
+  if (proofErr) return { error: "Impossible d'enregistrer la preuve de signature." };
 
   assertTransition(dossier.status as DossierStatus, "MANDATE_PENDING");
   await admin.from("dossiers").update({ status: "MANDATE_PENDING" }).eq("id", input.dossierId);
@@ -112,6 +124,7 @@ export async function uploadPiece(formData: FormData): Promise<ActionResult> {
   const dossierId = String(formData.get("dossierId") ?? "");
   const kind = String(formData.get("kind") ?? "");
   const file = formData.get("file");
+  if (!UUID_RE.test(dossierId)) return { error: "Dossier invalide." };
   if (!PIECE_KINDS.includes(kind as (typeof PIECE_KINDS)[number])) return { error: "Type de pièce invalide." };
   if (!(file instanceof File)) return { error: "Fichier manquant." };
 
@@ -133,13 +146,18 @@ export async function uploadPiece(formData: FormData): Promise<ActionResult> {
     .upload(path, encryptBytes(bytes), { contentType: "application/octet-stream" });
   if (upErr) return { error: "Échec de l'upload." };
 
-  await admin.from("pieces").insert({
+  const { error: pieceErr } = await admin.from("pieces").insert({
     dossier_id: dossierId,
     kind,
     storage_path: path,
     status: "RECEIVED",
     encrypted: true,
   });
+  // L'objet est déjà en storage : si la ligne échoue, on nettoie pour éviter un orphelin.
+  if (pieceErr) {
+    await admin.storage.from("pieces").remove([path]);
+    return { error: "Impossible d'enregistrer la pièce." };
+  }
 
   await maybeAdvanceToReview(dossierId, dossier.status as DossierStatus, user.email ?? null);
   revalidatePath(`/mandat/${dossierId}`);

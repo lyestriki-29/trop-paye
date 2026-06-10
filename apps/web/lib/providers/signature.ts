@@ -1,4 +1,4 @@
-import { sha256Hex, signatureHmac } from "@/lib/crypto";
+import { safeEqual, sha256Hex, signatureHmac } from "@/lib/crypto";
 
 /**
  * Port de signature. V1 = implémentation MAISON (eIDAS « simple » / SES) :
@@ -48,4 +48,22 @@ class HouseSignatureProvider implements SignatureProvider {
 
 export function getSignatureProvider(): SignatureProvider {
   return new HouseSignatureProvider();
+}
+
+/**
+ * Vérifie l'intégrité d'une preuve stockée : recalcule le HMAC depuis ses champs et le
+ * compare (temps constant). Détecte toute altération (signataire, empreinte, instant).
+ */
+export function verifySignatureProof(proof: {
+  documentHash: string;
+  signerName: string;
+  consentedAt: string;
+  proofHmac: string;
+}): boolean {
+  const payload = JSON.stringify({
+    documentHash: proof.documentHash,
+    signerName: proof.signerName,
+    consentedAt: proof.consentedAt,
+  });
+  return safeEqual(signatureHmac(payload), proof.proofHmac);
 }

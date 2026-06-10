@@ -58,16 +58,8 @@ async function executeOne(action: DueAction, nowISO: string): Promise<boolean> {
   if (!template) return false; // non un courrier planifié (event admin)
 
   const admin = getSupabaseAdmin();
-  const { data: dossier } = await admin
-    .from("dossiers")
-    .select("id, user_id, status, recovery_state, address_label")
-    .eq("id", action.dossier_id)
-    .single();
-  if (!dossier) return false;
-  // Garde-fou n°1 : aucune relance si la séquence est en pause ou verrouillée.
-  if (dossier.recovery_state !== "SCHEDULED" || dossier.status !== "RECOVERY") return false;
 
-  // Claim atomique : seul le premier passage exécute (évite le double envoi).
+  // 1) Claim atomique de l'action : seul le premier passage l'exécute (évite le double envoi).
   const { data: claimed } = await admin
     .from("actions")
     .update({ executed_at: nowISO })
@@ -76,6 +68,18 @@ async function executeOne(action: DueAction, nowISO: string): Promise<boolean> {
     .select("id")
     .maybeSingle();
   if (!claimed) return false;
+
+  // 2) Garde-fou n°1 RE-LU APRÈS le claim (atomicité du verrou) : si la séquence a été mise en
+  //    pause/verrou entre-temps, on annule le claim et on n'envoie RIEN (l'envoi LRE est irrévocable).
+  const { data: dossier } = await admin
+    .from("dossiers")
+    .select("user_id, status, recovery_state, address_label")
+    .eq("id", action.dossier_id)
+    .single();
+  if (!dossier || dossier.recovery_state !== "SCHEDULED" || dossier.status !== "RECOVERY") {
+    await admin.from("actions").update({ executed_at: null }).eq("id", action.id);
+    return false;
+  }
 
   const { data: verdict } = await admin
     .from("verdicts")
@@ -104,13 +108,18 @@ async function executeOne(action: DueAction, nowISO: string): Promise<boolean> {
 
   await admin.from("actions").update({ payload: { lreRef: receipt.ref } }).eq("id", action.id);
 
-  await queueEmail({
-    dossierId: action.dossier_id,
-    toEmail: await resolveEmail(dossier.user_id),
-    subject: "Avancement de votre dossier TropPayé",
-    body: `Un courrier (${action.type}) a été adressé au bailleur.\n\n${body}`,
-    template: action.type,
-  });
+  // Notification non bloquante : la LRE est déjà partie, un échec d'outbox ne doit pas l'invalider.
+  try {
+    await queueEmail({
+      dossierId: action.dossier_id,
+      toEmail: await resolveEmail(dossier.user_id),
+      subject: "Avancement de votre dossier TropPayé",
+      body: `Un courrier (${action.type}) a été adressé au bailleur.\n\n${body}`,
+      template: action.type,
+    });
+  } catch {
+    /* outbox best-effort */
+  }
 
   return true;
 }

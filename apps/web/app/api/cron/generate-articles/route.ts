@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
 import { getLLMProvider } from "@/lib/content/llm";
 import { env } from "@/lib/env";
+import { safeEqual } from "@/lib/crypto";
 
 /** Cibles SEO par défaut (planifiable : 1 appel/semaine via /schedule). */
 const TARGETS = [
@@ -16,7 +17,7 @@ const TARGETS = [
  * Protégé par CRON_SECRET. Mode mock tant qu'aucune clé Anthropic n'est fournie.
  */
 export async function POST(request: Request) {
-  if (request.headers.get("x-cron-secret") !== env.CRON_SECRET) {
+  if (!safeEqual(request.headers.get("x-cron-secret"), env.CRON_SECRET)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

@@ -23,12 +23,16 @@ export async function claimDossierForUser(dossierId: string, userId: string): Pr
 
   const token = await getSessionToken();
   if (token && data.session_token && data.session_token === token) {
-    await admin
+    // Claim atomique : on ne retourne "claimed" QUE si l'UPDATE a réellement modifié la ligne
+    // (sinon une requête concurrente l'a déjà réclamée entre le SELECT et l'UPDATE).
+    const { data: updated } = await admin
       .from("dossiers")
       .update({ user_id: userId, session_token: null })
       .eq("id", dossierId)
-      .is("user_id", null);
-    return "claimed";
+      .is("user_id", null)
+      .select("id")
+      .maybeSingle();
+    return updated ? "claimed" : "forbidden";
   }
   return "forbidden";
 }

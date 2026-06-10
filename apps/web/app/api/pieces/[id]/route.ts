@@ -20,29 +20,46 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .from("pieces")
     .select("storage_path, kind, dossier_id, encrypted")
     .eq("id", id)
-    .single();
+    .maybeSingle();
   if (!piece || !piece.storage_path) return new NextResponse("Introuvable", { status: 404 });
 
   const { data: dossier } = await admin
     .from("dossiers")
     .select("user_id")
     .eq("id", piece.dossier_id)
-    .single();
+    .maybeSingle();
 
-  if (!dossier || dossier.user_id !== userId) {
-    const { data: prof } = await admin.from("profiles").select("role").eq("id", userId).single();
+  const isOwner = dossier?.user_id === userId;
+  if (!isOwner) {
+    const { data: prof } = await admin.from("profiles").select("role").eq("id", userId).maybeSingle();
     if (prof?.role !== "admin") return new NextResponse("Introuvable", { status: 404 });
+    // Traçabilité RGPD : un admin consulte la pièce d'un dossier qui n'est pas le sien.
+    await admin.from("access_logs").insert({
+      dossier_id: piece.dossier_id,
+      actor_id: userId,
+      action: "admin_view_piece",
+    });
   }
 
   const { data: blob, error } = await admin.storage.from("pieces").download(piece.storage_path);
   if (error || !blob) return new NextResponse("Introuvable", { status: 404 });
 
-  const cipher = Buffer.from(await blob.arrayBuffer());
-  const plain = piece.encrypted ? decryptBytes(cipher) : cipher;
+  let plain: Buffer;
+  try {
+    const cipher = Buffer.from(await blob.arrayBuffer());
+    plain = piece.encrypted ? decryptBytes(cipher) : cipher;
+  } catch {
+    return new NextResponse("Document illisible", { status: 422 });
+  }
+  // Contenu UPLOADÉ par l'utilisateur : on force le téléchargement (jamais de rendu inline)
+  // + anti-sniffing + sandbox, pour neutraliser tout XSS stocké (ex. HTML déguisé en pièce).
+  const safeName = (piece.kind || "piece").replace(/[^a-z0-9_-]/gi, "");
   return new NextResponse(new Uint8Array(plain), {
     headers: {
       "Content-Type": "application/octet-stream",
-      "Content-Disposition": `inline; filename="${piece.kind}"`,
+      "Content-Disposition": `attachment; filename="${safeName}"`,
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "sandbox",
     },
   });
 }

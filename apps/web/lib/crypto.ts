@@ -1,4 +1,11 @@
-import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from "node:crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  createHmac,
+  randomBytes,
+  timingSafeEqual,
+} from "node:crypto";
 import { env } from "@/lib/env";
 
 /**
@@ -43,4 +50,12 @@ export function sha256Hex(buf: Buffer): string {
 /** Preuve d'intégrité de la signature : HMAC(SIGNATURE_SECRET, payload). */
 export function signatureHmac(payload: string): string {
   return createHmac("sha256", env.SIGNATURE_SECRET).update(payload).digest("hex");
+}
+
+/** Comparaison de secrets à temps constant (anti-timing). false si longueurs différentes. */
+export function safeEqual(candidate: string | null | undefined, secret: string): boolean {
+  if (!candidate) return false;
+  const a = Buffer.from(candidate);
+  const b = Buffer.from(secret);
+  return a.length === b.length && timingSafeEqual(a, b);
 }

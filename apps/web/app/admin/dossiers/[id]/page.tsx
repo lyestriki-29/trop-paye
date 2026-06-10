@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDossierAdmin } from "@/lib/admin/read";
+import { verifySignatureProof } from "@/lib/providers/signature";
 import { Amount } from "@/components/Amount";
 import { RuleCard } from "@/app/diagnostic/[verdictId]/RuleCard";
 import { frenchDate } from "@/lib/format-date";
@@ -13,6 +14,14 @@ export default async function AdminDossierPage({ params }: { params: Promise<{ i
   const detail = await getDossierAdmin(id);
   if (!detail) notFound();
   const { dossier, verdict, mandate, proof, pieces, actions, messages, funds } = detail;
+  const proofValid = proof
+    ? verifySignatureProof({
+        documentHash: proof.document_hash,
+        signerName: proof.signer_name,
+        consentedAt: proof.consented_at,
+        proofHmac: proof.proof_hmac,
+      })
+    : false;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -54,7 +63,16 @@ export default async function AdminDossierPage({ params }: { params: Promise<{ i
 
         {proof ? (
           <section className="mt-6 rounded-card border border-line bg-paper p-4 text-sm">
-            <h2 className="font-bold">Preuve de signature</h2>
+            <h2 className="flex items-center gap-2 font-bold">
+              Preuve de signature
+              <span
+                className={`rounded-badge px-2 py-0.5 text-xs ${
+                  proofValid ? "bg-refund/12 text-refund-text" : "bg-stamp/10 text-stamp"
+                }`}
+              >
+                {proofValid ? "intègre ✓" : "altérée"}
+              </span>
+            </h2>
             <dl className="mt-2 space-y-1 text-ink/70">
               <div className="flex justify-between gap-4">
                 <dt>Signataire</dt>
