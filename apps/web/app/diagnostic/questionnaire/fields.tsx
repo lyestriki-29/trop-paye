@@ -1,10 +1,12 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
+import { Field } from "@/components/ui/Field";
 
-const FIELD_CLASS =
-  "mt-1 w-full rounded-field border border-line bg-paper px-4 py-3 outline-none focus:border-ink focus:ring-2 focus:ring-ink/15";
-
+/**
+ * Enveloppe label/aide conservée pour l'autocomplete d'adresse (combobox, T3).
+ * Les champs simples du tunnel passent par `Field` P1 (label flottant) ci-dessous.
+ */
 export function FieldShell({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="block">
@@ -20,29 +22,29 @@ export function TextField({
   hint,
   value,
   onChange,
-  placeholder,
-  type = "text",
   inputMode,
+  mono = false,
 }: {
   label: string;
   hint?: string;
   value: string;
   onChange: (v: string) => void;
-  placeholder?: string;
-  type?: string;
   inputMode?: "text" | "numeric" | "decimal";
+  /** Valeur en mono `tabular` (numéros, références, valeurs chiffrées). */
+  mono?: boolean;
 }) {
+  const id = useId();
   return (
-    <FieldShell label={label} hint={hint}>
-      <input
-        type={type}
-        inputMode={inputMode}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={FIELD_CLASS}
-      />
-    </FieldShell>
+    <Field
+      id={id}
+      label={label}
+      hint={hint}
+      type="text"
+      inputMode={inputMode}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      inputClassName={mono ? "font-mono tabular" : undefined}
+    />
   );
 }
 
@@ -58,28 +60,54 @@ export function MoneyField({
   cents?: number;
   onChange: (cents: number | undefined) => void;
 }) {
+  const id = useId();
   const value = cents === undefined ? "" : (cents / 100).toString();
   return (
-    <FieldShell label={label} hint={hint}>
-      <div className="relative">
-        <input
-          type="text"
-          inputMode="decimal"
-          value={value}
-          onChange={(e) => {
-            const raw = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "");
-            if (raw === "") return onChange(undefined);
-            const euros = Number.parseFloat(raw);
-            onChange(Number.isFinite(euros) ? Math.round(euros * 100) : undefined);
-          }}
-          placeholder="0"
-          className={`${FIELD_CLASS} pr-9 font-mono tabular`}
-        />
-        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 font-mono text-ink/50">
-          €
-        </span>
-      </div>
-    </FieldShell>
+    <Field
+      id={id}
+      label={label}
+      hint={hint}
+      type="text"
+      inputMode="decimal"
+      value={value}
+      onChange={(e) => {
+        const raw = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "");
+        if (raw === "") return onChange(undefined);
+        const euros = Number.parseFloat(raw);
+        onChange(Number.isFinite(euros) ? Math.round(euros * 100) : undefined);
+      }}
+      suffix="€"
+      inputClassName="font-mono tabular"
+    />
+  );
+}
+
+/** Saisie de date ISO (AAAA-MM-JJ) sur `Field` P1 — label flottant figé en haut. */
+export function DateField({
+  label,
+  hint,
+  value,
+  onChange,
+  max,
+}: {
+  label: string;
+  hint?: string;
+  value: string;
+  onChange: (v: string) => void;
+  max?: string;
+}) {
+  const id = useId();
+  return (
+    <Field
+      id={id}
+      label={label}
+      hint={hint}
+      type="date"
+      value={value}
+      max={max}
+      onChange={(e) => onChange(e.target.value)}
+      inputClassName="font-mono tabular"
+    />
   );
 }
 
@@ -88,7 +116,7 @@ export interface Choice<T extends string> {
   label: string;
 }
 
-/** Groupe de boutons radio (oui / non / je ne sais pas…). */
+/** Groupe de boutons radio en pilules v2 (oui / non / je ne sais pas…). */
 export function ChoiceField<T extends string>({
   label,
   hint,
@@ -105,7 +133,7 @@ export function ChoiceField<T extends string>({
   return (
     <fieldset>
       <legend className="text-sm font-medium text-ink/80">{label}</legend>
-      <div className="mt-2 flex flex-wrap gap-2">
+      <div className="mt-2.5 flex flex-wrap gap-2">
         {choices.map((c) => {
           const active = c.value === value;
           return (
@@ -114,10 +142,10 @@ export function ChoiceField<T extends string>({
               type="button"
               onClick={() => onChange(c.value)}
               aria-pressed={active}
-              className={`rounded-field border px-4 py-2.5 text-sm transition-colors ${
+              className={`rounded-badge border px-5 py-2.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 ${
                 active
-                  ? "border-ink bg-ink text-paper"
-                  : "border-line bg-paper text-ink/80 hover:border-ink/40"
+                  ? "border-ink bg-ink text-paper shadow-sm"
+                  : "border-line bg-paper text-ink/80 hover:border-ink/40 hover:shadow-sm"
               }`}
             >
               {c.label}
@@ -125,7 +153,7 @@ export function ChoiceField<T extends string>({
           );
         })}
       </div>
-      {hint ? <p className="mt-1 text-xs text-ink/50">{hint}</p> : null}
+      {hint ? <p className="mt-1.5 text-xs text-ink/50">{hint}</p> : null}
     </fieldset>
   );
 }

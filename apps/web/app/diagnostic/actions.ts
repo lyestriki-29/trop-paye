@@ -4,35 +4,36 @@ import { cookies } from "next/headers";
 import { evaluateAll } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
-import { completeAddress, type AddressSuggestion } from "@/lib/providers/geo";
-import { dpeByAddress, dpeByNumber, type DpeResult } from "@/lib/providers/dpe";
+import { completeAddress, type AddressSearchResult } from "@/lib/providers/geo";
+import { dpeByAddress, dpeByNumber, type DpeLookupResult } from "@/lib/providers/dpe";
 import { getReferentials } from "@/lib/referentials";
 import { diagnosticSchema, toSnapshot } from "@/lib/diagnostic/schema";
 import { SESSION_COOKIE } from "@/lib/diagnostic/session";
 
-export async function searchAddressAction(query: string): Promise<AddressSuggestion[]> {
+// Échec fournisseur (`ok: false`) ≠ zéro résultat : l'UI bascule en saisie manuelle.
+export async function searchAddressAction(query: string): Promise<AddressSearchResult> {
   // Garde-fou anti-abus : trop court = bruit, trop long = requête forgée. On ne propage pas.
   const q = query.trim();
-  if (q.length < 3 || q.length > 200) return [];
+  if (q.length < 3 || q.length > 200) return { ok: true, suggestions: [] };
   return completeAddress(q);
 }
 
+// Même mécanique : échec ADEME (`ok: false`) ≠ DPE introuvable (`results: []`).
 export async function lookupDpeAction(input: {
   numero?: string;
   label?: string;
-}): Promise<DpeResult[]> {
+}): Promise<DpeLookupResult> {
   if (input.numero) {
     const numero = input.numero.trim();
-    if (numero.length === 0 || numero.length > 64) return [];
-    const d = await dpeByNumber(numero);
-    return d ? [d] : [];
+    if (numero.length === 0 || numero.length > 64) return { ok: true, results: [] };
+    return dpeByNumber(numero);
   }
   if (input.label) {
     const label = input.label.trim();
-    if (label.length < 3 || label.length > 200) return [];
+    if (label.length < 3 || label.length > 200) return { ok: true, results: [] };
     return dpeByAddress(label);
   }
-  return [];
+  return { ok: true, results: [] };
 }
 
 export type SubmitResult = { verdictId: string } | { error: string };

@@ -16,12 +16,15 @@ export function AddressAutocomplete({
   onSelect,
   appearance = "form",
   placeholder,
+  onProviderError,
 }: {
   value?: AddressSuggestion;
   onSelect: (a: AddressSuggestion) => void;
   /** Apparence uniquement — la logique (débounce, anti-réponse-périmée) est identique. */
   appearance?: "form" | "hero";
   placeholder?: string;
+  /** Échec Géoplateforme IGN (réseau/5xx) ≠ zéro résultat — déclenche la saisie manuelle (Task 4). */
+  onProviderError?: () => void;
 }) {
   const [query, setQuery] = useState(value?.label ?? "");
   const [results, setResults] = useState<AddressSuggestion[]>([]);
@@ -44,12 +47,18 @@ export function AddressAutocomplete({
     const timer = setTimeout(async () => {
       const r = await searchAddressAction(q);
       if (id !== seq.current) return; // réponse périmée
-      setResults(r);
-      setOpen(true);
       setLoading(false);
+      if (!r.ok) {
+        setResults([]);
+        setOpen(false);
+        onProviderError?.();
+        return;
+      }
+      setResults(r.suggestions);
+      setOpen(true);
     }, 250);
     return () => clearTimeout(timer);
-  }, [query, value?.label]);
+  }, [query, value?.label, onProviderError]);
 
   const field = (
     <div className="relative">
@@ -71,8 +80,8 @@ export function AddressAutocomplete({
         onKeyDown={(e) => {
           if (e.key === "Escape") setOpen(false);
         }}
-        // Copy deck §2 — placeholder de l'étape adresse.
-        placeholder={placeholder ?? (hero ? "12 rue de la République, Lyon" : "12 rue des Lilas, 75011 Paris")}
+        // Copy deck §2 — placeholder de l'étape adresse (hero ET formulaire).
+        placeholder={placeholder ?? "12 rue de la République, Lyon"}
         className={hero ? HERO_CLASS : FIELD_CLASS}
       />
       {loading ? (
