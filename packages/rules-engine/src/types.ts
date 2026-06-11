@@ -3,7 +3,15 @@
 export type DpeClass = "A" | "B" | "C" | "D" | "E" | "F" | "G";
 export type Confidence = "HIGH" | "MEDIUM" | "LOW";
 export type Outcome = "IRREGULAR" | "COMPLIANT" | "INSUFFICIENT_DATA";
-export type RuleId = "DPE_FREEZE" | "IRL_OVERCHARGE" | "DEPOSIT_LATE" | "DEPOSIT_CAP";
+export type RuleId =
+  | "DPE_FREEZE"
+  | "IRL_OVERCHARGE"
+  | "DEPOSIT_LATE"
+  | "DEPOSIT_CAP"
+  | "AGENCY_FEES_CAP";
+
+/** Zone d'encadrement des honoraires de location (décret ALUR). */
+export type AgencyZone = "TRES_TENDUE" | "TENDUE" | "RESTE";
 
 export type DpeSource = "ADEME_API" | "USER_INPUT" | "DOCUMENT";
 export type RentEventType =
@@ -74,6 +82,12 @@ export interface DossierSnapshot {
   rentReconstructedFromShare?: boolean;
   previousTenantRentCents?: number;
   deposit?: DepositInput;
+  /** Booster honoraires d'agence (LOT 2) : location passée par une agence. */
+  agencyUsed?: boolean;
+  /** Part locataire des honoraires d'agence payés à l'entrée (centimes). */
+  agencyFeesPaidCents?: number;
+  /** État des lieux facturé séparément, le cas échéant (centimes). */
+  edlFeesPaidCents?: number;
   /**
    * Montant du dépôt de garantie versé (étape 5, LOT 1) → règle DEPOSIT_CAP
    * (plafond 1 mois HC vide / 2 mois meublé). Absent = « je ne sais pas / pas de
@@ -89,10 +103,27 @@ export interface IrlIndexEntry {
   verified: boolean;
 }
 
+/** Plafonds d'honoraires (part locataire) par m², pour une zone donnée. */
+export interface AgencyFeeCap {
+  /** Visite + constitution du dossier + rédaction du bail, par m². */
+  feePerM2Cents: number;
+  /** État des lieux d'entrée, plafond distinct par m². */
+  edlPerM2Cents: number;
+}
+
+/** Référentiel honoraires d'agence (injecté, valeurs TODO_VERIFIER). */
+export interface AgencyFeeReferential {
+  capsByZone: Record<AgencyZone, AgencyFeeCap>;
+  /** Code INSEE → zone. Vide tant que le dataset des zones n'est pas chargé. */
+  zoneByInsee: Record<string, AgencyZone>;
+}
+
 export interface Referentials {
   irl: IrlIndexEntry[];
   /** Bouclier loyer : plafond de variation (métropole 3,5 %). */
   shieldRatePct: number;
+  /** Plafonds + zonage des honoraires d'agence (LOT 2). Absent = règle inerte. */
+  agencyFees?: AgencyFeeReferential;
 }
 
 export interface RuleInput {

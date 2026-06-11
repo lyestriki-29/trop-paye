@@ -9,6 +9,7 @@ export const RULE_LABEL: Record<RuleId, string> = {
   IRL_OVERCHARGE: "Révision IRL",
   DEPOSIT_LATE: "Dépôt de garantie",
   DEPOSIT_CAP: "Dépôt de garantie (plafond)",
+  AGENCY_FEES_CAP: "Honoraires d'agence (plafond)",
 };
 
 /** Niveau de confiance, en clair. */

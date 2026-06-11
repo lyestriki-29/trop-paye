@@ -13,6 +13,7 @@ import { evaluateDpeFreeze } from "./rules/dpe-freeze";
 import { evaluateIrlOvercharge } from "./rules/irl-overcharge";
 import { evaluateDepositLate } from "./rules/deposit-late";
 import { evaluateDepositCap } from "./rules/deposit-cap";
+import { evaluateAgencyFeesCap } from "./rules/agency-fees-cap";
 
 /** Classe DPE en vigueur à la date d'évaluation (la plus récente ≤ asOf). */
 export function latestDpeClassAt(input: RuleInput): DpeClass | undefined {
@@ -148,6 +149,14 @@ export const CASE_REGISTRY: CaseDefinition[] = [
     // par défaut → faux positif sur un meublé. Clé manquante = cas non évalué.
     requiredInputs: ["depositPaidCents", "furnished"],
     evaluate: evaluateDepositCap,
+  },
+  {
+    id: "AGENCY_FEES_CAP",
+    legalBasisStatus: "TODO_VERIFIER",
+    detectability: "COMPUTED",
+    prescriptionWindowYears: 3,
+    requiredInputs: ["agencyFeesPaidCents"],
+    evaluate: evaluateAgencyFeesCap,
   },
   decenceCase,
   complementCase,

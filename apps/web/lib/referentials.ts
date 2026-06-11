@@ -15,5 +15,20 @@ export async function getReferentials(): Promise<Referentials> {
 
   // TODO_VERIFIER [AVOCAT] : bouclier loyer = 3,5 % (métropole, T3-2022→T1-2024).
   // Valeur codée en dur — à confirmer à sa source officielle (loi pouvoir d'achat 2022).
-  return { irl, shieldRatePct: 3.5 };
+  return {
+    irl,
+    shieldRatePct: 3.5,
+    // TODO_VERIFIER [AVOCAT] : plafonds honoraires (décret 2014-890) = 12/10/8 €/m²
+    // selon zone + 3 €/m² état des lieux. Valeurs à confirmer à la source.
+    // zoneByInsee VIDE : tant que le dataset des zones tendues n'est pas chargé,
+    // la règle AGENCY_FEES_CAP reste inerte (aucun chiffrage hasardeux). TODO_VERIFIER.
+    agencyFees: {
+      capsByZone: {
+        TRES_TENDUE: { feePerM2Cents: 1200, edlPerM2Cents: 300 },
+        TENDUE: { feePerM2Cents: 1000, edlPerM2Cents: 300 },
+        RESTE: { feePerM2Cents: 800, edlPerM2Cents: 300 },
+      },
+      zoneByInsee: {},
+    },
+  };
 }
