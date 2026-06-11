@@ -180,3 +180,60 @@ Les boutons disent ce qui se passe (« Récupérer mes 1 437 € », pas
 culpabiliser. Jamais de promesse de résultat (« récupérable »,
 « estimation », jamais « vous allez toucher »). Le fun reste sur les
 réseaux ; ici, on est précis, calme, et de votre côté.
+
+## 7. Page « Notre histoire » + injections du récit fondateur
+
+### ⚠️ SQUELETTE À REMPLIR PAR LYES — chaque `TODO_COPY` bloque le build de prod
+### (scripts/check-copy.mjs). Une fois remplie, aligner mot pour mot
+### apps/web/lib/content/notre-histoire.ts. Garde-fous : Nicolas = « expert de
+### la location » UNIQUEMENT (jamais juriste/expert juridique) ; aucune mention
+### « validé par avocat » hors flag legalReviewDone.
+
+**SEO**
+- seo.title : TODO_COPY
+- seo.description : TODO_COPY
+
+**§1 Hero « cas zéro »** (chiffres réels actés 2026-06-11 : loyer 900,00 € HC,
+complément de loyer 120,00 €/mois, logement classé F — éditables ici)
+- hero.kicker : TODO_COPY
+- hero.title : TODO_COPY
+- hero.intro : TODO_COPY
+- casZero.meta (ligne mono sous l'en-tête de la quittance, non-PII) : TODO_COPY
+
+**§2 Récit du duo** (deux voix en alternance)
+- duo.title : TODO_COPY
+- duo.founder.role (affiché sous « Lyes ») : TODO_COPY
+- duo.founder.photoAlt : TODO_COPY
+- duo.founder.p1 / p2 : TODO_COPY
+- duo.nicolas.photoAlt : TODO_COPY
+- duo.nicolas.p1 / p2 : TODO_COPY
+  (le rôle affiché de Nicolas est figé : « Expert de la location »)
+
+**§3 La bascule**
+- bascule.title : TODO_COPY
+- bascule.p1 / p2 : TODO_COPY
+
+**§4 La méthode** (mentions type document officiel : 4 paires libellé → valeur)
+- methode.title / methode.intro : TODO_COPY
+- methode.m1..m4 (label + value) : TODO_COPY
+
+**§5 Preuve sociale**
+- preuve.title : TODO_COPY
+- preuve.emptyState (imposé par la spec) : « Premier dossier en cours : le nôtre. »
+
+**§6 CTA**
+- cta.title : TODO_COPY (le bouton réutilise le CTA du deck §1)
+
+**Phrase avocat** (rendue uniquement si legalReviewDone=true)
+- legalReviewLine : TODO_COPY
+
+**JSON-LD**
+- jsonLd.founderJobTitle : TODO_COPY (ne pas inventer)
+- jsonLd.nicolasName (nom complet) : TODO_COPY
+- jsonLd.nicolasJobTitle : TODO_COPY (jamais « juriste »)
+
+**Injections**
+- storyTeaser.l1/l2/l3 (3 lignes, homepage) + storyTeaser.linkLabel : TODO_COPY
+- reviewer.phrase (tunnel mandat, étape signature) + reviewer.photoAlt : TODO_COPY
+- verdictStoryLine (une ligne, verdict positif uniquement) : TODO_COPY
+- footerSignature (signature courte du footer) : TODO_COPY

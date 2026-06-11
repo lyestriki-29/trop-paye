@@ -33,3 +33,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-anon-key-for-build
+          # CI d'intégration : tolère les TODO_COPY du récit. Le build de
+          # DÉPLOIEMENT ne pose jamais ce flag → la prod reste bloquée tant
+          # que le copy deck §7 n'est pas rempli (garde-fou notre-histoire).
+          TODO_COPY_ALLOW: "1"
