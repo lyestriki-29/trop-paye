@@ -62,10 +62,20 @@ export function Hero() {
           <p className="mt-4 text-sm font-medium text-ink/55">
             {brand.hero.reassurance.join(" · ")}
           </p>
-          {/* Copy deck §1 — stat d'appui ; TODO_COPY : URL de la source à fournir (deck : « (lien source) »). */}
+          {/* Copy deck §1 — stat d'appui. Source la plus proche (recherche 2026-06-11,
+              consigne Lyes « accurate, avocat à la fin ») : SDES, parc locatif privé
+              classé F/G ≈ 18,5 % au 01/01/2023. TODO_VERIFIER : la formulation
+              « loyer illégal » du deck reste à faire coller à la source (édition deck). */}
           <p className="mt-10 max-w-xl border-l-4 border-accent pl-4 text-sm font-medium leading-relaxed text-ink/80">
             1 logement loué sur 6 en France a un loyer illégal. Le vôtre ?{" "}
-            <span className="text-ink/45 underline underline-offset-2">(lien source)</span>
+            <a
+              href="https://www.statistiques.developpement-durable.gouv.fr/la-performance-energetique-du-parc-locatif-prive-au-1er-janvier-2023"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ink/45 underline underline-offset-2 transition hover:text-ink"
+            >
+              (source : SDES)
+            </a>
           </p>
         </div>
       </div>

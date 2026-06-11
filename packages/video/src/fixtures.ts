@@ -18,11 +18,14 @@ export const demoVerdict = {
   hikeDate: "01/10/2024",
 } as const;
 
-/** Stat d'appui (copy deck §1, mot pour mot) — TODO_COPY : URL de la source. */
+/**
+ * Stat d'appui (copy deck §1, mot pour mot). Source la plus proche (recherche
+ * 2026-06-11) : SDES, parc locatif privé F/G. TODO_VERIFIER : formulation deck.
+ */
 export const demoStat = {
   text: "1 logement loué sur 6 en France a un loyer illégal.",
   punch: "Le vôtre ?",
-  source: "(source à citer — TODO_COPY)",
+  source: "Source : SDES — parc locatif privé classé F/G, 01/01/2023",
 } as const;
 
 /** Témoignage FICTIF (post-pilote : remplacer par un dossier gagné réel consenti). */

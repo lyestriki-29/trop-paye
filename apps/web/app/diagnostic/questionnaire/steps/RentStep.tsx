@@ -26,7 +26,8 @@ export function RentStep({ draft, setField }: StepProps) {
     <div className="space-y-6">
       <ChoiceField
         label="Mes montants sont :"
-        hint="Le « charges comprises » est le total que vous virez chaque mois."
+        /* Phrase actée par Lyes (2026-06-11) : guider vers le CC si le HC est inconnu. */
+        hint="Vous n'avez pas le montant hors charges ? Donnez-nous le total charges comprises."
         choices={[
           { value: "HC", label: "Hors charges" },
           { value: "CC", label: "Charges comprises" },
