@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: { "/api/og/[verdictId]": ["./assets/fonts/**/*"] },
   // Le moteur et la marque sont des packages TS du monorepo → à transpiler.
   transpilePackages: ["@troppaye/shared", "@troppaye/rules-engine"],
+  // /a-propos → /notre-histoire (arbitrage Lyes 2026-06-11 : une seule page récit).
+  async redirects() {
+    return [{ source: "/a-propos", destination: "/notre-histoire", permanent: true }];
+  },
   images: { remotePatterns: [] },
   // NB : cacheComponents (use cache) sera activé plus tard, uniquement sur les
   // surfaces publiques. Par défaut tout est dynamique : sain pour une legaltech

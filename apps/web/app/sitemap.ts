@@ -11,7 +11,7 @@ const STATIC_PATHS = [
   "/diagnostic",
   "/comment-ca-marche",
   "/resultats",
-  "/a-propos",
+  "/notre-histoire",
   "/partenaires",
   "/presse",
   "/guides",

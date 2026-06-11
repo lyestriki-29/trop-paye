@@ -5,7 +5,7 @@ const NAV = [
   { label: "Comment ça marche", href: "/comment-ca-marche" },
   { label: "Guides", href: "/guides" },
   { label: "Résultats", href: "/resultats" },
-  { label: "À propos", href: "/a-propos" },
+  { label: "Notre histoire", href: "/notre-histoire" },
   { label: "Partenaires", href: "/partenaires" },
   { label: "Presse", href: "/presse" },
   { label: "Mentions légales", href: "/legal" },
