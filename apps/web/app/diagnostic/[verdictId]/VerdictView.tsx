@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { VerdictGlobal } from "@troppaye/rules-engine";
+import { stripInternalMarkers, type VerdictGlobal } from "@troppaye/rules-engine";
 import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
 import { prescriptionInfo } from "@/lib/diagnostic/prescription";
@@ -92,7 +92,7 @@ export function VerdictView({
                   <span aria-hidden className="text-stamp">
                     ⚑
                   </span>
-                  <span>{signal}</span>
+                  <span>{stripInternalMarkers(signal)}</span>
                 </li>
               ))}
             </ul>

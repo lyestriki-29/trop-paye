@@ -1,3 +1,4 @@
+import { stripInternalMarkers } from "@troppaye/rules-engine";
 import { Button } from "@/components/ui/Button";
 
 /**
@@ -38,7 +39,7 @@ export function VerdictUnquantified({
             <span aria-hidden className="text-stamp">
               ⚑
             </span>
-            <span>{signal}</span>
+            <span>{stripInternalMarkers(signal)}</span>
           </li>
         ))}
       </ul>

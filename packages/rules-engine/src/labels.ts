@@ -29,6 +29,19 @@ export const OUTCOME_TITLE: Record<Outcome, string> = {
 export const VERDICT_DISCLAIMER =
   "Estimation informative à partir de données publiques — ceci n'est pas un conseil juridique.";
 
+/**
+ * Retire les marqueurs internes ([AVOCAT], TODO_VERIFIER, TODO_COPY) d'un texte
+ * destiné à l'affichage PUBLIC. Le back-office garde les signaux bruts (marqueurs
+ * inclus) ; seul le rendu côté locataire est nettoyé (CLAUDE.md : [AVOCAT] jamais
+ * en prod). Idempotent.
+ */
+export function stripInternalMarkers(text: string): string {
+  return text
+    .replace(/\s*\[AVOCAT\]/g, "")
+    .replace(/\s*TODO_(?:VERIFIER|COPY)/g, "")
+    .trim();
+}
+
 /** Centimes (int) → euros formatés fr-FR. */
 export function formatEur(cents: number): string {
   return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(
