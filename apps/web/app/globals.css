@@ -141,3 +141,82 @@ body::after {
 @keyframes tp-marker-sweep {
   to { transform: scaleX(1); }
 }
+
+/* ===== Home v3 dossier d'instruction (arbitrage Lyes 2026-06-11 : EN PROD) ===== */
+
+/* Papier de cahier : lignes horizontales + marge rouge verticale (fond hero). */
+.v3-ruled {
+  background-image:
+    linear-gradient(rgb(var(--color-stamp) / 0.16), rgb(var(--color-stamp) / 0.16)),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 35px,
+      rgb(var(--color-line) / 0.55) 35px,
+      rgb(var(--color-line) / 0.55) 36px
+    );
+  background-size:
+    1px 100%,
+    auto;
+  background-position:
+    clamp(20px, 7vw, 120px) 0,
+    0 0;
+  background-repeat: no-repeat, repeat;
+}
+
+/* Papier millimétré (section instruction du moteur). */
+.v3-grid {
+  background-image:
+    linear-gradient(rgb(var(--color-line) / 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--color-line) / 0.4) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Bandeau défilant des bases légales — CSS pur, pause au survol. Deux copies
+   du contenu dans la piste → translateX(-50%) boucle sans couture.
+   reduced-motion : gelé par l'override global de globals.css + ceinture ici. */
+.v3-marquee {
+  overflow: hidden;
+}
+.v3-marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: v3-scroll 38s linear infinite;
+}
+.v3-marquee:hover .v3-marquee-track {
+  animation-play-state: paused;
+}
+@keyframes v3-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v3-marquee-track {
+    animation: none;
+  }
+}
+
+/* Onglet de classeur — chaque section est une pièce numérotée du dossier. */
+.v3-tab {
+  clip-path: polygon(0 100%, 0 30%, 10px 0, calc(100% - 10px) 0, 100% 30%, 100% 100%);
+}
+
+/* Numéro de pièce géant au trait (fond des étapes de la méthode). */
+.v3-outline {
+  color: transparent;
+  -webkit-text-stroke: 2px rgb(var(--color-ink) / 0.16);
+}
+
+/* Code-barres décoratif (artefact dossier, aria-hidden côté JSX). */
+.v3-barcode {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgb(var(--color-ink) / 0.75) 0 2px,
+    transparent 2px 5px,
+    rgb(var(--color-ink) / 0.75) 5px 6px,
+    transparent 6px 9px,
+    rgb(var(--color-ink) / 0.75) 9px 12px,
+    transparent 12px 16px
+  );
+}

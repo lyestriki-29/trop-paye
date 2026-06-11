@@ -30,12 +30,14 @@ const FAQ: ReadonlyArray<{ q: string; a: ReactNode }> = [
     ),
   },
   {
+    // Copy deck §1 amendé le 2026-06-11 (décision Lyes, anti-L121-2) : pas de
+    // « partenaire » tant qu'aucune convention d'avocat n'est signée.
     q: "Combien de temps ça prend ?",
     a: (
       <>
         La plupart des dossiers se règlent à l&apos;amiable en 1 à 3 mois. S&apos;il faut
-        aller plus loin, nous vous proposons un avocat partenaire — toujours sans frais
-        d&apos;avance.
+        aller plus loin, nous vous aidons à saisir un avocat, toujours sans frais
+        d&apos;avance de notre part.
       </>
     ),
   },
