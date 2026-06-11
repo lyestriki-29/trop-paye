@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
+import { FooterSignature } from "@/components/story/injections";
 
 const NAV = [
   { label: "Comment ça marche", href: "/comment-ca-marche" },
@@ -63,6 +64,8 @@ export function SiteFooter() {
             </ul>
           </nav>
         </div>
+        {/* Signature courte du récit (phase 3 notre-histoire, deck §7). */}
+        <FooterSignature />
         {/* [AVOCAT] — squelette R124 du copy deck §5, mot pour mot ; ne pas reformuler. */}
         <p className="mt-10 border-t border-line pt-6 text-xs leading-relaxed text-ink/50">
           TropPayé est une marque de {"{RAISON SOCIALE}"}, société par actions

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
+import { ReviewerReassurance } from "@/components/story/injections";
 import { BaremeMandat } from "./BaremeMandat";
 import { signMandate } from "./actions";
 
@@ -157,6 +158,9 @@ export function MandateForm({
             consentement à valider.]
           </span>
         </label>
+
+        {/* Réassurance revue humaine (récit, phase 3) — au plus près de la signature. */}
+        <ReviewerReassurance />
 
         {error ? <p className="mt-4 text-sm text-stamp">{error}</p> : null}
 

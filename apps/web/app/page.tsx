@@ -6,6 +6,7 @@ import { HeroV3, TickerLegal } from "@/components/home/v3/sections-hero";
 import { MoteurV3 } from "@/components/home/v3/sections-moteur";
 import { ConfianceV3, TemoignageV3 } from "@/components/home/v3/sections-preuves";
 import { RegimesV3 } from "@/components/home/v3/sections-regimes";
+import { StoryTeaser } from "@/components/story/injections";
 import { FAQ_COMPLETE } from "@/components/public/FaqComplete";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
@@ -48,6 +49,8 @@ export default async function Home() {
         <RegimesV3 />
         <EtapesV3 />
         <ConfianceV3 stats={stats} />
+        {/* Récit fondateur (phase 3 notre-histoire) : teaser entre confiance et témoignage. */}
+        <StoryTeaser />
         <TemoignageV3 />
         <ClosingV3 />
       </main>

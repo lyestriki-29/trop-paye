@@ -6,6 +6,7 @@ import {
   type VerdictGlobal,
 } from "@troppaye/rules-engine";
 import { BoostersModule } from "./BoostersModule";
+import { VerdictStoryLine } from "@/components/story/injections";
 import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
 import { prescriptionInfo } from "@/lib/diagnostic/prescription";
@@ -77,6 +78,8 @@ export function VerdictView({
             />
             {/* Partage (Task 7) : un tiers n'ouvrira que le teaser anonymisé + OG. */}
             <ShareActions amountCents={verdict.totalRecoverableCents} />
+            {/* Récit fondateur : une ligne, verdict POSITIF uniquement (phase 3). */}
+            <VerdictStoryLine />
           </>
         ) : unquantified ? (
           <VerdictUnquantified signals={verdict.signals} addressLabel={addressLabel} />
