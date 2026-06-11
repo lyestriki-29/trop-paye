@@ -3,7 +3,9 @@ import { after } from "next/server";
 import { brand, formatEUR } from "@troppaye/shared";
 import { getVerdictForSession } from "@/lib/diagnostic/verdict-read";
 import { getVerdictTeaser } from "@/lib/diagnostic/verdict-teaser";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { trackEvent } from "@/lib/track";
+import { CaptureView } from "./CaptureView";
 import { VerdictView } from "./VerdictView";
 import { VerdictUnavailable } from "./VerdictUnavailable";
 import { TeaserView } from "./TeaserView";
@@ -45,9 +47,35 @@ export async function generateMetadata({ params }: VerdictPageProps): Promise<Me
 export default async function VerdictPage({ params }: VerdictPageProps) {
   const { verdictId } = await params;
 
-  // Propriétaire (cookie de session du diagnostic) → verdict complet.
+  // Propriétaire (cookie de session du diagnostic) → capture PUIS verdict complet.
   const data = await getVerdictForSession(verdictId);
   if (data) {
+    // Porte de capture (spec P2) : l'email d'abord, le verdict ensuite. Le lead
+    // est unique par dossier (index) : une fois posé, la porte ne réapparaît plus.
+    const { data: lead } = await getSupabaseAdmin()
+      .from("leads")
+      .select("id")
+      .eq("dossier_id", data.dossierId)
+      .maybeSingle();
+
+    if (!lead) {
+      const shortRef = `TP-${data.dossierId.slice(0, 8).toUpperCase()}`;
+      const irregular = data.verdict.outcome === "IRREGULAR";
+      // Gabarit masqué de même longueur que le vrai montant : le montant réel
+      // ne quitte JAMAIS le serveur avant la capture.
+      const maskedAmount = irregular
+        ? formatEUR(data.verdict.totalRecoverableCents).replace(/\d/g, "8")
+        : null;
+      return (
+        <CaptureView
+          verdictId={verdictId}
+          shortRef={shortRef}
+          maskedAmount={maskedAmount}
+          irregular={irregular}
+        />
+      );
+    }
+
     // Jalon funnel PRD §5 — dédupliqué à la lecture par count(distinct dossier_id).
     // after() : la mesure ne retarde jamais l'affichage du verdict.
     after(() => trackEvent("verdict_affiche", { dossierId: data.dossierId }));
