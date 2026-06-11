@@ -76,6 +76,29 @@ export function RentStep({ draft, setField }: StepProps) {
           ) : null}
         </div>
       ) : null}
+
+      {/* Complément de loyer (retour Lyes 2026-06-11) : déclaratif, alimente un
+          signal d'orientation du moteur (jamais un chiffrage automatique).
+          TODO_COPY — libellés brouillon, hors copy deck. */}
+      <ChoiceField
+        label="Votre bail mentionne-t-il un « complément de loyer » ?"
+        hint="C'est une ligne à part du loyer de base, parfois ajoutée en zone d'encadrement. Souvent contestable."
+        choices={[
+          { value: "OUI", label: "Oui" },
+          { value: "NON", label: "Non" },
+          { value: "NSP", label: "Je ne sais pas" },
+        ]}
+        value={draft.rentSupplement}
+        onChange={(v) => setField("rentSupplement", v)}
+      />
+      {draft.rentSupplement === "OUI" ? (
+        <MoneyField
+          label="Montant du complément (par mois, si indiqué)"
+          hint="Facultatif. Il est sur la même page du bail que le loyer de base."
+          cents={draft.rentSupplementCents}
+          onChange={(c) => setField("rentSupplementCents", c)}
+        />
+      ) : null}
     </div>
   );
 }

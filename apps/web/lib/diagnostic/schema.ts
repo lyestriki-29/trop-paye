@@ -36,6 +36,10 @@ export const diagnosticSchema = z
       .array(z.object({ date: isoDate, rentCents: z.number().int().positive() }))
       .default([]),
     revisionClause: z.boolean().optional(),
+    /** Complément de loyer au bail (retour Lyes 2026-06-11) : OUI alimente un
+        signal d'orientation du moteur, jamais un chiffrage. */
+    rentSupplement: z.enum(["OUI", "NON", "NSP"]).optional(),
+    rentSupplementCents: z.number().int().positive().optional(),
     revisionQuarter: z.string().optional(),
     /** « Je ne sais pas » (spec §3) : trimestre à déduire du mois de signature. */
     revisionQuarterUnknown: z.boolean().optional(),
@@ -127,6 +131,8 @@ export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapsho
       asOf,
     }),
     revisionClause: input.revisionClause,
+    rentSupplementDeclared: input.rentSupplement === "OUI" ? true : undefined,
+    rentSupplementCents: input.rentSupplement === "OUI" ? input.rentSupplementCents : undefined,
     revisionQuarter,
     revisionQuarterSource,
     rentEstimated,

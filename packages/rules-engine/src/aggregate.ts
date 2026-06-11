@@ -58,7 +58,16 @@ export function evaluateAll(input: RuleInput): VerdictGlobal {
   }
   if (cls === "F" && asOfDay >= "2028-01-01") {
     signals.push(
-      "Logement classé F : interdiction de mise en location depuis le 01/01/2028 (décence énergétique). Orientation judiciaire — non chiffrée automatiquement. [AVOCAT]",
+      "Logement classé F : interdiction de mise en location depuis le 01/01/2028 (décence énergétique). Orientation judiciaire, non chiffrée automatiquement. [AVOCAT]",
+    );
+  }
+  // Complément de loyer (retour Lyes 2026-06-11) : licite uniquement en zone
+  // d'encadrement pour des caractéristiques exceptionnelles ; contestation
+  // dans les 3 mois suivant la signature (CDC). Signal d'orientation, JAMAIS
+  // chiffré automatiquement. TODO_VERIFIER [AVOCAT] : base art. 140 loi ELAN.
+  if (input.dossier.rentSupplementDeclared) {
+    signals.push(
+      "Complément de loyer mentionné au bail : il n'est licite qu'en zone d'encadrement, pour des caractéristiques exceptionnelles du logement, et se conteste dans les 3 mois suivant la signature du bail. À examiner en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]",
     );
   }
 

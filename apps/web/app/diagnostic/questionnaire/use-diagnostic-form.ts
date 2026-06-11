@@ -33,6 +33,9 @@ export interface DiagnosticDraft {
   leaseSignedAt?: string;
   initialRentCents?: number;
   currentRentCents?: number;
+  /** Complément de loyer au bail (retour Lyes 2026-06-11) : signal d'orientation. */
+  rentSupplement?: "OUI" | "NON" | "NSP";
+  rentSupplementCents?: number;
   revisionClause?: boolean;
   revisionQuarter?: string;
   /** « Je ne sais pas » (spec §3) : trimestre déduit du mois de signature côté serveur. */
@@ -91,6 +94,8 @@ export type SetField = <K extends keyof DiagnosticDraft>(
 export interface StepProps {
   draft: DiagnosticDraft;
   setField: SetField;
+  /** Avance d'une étape (boutons « je ne sais pas » : friction réduite, retour Lyes 2026-06-11). */
+  goNext?: () => void;
 }
 
 /** Construit l'objet validé par `diagnosticSchema` à partir du brouillon UI. */
@@ -107,6 +112,8 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
     currentRentCents: draft.currentRentCents,
     // Lignes anniversaire ou libres, incomplètes ignorées (cf. effectiveRevisions).
     revisions: effectiveRevisions(draft, new Date().toISOString().slice(0, 10)),
+    rentSupplement: draft.rentSupplement,
+    rentSupplementCents: draft.rentSupplement === "OUI" ? draft.rentSupplementCents : undefined,
     revisionClause: draft.revisionClause,
     revisionQuarter: draft.revisionQuarter,
     revisionQuarterUnknown: draft.revisionQuarterUnknown,

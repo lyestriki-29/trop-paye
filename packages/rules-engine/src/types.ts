@@ -47,6 +47,10 @@ export interface DossierSnapshot {
   dpeHistory: DpeRecord[];
   rentHistory: RentEvent[];
   revisionClause?: boolean;
+  /** Complément de loyer mentionné au bail (déclaratif, retour Lyes 2026-06-11) :
+      alimente un SIGNAL d'orientation, jamais un chiffrage automatique. */
+  rentSupplementDeclared?: boolean;
+  rentSupplementCents?: number;
   revisionQuarter?: string; // "T2" — trimestre IRL de référence
   /** Origine du trimestre : lu dans le bail, ou déduit du mois de signature (spec §3). */
   revisionQuarterSource?: "BAIL" | "DEDUCED";

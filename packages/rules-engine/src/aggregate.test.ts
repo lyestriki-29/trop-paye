@@ -46,6 +46,40 @@ describe("evaluateAll (agrégateur)", () => {
     expect(irl.subsidiaryOf).toBe("DPE_FREEZE");
   });
 
+  it("émet un signal d'orientation (non chiffré) quand un complément de loyer est déclaré", () => {
+    const v = evaluateAll(
+      mk(
+        {
+          dpeHistory: [{ class: "D", date: "2021-01-01", source: "ADEME_API" }],
+          rentSupplementDeclared: true,
+          rentSupplementCents: 15000,
+          rentHistory: [
+            { type: "INITIAL", date: "2023-01-01", rentCents: 90000, source: "quittance" },
+          ],
+        },
+        "2024-06-01",
+      ),
+    );
+    // Jamais chiffré : le complément n'entre pas dans le total recouvrable.
+    expect(v.totalRecoverableCents).toBe(0);
+    expect(v.signals.some((s) => s.includes("Complément de loyer"))).toBe(true);
+  });
+
+  it("pas de signal complément de loyer sans déclaration", () => {
+    const v = evaluateAll(
+      mk(
+        {
+          dpeHistory: [{ class: "D", date: "2021-01-01", source: "ADEME_API" }],
+          rentHistory: [
+            { type: "INITIAL", date: "2023-01-01", rentCents: 90000, source: "quittance" },
+          ],
+        },
+        "2024-06-01",
+      ),
+    );
+    expect(v.signals.some((s) => s.includes("Complément de loyer"))).toBe(false);
+  });
+
   it("émet un signal d'orientation (non chiffré) pour un G loué après 2025", () => {
     const v = evaluateAll(
       mk(
