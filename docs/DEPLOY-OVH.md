@@ -59,9 +59,14 @@ nginx : reverse proxy `troppaye.fr` → `127.0.0.1:3000` puis
 ## 4. Cron (séquences J0/J21/J35/J50 + envoi outbox)
 
 ```cron
-# crontab -e (toutes les 15 min ; idempotent côté app)
-*/15 * * * * curl -fsS -X POST -H "x-cron-secret: $CRON_SECRET" https://troppaye.fr/api/cron/run-due-actions >> /var/log/troppaye-cron.log 2>&1
+# crontab -e (toutes les 15 min ; idempotent côté app).
+# ⚠️ cron a un environnement VIDE : $CRON_SECRET n'y existe pas — on le lit
+# directement dans le .env du serveur au moment de l'appel.
+*/15 * * * * curl -fsS -X POST -H "x-cron-secret: $(grep '^CRON_SECRET=' /opt/troppaye/.env | cut -d= -f2-)" https://troppaye.fr/api/cron/run-due-actions >> /var/log/troppaye-cron.log 2>&1
 ```
+
+Vérifier après installation : `tail /var/log/troppaye-cron.log` doit montrer du JSON
+`{"processed":…}` et jamais `unauthorized`.
 
 ## 5. Checklist avant ouverture publique (palier 1)
 

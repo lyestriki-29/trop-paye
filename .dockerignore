@@ -1,0 +1,20 @@
+# Revue 2026-06-11 : sans .dockerignore, COPY . . embarquait .env.local (secrets
+# dans les layers) et le node_modules hôte écrasait celui du stage deps.
+node_modules
+**/node_modules
+.next
+**/.next
+.git
+.github
+.planning
+.claude
+.env
+.env.*
+!.env.example
+packages/video/out
+docs
+*.md
+Dockerfile
+.dockerignore
+supabase/.branches
+supabase/.temp
