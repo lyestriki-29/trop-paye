@@ -4,6 +4,8 @@ import { CtaFinal } from "@/components/home/CtaFinal";
 import { Reveal } from "@/components/home/Reveal";
 import { RevealInit } from "@/components/home/RevealInit";
 import { Temoignages } from "@/components/home/Temoignages";
+import { PageHero } from "@/components/public/PageHero";
+import { Marker } from "@/components/ui/Marker";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { getPublicStats } from "@/lib/public-stats";
@@ -29,17 +31,16 @@ export default async function ResultatsPage() {
     <>
       <SiteHeader />
       <main>
-        <header className="mx-auto max-w-container px-6 pb-4 pt-14 sm:pt-20">
-          <Reveal>
-            {/* TODO_COPY — intitulé et chapeau de page (hors copy deck). */}
-            <h1 className="font-display text-2xl font-extrabold leading-tight tracking-display sm:text-hero">
-              Résultats
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/70">
-              Chaque euro récupéré est tracé sur un compte dédié. Voici où nous en sommes.
-            </p>
-          </Reveal>
-        </header>
+        <PageHero
+          kicker="TropPayé · Les preuves"
+          /* TODO_COPY — intitulé et chapeau de page (hors copy deck). */
+          title={
+            <>
+              Des <Marker>résultats</Marker>, pas des promesses
+            </>
+          }
+          lede="Chaque euro récupéré est tracé sur un compte dédié. Voici où nous en sommes."
+        />
 
         <Confiance stats={stats} />
 

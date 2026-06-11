@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Reveal } from "@/components/home/Reveal";
 import { RevealInit } from "@/components/home/RevealInit";
+import { PageHero } from "@/components/public/PageHero";
+import { Marker } from "@/components/ui/Marker";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 
@@ -20,18 +22,16 @@ export default function PartenairesPage() {
     <>
       <SiteHeader />
       <main>
-        <header className="mx-auto max-w-container px-6 pb-10 pt-14 sm:pt-20">
-          <Reveal>
-            {/* TODO_COPY — intitulé et chapeau de page (hors copy deck). */}
-            <h1 className="font-display text-2xl font-extrabold leading-tight tracking-display sm:text-hero">
-              Partenaires
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/70">
-              Avocats en droit immobilier, associations de locataires : certains dossiers
-              méritent plus que le recouvrement amiable.
-            </p>
-          </Reveal>
-        </header>
+        <PageHero
+          kicker="TropPayé · Le réseau"
+          /* TODO_COPY — intitulé et chapeau de page (hors copy deck). */
+          title={
+            <>
+              Plus forts <Marker>ensemble</Marker>
+            </>
+          }
+          lede="Avocats en droit immobilier, associations de locataires : certains dossiers méritent plus que le recouvrement amiable."
+        />
 
         <section className="mx-auto max-w-container grid gap-6 px-6 pb-20 md:grid-cols-2">
           <Reveal>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
+import { Stamp } from "@/components/ui/Stamp";
 
 /** 404 globale (spec P3) — registre charte : calme, oriente sans culpabiliser. */
 export default function NotFound() {
@@ -9,11 +10,9 @@ export default function NotFound() {
     <>
       <SiteHeader />
       <main className="mx-auto flex max-w-container flex-col items-start px-6 py-24 sm:py-32">
-        <p className="font-mono text-xs font-medium uppercase tracking-widest text-ink/45">
-          Erreur 404
-        </p>
+        <Stamp rotate={-4}>Erreur 404</Stamp>
         {/* TODO_COPY — page 404 (hors copy deck). */}
-        <h1 className="mt-3 font-display text-2xl font-extrabold leading-tight tracking-display sm:text-hero">
+        <h1 className="mt-6 font-display text-mega font-extrabold tracking-display">
           Cette page n&apos;existe pas.
         </h1>
         <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink/70">

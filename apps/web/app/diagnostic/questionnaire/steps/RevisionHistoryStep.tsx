@@ -60,6 +60,9 @@ function FreeRows({ draft, setField }: StepProps) {
 
 export function RevisionHistoryStep({ draft, setField }: StepProps) {
   const mode = revisionsEditorMode(draft);
+  // Bail < 1 an : mode FREE forcé par revisionsEditorMode — message dédié,
+  // éditeur libre directement utilisable (retour Lyes 2026-06-11).
+  const bailTropRecent = mode === "FREE" && Boolean(draft.leaseSignedAt) && !draft.revisionsMode;
 
   return (
     <div className="space-y-5">
@@ -72,6 +75,13 @@ export function RevisionHistoryStep({ draft, setField }: StepProps) {
         /* TODO_COPY — rappel du mode CC sur les hausses (hors copy deck §2). */
         <p className="text-xs text-ink/55">
           Indiquez des montants charges comprises, comme vos loyers.
+        </p>
+      ) : null}
+      {bailTropRecent ? (
+        /* TODO_COPY — bail de moins d'un an (hors copy deck §2). */
+        <p className="rounded-card border-l-4 border-accent bg-paper-2 px-4 py-3 text-sm text-ink/70">
+          Votre bail a moins d&apos;un an : aucune révision annuelle n&apos;a normalement pu
+          avoir lieu. Si votre loyer a quand même augmenté, ajoutez la hausse ci-dessous.
         </p>
       ) : null}
 
@@ -90,7 +100,7 @@ export function RevisionHistoryStep({ draft, setField }: StepProps) {
       ) : (
         <>
           <FreeRows draft={draft} setField={setField} />
-          {draft.leaseSignedAt ? (
+          {draft.revisionsMode === "FREE" && !bailTropRecent ? (
             <button
               type="button"
               onClick={() => setField("revisionsMode", "ANNIVERSARY")}

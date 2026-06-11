@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { CtaFinal } from "@/components/home/CtaFinal";
-import { Reveal } from "@/components/home/Reveal";
 import { RevealInit } from "@/components/home/RevealInit";
 import { Steps } from "@/components/home/Steps";
 import { Bareme } from "@/components/public/Bareme";
 import { FAQ_COMPLETE, FaqComplete } from "@/components/public/FaqComplete";
+import { PageHero } from "@/components/public/PageHero";
+import { Marker } from "@/components/ui/Marker";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
+import { Stamp } from "@/components/ui/Stamp";
 
 export const metadata: Metadata = {
   /* TODO_COPY — title/description SEO à valider (socle P3). */
@@ -32,18 +34,21 @@ export default function CommentCaMarchePage() {
     <>
       <SiteHeader />
       <main>
-        <header className="mx-auto max-w-container px-6 pb-4 pt-14 sm:pt-20">
-          <Reveal>
-            {/* TODO_COPY — intitulé de page (hors copy deck). */}
-            <h1 className="font-display text-2xl font-extrabold leading-tight tracking-display sm:text-hero">
-              Comment ça marche
-            </h1>
-            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/70">
-              {/* Copy deck §1, sous-titre hero mot pour mot. */}
-              Vérifiez votre loyer en 2 minutes. Si on ne récupère rien, vous ne payez rien.
-            </p>
-          </Reveal>
-        </header>
+        <PageHero
+          kicker="TropPayé · Le parcours"
+          /* TODO_COPY — intitulé de page (hors copy deck). */
+          title={
+            <>
+              Comment ça <Marker>marche</Marker>
+            </>
+          }
+          /* Copy deck §1, sous-titre hero mot pour mot. */
+          lede="Vérifiez votre loyer en 2 minutes. Si on ne récupère rien, vous ne payez rien."
+        >
+          <div className="mt-6">
+            <Stamp rotate={-3}>0 € d&apos;avance</Stamp>
+          </div>
+        </PageHero>
         <Steps />
         <div id="bareme" className="scroll-mt-6">
           <Bareme />

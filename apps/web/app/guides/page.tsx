@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Reveal } from "@/components/home/Reveal";
 import { RevealInit } from "@/components/home/RevealInit";
+import { PageHero } from "@/components/public/PageHero";
+import { Marker } from "@/components/ui/Marker";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { getSupabasePublic } from "@/lib/supabase/public";
@@ -34,17 +36,17 @@ export default async function GuidesIndex() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-container px-6 pb-24 pt-14 sm:pt-20">
-        <Reveal>
-          <h1 className="font-display text-2xl font-extrabold leading-tight tracking-display sm:text-hero">
-            Guides
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ink/70">
-            Vos droits, expliqués simplement. Chaque guide cite ses sources.
-          </p>
-        </Reveal>
-
-        <ul className="mt-12 grid gap-6 md:grid-cols-2">
+      <PageHero
+        kicker="TropPayé · Guides"
+        title={
+          <>
+            Vos droits, <Marker>expliqués</Marker>
+          </>
+        }
+        lede="Vos droits, expliqués simplement. Chaque guide cite ses sources."
+      />
+      <main className="mx-auto max-w-container px-6 pb-24">
+        <ul className="grid gap-6 md:grid-cols-2">
           {(articles ?? []).map((a, i) => (
             <Reveal key={a.slug} delay={0.05 + (i % 4) * 0.06} className="h-full">
               <li className="h-full">

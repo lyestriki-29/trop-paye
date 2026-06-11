@@ -51,9 +51,15 @@ export interface DiagnosticDraft {
   noIncreaseDates?: string[];
 }
 
-/** Mode effectif de l'éditeur de hausses : anniversaire si la date de bail est connue. */
+/**
+ * Mode effectif de l'éditeur de hausses : anniversaire si la date de bail est
+ * connue ET qu'au moins un anniversaire est passé (bail < 1 an → l'éditeur
+ * anniversaire n'aurait rien à montrer : repli libre, retour Lyes 2026-06-11).
+ */
 export function revisionsEditorMode(d: DiagnosticDraft): "ANNIVERSARY" | "FREE" {
   if (!d.leaseSignedAt) return "FREE";
+  const today = new Date().toISOString().slice(0, 10);
+  if (anniversariesBetween(d.leaseSignedAt, today).length === 0) return "FREE";
   return d.revisionsMode ?? "ANNIVERSARY";
 }
 
