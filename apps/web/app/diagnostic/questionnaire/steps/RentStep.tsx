@@ -77,6 +77,16 @@ export function RentStep({ draft, setField }: StepProps) {
         </div>
       ) : null}
 
+      {/* Dépôt de garantie versé (LOT 1, règle DEPOSIT_CAP) : optionnel — vide =
+          « je ne sais pas / pas de dépôt », la règle n'est pas évaluée.
+          TODO_COPY — libellés brouillon, hors copy deck. */}
+      <MoneyField
+        label="Montant du dépôt de garantie versé"
+        hint="Facultatif. Laissez vide si vous ne savez pas ou n'avez pas versé de dépôt. La loi le plafonne à 1 mois de loyer hors charges (2 mois si meublé)."
+        cents={draft.depositPaidCents}
+        onChange={(c) => setField("depositPaidCents", c)}
+      />
+
       {/* Complément de loyer (retour Lyes 2026-06-11) : déclaratif, alimente un
           signal d'orientation du moteur (jamais un chiffrage automatique).
           TODO_COPY — libellés brouillon, hors copy deck. */}

@@ -12,6 +12,7 @@ import { formatEur } from "./labels";
 import { evaluateDpeFreeze } from "./rules/dpe-freeze";
 import { evaluateIrlOvercharge } from "./rules/irl-overcharge";
 import { evaluateDepositLate } from "./rules/deposit-late";
+import { evaluateDepositCap } from "./rules/deposit-cap";
 
 /** Classe DPE en vigueur à la date d'évaluation (la plus récente ≤ asOf). */
 export function latestDpeClassAt(input: RuleInput): DpeClass | undefined {
@@ -121,6 +122,14 @@ export const CASE_REGISTRY: CaseDefinition[] = [
     prescriptionWindowYears: 3,
     requiredInputs: [],
     evaluate: evaluateDepositLate,
+  },
+  {
+    id: "DEPOSIT_CAP",
+    legalBasisStatus: "TODO_VERIFIER",
+    detectability: "COMPUTED",
+    prescriptionWindowYears: 3,
+    requiredInputs: ["depositPaidCents"],
+    evaluate: evaluateDepositCap,
   },
   decenceCase,
   complementCase,

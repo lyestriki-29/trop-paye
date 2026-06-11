@@ -8,6 +8,7 @@ export const RULE_LABEL: Record<RuleId, string> = {
   DPE_FREEZE: "Gel des loyers (passoire F/G)",
   IRL_OVERCHARGE: "Révision IRL",
   DEPOSIT_LATE: "Dépôt de garantie",
+  DEPOSIT_CAP: "Dépôt de garantie (plafond)",
 };
 
 /** Niveau de confiance, en clair. */

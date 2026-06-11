@@ -3,7 +3,7 @@
 export type DpeClass = "A" | "B" | "C" | "D" | "E" | "F" | "G";
 export type Confidence = "HIGH" | "MEDIUM" | "LOW";
 export type Outcome = "IRREGULAR" | "COMPLIANT" | "INSUFFICIENT_DATA";
-export type RuleId = "DPE_FREEZE" | "IRL_OVERCHARGE" | "DEPOSIT_LATE";
+export type RuleId = "DPE_FREEZE" | "IRL_OVERCHARGE" | "DEPOSIT_LATE" | "DEPOSIT_CAP";
 
 export type DpeSource = "ADEME_API" | "USER_INPUT" | "DOCUMENT";
 export type RentEventType =
@@ -61,6 +61,12 @@ export interface DossierSnapshot {
   rentEstimated?: boolean;
   previousTenantRentCents?: number;
   deposit?: DepositInput;
+  /**
+   * Montant du dépôt de garantie versé (étape 5, LOT 1) → règle DEPOSIT_CAP
+   * (plafond 1 mois HC vide / 2 mois meublé). Absent = « je ne sais pas / pas de
+   * dépôt » : la règle n'est pas évaluée. Distinct de `deposit` (retard, LOT 3).
+   */
+  depositPaidCents?: number;
 }
 
 export interface IrlIndexEntry {
