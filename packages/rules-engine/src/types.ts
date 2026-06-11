@@ -8,7 +8,8 @@ export type RuleId =
   | "IRL_OVERCHARGE"
   | "DEPOSIT_LATE"
   | "DEPOSIT_CAP"
-  | "AGENCY_FEES_CAP";
+  | "AGENCY_FEES_CAP"
+  | "PRIVATE_LANDLORD_FEES";
 
 /** Zone d'encadrement des honoraires de location (décret ALUR). */
 export type AgencyZone = "TRES_TENDUE" | "TENDUE" | "RESTE";
@@ -88,6 +89,12 @@ export interface DossierSnapshot {
   agencyFeesPaidCents?: number;
   /** État des lieux facturé séparément, le cas échéant (centimes). */
   edlFeesPaidCents?: number;
+  /** Frais (dossier, rédaction de bail…) facturés par un bailleur PARTICULIER (centimes). */
+  privateLandlordFeesPaidCents?: number;
+  /** Frais abusifs cochés (LOT 2, signal) : quittance facturée, relance, pénalités… */
+  forbiddenFees?: string[];
+  /** Points de régularisation de charges cochés (LOT 2, signal). */
+  chargesReviewItems?: string[];
   /**
    * Montant du dépôt de garantie versé (étape 5, LOT 1) → règle DEPOSIT_CAP
    * (plafond 1 mois HC vide / 2 mois meublé). Absent = « je ne sais pas / pas de

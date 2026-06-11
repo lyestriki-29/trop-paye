@@ -10,6 +10,7 @@ export const RULE_LABEL: Record<RuleId, string> = {
   DEPOSIT_LATE: "Dépôt de garantie",
   DEPOSIT_CAP: "Dépôt de garantie (plafond)",
   AGENCY_FEES_CAP: "Honoraires d'agence (plafond)",
+  PRIVATE_LANDLORD_FEES: "Frais facturés par le bailleur",
 };
 
 /** Niveau de confiance, en clair. */

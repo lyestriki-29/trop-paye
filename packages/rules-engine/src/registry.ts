@@ -14,6 +14,7 @@ import { evaluateIrlOvercharge } from "./rules/irl-overcharge";
 import { evaluateDepositLate } from "./rules/deposit-late";
 import { evaluateDepositCap } from "./rules/deposit-cap";
 import { evaluateAgencyFeesCap } from "./rules/agency-fees-cap";
+import { evaluatePrivateLandlordFees } from "./rules/private-landlord-fees";
 
 /** Classe DPE en vigueur à la date d'évaluation (la plus récente ≤ asOf). */
 export function latestDpeClassAt(input: RuleInput): DpeClass | undefined {
@@ -110,6 +111,52 @@ const complementCase: CaseDefinition = {
 };
 
 /**
+ * Frais abusifs (LOT 2, signal) : facturation de quittances, frais de relance /
+ * mise en demeure, pénalités de retard. Encadré par l'art. 4 de la loi du
+ * 06/07/1989. Signal de revue, JAMAIS chiffré.
+ */
+const forbiddenFeesCase: CaseDefinition = {
+  id: "FORBIDDEN_FEES",
+  legalBasisStatus: "AVOCAT_PENDING",
+  detectability: "DECLARED_SIGNAL",
+  requiredInputs: ["forbiddenFees"],
+  evaluate: (input) => {
+    const items = input.dossier.forbiddenFees ?? [];
+    if (items.length === 0) return null;
+    return [
+      {
+        caseId: "FORBIDDEN_FEES",
+        message: `Frais potentiellement abusifs signalés (${items.length}) : la facturation de quittances, de frais de relance ou de mise en demeure, ou de pénalités de retard est encadrée par la loi (art. 4, loi du 06/07/1989). À examiner en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]`,
+      },
+    ];
+  },
+};
+
+/**
+ * Régularisation de charges à vérifier (LOT 2, signal) : dépenses non
+ * récupérables sur le locataire (assurance du propriétaire, frais de gestion,
+ * taxe foncière hors ordures ménagères, ou régularisation jamais reçue).
+ * Signal de revue (décompte à examiner), JAMAIS chiffré.
+ */
+const chargesReviewCase: CaseDefinition = {
+  id: "CHARGES_REVIEW",
+  legalBasisStatus: "AVOCAT_PENDING",
+  detectability: "DECLARED_SIGNAL",
+  requiredInputs: ["chargesReviewItems"],
+  evaluate: (input) => {
+    const items = input.dossier.chargesReviewItems ?? [];
+    if (items.length === 0) return null;
+    const plural = items.length > 1 ? "s" : "";
+    return [
+      {
+        caseId: "CHARGES_REVIEW",
+        message: `Régularisation de charges à vérifier (${items.length} point${plural}) : certaines dépenses (assurance du propriétaire, frais de gestion, taxe foncière hors ordures ménagères) ne sont pas récupérables sur le locataire. À examiner en revue avec le décompte. Orientation, jamais chiffrée automatiquement. [AVOCAT]`,
+      },
+    ];
+  },
+};
+
+/**
  * Registre ordonné. L'ordre fixe la séquence des `results` (DPE → IRL → dépôt) et
  * des `signals` (décence avant complément) → byte-compatible avec l'historique.
  * Les cas COMPUTED gardent `requiredInputs: []` : ils s'auto-évaluent et gèrent
@@ -158,6 +205,16 @@ export const CASE_REGISTRY: CaseDefinition[] = [
     requiredInputs: ["agencyFeesPaidCents"],
     evaluate: evaluateAgencyFeesCap,
   },
+  {
+    id: "PRIVATE_LANDLORD_FEES",
+    legalBasisStatus: "TODO_VERIFIER",
+    detectability: "COMPUTED",
+    prescriptionWindowYears: 3,
+    requiredInputs: ["privateLandlordFeesPaidCents"],
+    evaluate: evaluatePrivateLandlordFees,
+  },
   decenceCase,
   complementCase,
+  forbiddenFeesCase,
+  chargesReviewCase,
 ];

@@ -4,6 +4,7 @@ export { evaluateIrlOvercharge } from "./rules/irl-overcharge";
 export { evaluateDepositLate } from "./rules/deposit-late";
 export { evaluateDepositCap } from "./rules/deposit-cap";
 export { evaluateAgencyFeesCap } from "./rules/agency-fees-cap";
+export { evaluatePrivateLandlordFees } from "./rules/private-landlord-fees";
 export { evaluateAll } from "./aggregate";
 export { CASE_REGISTRY, latestDpeClassAt } from "./registry";
 export {
