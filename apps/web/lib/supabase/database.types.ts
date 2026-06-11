@@ -73,7 +73,10 @@ export type Database = {
           executed_at: string | null
           id: string
           payload: Json
+          post_status: string | null
+          posted_at: string | null
           scheduled_at: string | null
+          tracking_number: string | null
           type: Database["public"]["Enums"]["action_type"]
         }
         Insert: {
@@ -82,7 +85,10 @@ export type Database = {
           executed_at?: string | null
           id?: string
           payload?: Json
+          post_status?: string | null
+          posted_at?: string | null
           scheduled_at?: string | null
+          tracking_number?: string | null
           type: Database["public"]["Enums"]["action_type"]
         }
         Update: {
@@ -91,7 +97,10 @@ export type Database = {
           executed_at?: string | null
           id?: string
           payload?: Json
+          post_status?: string | null
+          posted_at?: string | null
           scheduled_at?: string | null
+          tracking_number?: string | null
           type?: Database["public"]["Enums"]["action_type"]
         }
         Relationships: [
@@ -155,6 +164,7 @@ export type Database = {
       dossiers: {
         Row: {
           address_label: string | null
+          agreed_total_cents: number | null
           ban_id: string | null
           charges_cents: number | null
           construction_period: string | null
@@ -168,8 +178,12 @@ export type Database = {
           engine_snapshot: Json | null
           furnished: boolean | null
           id: string
+          immediate_execution: boolean
           initial_rent_cents: number | null
           insee_code: string | null
+          landlord_address: string | null
+          landlord_kind: string | null
+          landlord_name: string | null
           lease_renewed_at: string | null
           lease_signed_at: string | null
           previous_tenant_rent_cents: number | null
@@ -185,6 +199,7 @@ export type Database = {
         }
         Insert: {
           address_label?: string | null
+          agreed_total_cents?: number | null
           ban_id?: string | null
           charges_cents?: number | null
           construction_period?: string | null
@@ -198,8 +213,12 @@ export type Database = {
           engine_snapshot?: Json | null
           furnished?: boolean | null
           id?: string
+          immediate_execution?: boolean
           initial_rent_cents?: number | null
           insee_code?: string | null
+          landlord_address?: string | null
+          landlord_kind?: string | null
+          landlord_name?: string | null
           lease_renewed_at?: string | null
           lease_signed_at?: string | null
           previous_tenant_rent_cents?: number | null
@@ -215,6 +234,7 @@ export type Database = {
         }
         Update: {
           address_label?: string | null
+          agreed_total_cents?: number | null
           ban_id?: string | null
           charges_cents?: number | null
           construction_period?: string | null
@@ -228,8 +248,12 @@ export type Database = {
           engine_snapshot?: Json | null
           furnished?: boolean | null
           id?: string
+          immediate_execution?: boolean
           initial_rent_cents?: number | null
           insee_code?: string | null
+          landlord_address?: string | null
+          landlord_kind?: string | null
+          landlord_name?: string | null
           lease_renewed_at?: string | null
           lease_signed_at?: string | null
           previous_tenant_rent_cents?: number | null
@@ -346,6 +370,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fund_movements_dossier_id_fkey"
+            columns: ["dossier_id"]
+            isOneToOne: false
+            referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      funnel_events: {
+        Row: {
+          created_at: string
+          dossier_id: string | null
+          event: string
+          id: string
+          metadata: Json
+          src: string | null
+        }
+        Insert: {
+          created_at?: string
+          dossier_id?: string | null
+          event: string
+          id?: string
+          metadata?: Json
+          src?: string | null
+        }
+        Update: {
+          created_at?: string
+          dossier_id?: string | null
+          event?: string
+          id?: string
+          metadata?: Json
+          src?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funnel_events_dossier_id_fkey"
             columns: ["dossier_id"]
             isOneToOne: false
             referencedRelation: "dossiers"
@@ -549,6 +608,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "outbox_emails_dossier_id_fkey"
+            columns: ["dossier_id"]
+            isOneToOne: false
+            referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payout_details: {
+        Row: {
+          created_at: string
+          dossier_id: string
+          holder_name: string
+          iban_encrypted: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          dossier_id: string
+          holder_name: string
+          iban_encrypted: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          dossier_id?: string
+          holder_name?: string
+          iban_encrypted?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_details_dossier_id_fkey"
             columns: ["dossier_id"]
             isOneToOne: false
             referencedRelation: "dossiers"
