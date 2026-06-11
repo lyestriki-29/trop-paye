@@ -43,6 +43,12 @@ export async function claimDossierForUser(dossierId: string, userId: string): Pr
  * Safari → pas de cookie `tp_session`, dossier orphelin. Or le magic link
  * PROUVE la propriété de l'email : on rattache tous les dossiers sans
  * propriétaire dont le lead porte cet email. Appelé au callback d'auth.
+ *
+ * Risque résiduel ACCEPTÉ (revue 2026-06-11, sévérité moyenne) : un tiers peut
+ * poser l'email d'autrui sur SON dossier anonyme → la victime, à son prochain
+ * login, voit apparaître ce dossier fabriqué (nuisance, pas de fuite de PII :
+ * elle GAGNE la visibilité du dossier de l'attaquant, pas l'inverse). Pilote :
+ * volumétrie faible + revue humaine de tout mandat. À réévaluer à l'échelle.
  */
 export async function claimDossiersByEmail(userId: string, email: string): Promise<void> {
   const admin = getSupabaseAdmin();

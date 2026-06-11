@@ -248,6 +248,13 @@ otp_expiry = 1800
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
+# Magic link en token_hash (revue 2026-06-11) : vérifié serveur via verifyOtp,
+# fonctionne même ouvert dans un AUTRE navigateur (webview TikTok → Safari).
+# Cloud : répliquer ce template dans Auth > Email Templates (cf. DEPLOY-OVH.md).
+[auth.email.template.magic_link]
+subject = "Votre lien de connexion TropPayé"
+content_path = "./supabase/templates/magic_link.html"
+
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
 # enabled = true
