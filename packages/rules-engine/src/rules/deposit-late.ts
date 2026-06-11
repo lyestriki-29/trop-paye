@@ -3,7 +3,7 @@ import { shiftISO } from "../internal/dates";
 
 const RULE_ID = "DEPOSIT_LATE" as const;
 const RULE_VERSION = "1989-art22";
-const LEGAL_BASIS =
+export const LEGAL_BASIS =
   "Dépôt de garantie — loi du 06/07/1989 art. 22 : restitution sous 1 mois (EDL de sortie conforme) ou 2 mois ; à défaut, majoration de 10 % du loyer mensuel hors charges par mois de retard entamé.";
 
 const day = (iso: string): string => iso.slice(0, 10);

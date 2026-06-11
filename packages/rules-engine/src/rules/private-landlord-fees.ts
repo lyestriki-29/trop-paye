@@ -4,7 +4,7 @@ import { shiftISO } from "../internal/dates";
 const RULE_ID = "PRIVATE_LANDLORD_FEES" as const;
 const RULE_VERSION = "1989-art5-bailleur-prive";
 const PRESCRIPTION_YEARS = 3;
-const LEGAL_BASIS =
+export const LEGAL_BASIS =
   "Frais de location facturés par un bailleur non professionnel — loi du 06/07/1989 art. 5 : un particulier qui loue sans intermédiaire ne peut facturer au locataire des honoraires de constitution de dossier ou de rédaction de bail. La somme indûment perçue est récupérable. TODO_VERIFIER [AVOCAT] : périmètre exact et point de départ de la prescription.";
 
 const day = (iso: string): string => iso.slice(0, 10);

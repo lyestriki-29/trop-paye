@@ -4,7 +4,7 @@ import { shiftISO } from "../internal/dates";
 const RULE_ID = "AGENCY_FEES_CAP" as const;
 const RULE_VERSION = "2014-alur-honoraires";
 const PRESCRIPTION_YEARS = 3;
-const LEGAL_BASIS =
+export const LEGAL_BASIS =
   "Honoraires de location — loi du 06/07/1989 art. 5-I (loi ALUR), décret 2014-890 : la part du locataire (visite, constitution du dossier, rédaction du bail) est plafonnée par m² selon la zone, plus un plafond distinct pour l'état des lieux. TODO_VERIFIER [AVOCAT] : valeurs des plafonds, zonage par commune et point de départ de la prescription.";
 
 const day = (iso: string): string => iso.slice(0, 10);

@@ -2,7 +2,7 @@ import type { ComputationStep, RuleInput, RuleResult } from "../types";
 
 const RULE_ID = "DEPOSIT_CAP" as const;
 const RULE_VERSION = "1989-art22-cap";
-const LEGAL_BASIS =
+export const LEGAL_BASIS =
   "Dépôt de garantie — loi du 06/07/1989 art. 22 : plafond de 1 mois de loyer hors charges (logement vide) ou 2 mois (meublé). TODO_VERIFIER : loyer HC de référence (date de signature présumée).";
 
 /**

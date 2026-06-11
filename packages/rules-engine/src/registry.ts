@@ -8,13 +8,19 @@
  * Les libellés sont repris VERBATIM de l'ancien `aggregate.ts` (audit + tests).
  */
 import type { CaseDefinition, DpeClass, RuleInput, Signal } from "./types";
-import { formatEur } from "./labels";
-import { evaluateDpeFreeze } from "./rules/dpe-freeze";
-import { evaluateIrlOvercharge } from "./rules/irl-overcharge";
-import { evaluateDepositLate } from "./rules/deposit-late";
-import { evaluateDepositCap } from "./rules/deposit-cap";
-import { evaluateAgencyFeesCap } from "./rules/agency-fees-cap";
-import { evaluatePrivateLandlordFees } from "./rules/private-landlord-fees";
+import { formatEur, RULE_LABEL } from "./labels";
+import { evaluateDpeFreeze, LEGAL_BASIS as DPE_FREEZE_BASIS } from "./rules/dpe-freeze";
+import {
+  evaluateIrlOvercharge,
+  LEGAL_BASIS as IRL_OVERCHARGE_BASIS,
+} from "./rules/irl-overcharge";
+import { evaluateDepositLate, LEGAL_BASIS as DEPOSIT_LATE_BASIS } from "./rules/deposit-late";
+import { evaluateDepositCap, LEGAL_BASIS as DEPOSIT_CAP_BASIS } from "./rules/deposit-cap";
+import { evaluateAgencyFeesCap, LEGAL_BASIS as AGENCY_FEES_BASIS } from "./rules/agency-fees-cap";
+import {
+  evaluatePrivateLandlordFees,
+  LEGAL_BASIS as PRIVATE_FEES_BASIS,
+} from "./rules/private-landlord-fees";
 
 /** Classe DPE en vigueur à la date d'évaluation (la plus récente ≤ asOf). */
 export function latestDpeClassAt(input: RuleInput): DpeClass | undefined {
@@ -31,6 +37,9 @@ export function latestDpeClassAt(input: RuleInput): DpeClass | undefined {
  */
 const decenceCase: CaseDefinition = {
   id: "DECENCE_PROHIBITION",
+  label: "Décence énergétique (interdiction de louer)",
+  legalBasis:
+    "Décence énergétique — loi Climat et résilience (2021-1104) : interdiction de mise en location des logements classés G depuis le 01/01/2025, F au 01/01/2028. TODO_VERIFIER [AVOCAT].",
   legalBasisStatus: "AVOCAT_PENDING",
   detectability: "ESCALATION",
   requiredInputs: ["dpeHistory"],
@@ -73,6 +82,9 @@ const COMPLEMENT_3DS_PIVOT = "2022-08-18";
  */
 const complementCase: CaseDefinition = {
   id: "RENT_SUPPLEMENT",
+  label: "Complément de loyer",
+  legalBasis:
+    "Complément de loyer — loi du 06/07/1989 art. 17 (encadrement) ; loi 3DS (2022-217) : interdit si le logement présente une caractéristique excluante, pour les baux conclus depuis le 18/08/2022. TODO_VERIFIER [AVOCAT].",
   legalBasisStatus: "AVOCAT_PENDING",
   detectability: "DECLARED_SIGNAL",
   requiredInputs: ["rentSupplementDeclared"],
@@ -117,6 +129,9 @@ const complementCase: CaseDefinition = {
  */
 const forbiddenFeesCase: CaseDefinition = {
   id: "FORBIDDEN_FEES",
+  label: "Frais interdits au quotidien",
+  legalBasis:
+    "Clauses et frais interdits — loi du 06/07/1989 art. 4 : facturation de quittances, frais de relance ou pénalités non prévus par la loi. TODO_VERIFIER [AVOCAT].",
   legalBasisStatus: "AVOCAT_PENDING",
   detectability: "DECLARED_SIGNAL",
   requiredInputs: ["forbiddenFees"],
@@ -140,6 +155,9 @@ const forbiddenFeesCase: CaseDefinition = {
  */
 const chargesReviewCase: CaseDefinition = {
   id: "CHARGES_REVIEW",
+  label: "Charges récupérables",
+  legalBasis:
+    "Charges récupérables — loi du 06/07/1989 art. 23 et décret 87-713 (liste limitative) : assurance du propriétaire, frais de gestion ou taxe foncière (hors ordures ménagères) ne sont pas récupérables. TODO_VERIFIER [AVOCAT].",
   legalBasisStatus: "AVOCAT_PENDING",
   detectability: "DECLARED_SIGNAL",
   requiredInputs: ["chargesReviewItems"],
@@ -165,6 +183,8 @@ const chargesReviewCase: CaseDefinition = {
 export const CASE_REGISTRY: CaseDefinition[] = [
   {
     id: "DPE_FREEZE",
+    label: RULE_LABEL.DPE_FREEZE,
+    legalBasis: DPE_FREEZE_BASIS,
     legalBasisStatus: "TODO_VERIFIER",
     detectability: "COMPUTED",
     prescriptionWindowYears: 3,
@@ -173,6 +193,8 @@ export const CASE_REGISTRY: CaseDefinition[] = [
   },
   {
     id: "IRL_OVERCHARGE",
+    label: RULE_LABEL.IRL_OVERCHARGE,
+    legalBasis: IRL_OVERCHARGE_BASIS,
     legalBasisStatus: "TODO_VERIFIER",
     detectability: "COMPUTED",
     prescriptionWindowYears: 3,
@@ -181,6 +203,8 @@ export const CASE_REGISTRY: CaseDefinition[] = [
   },
   {
     id: "DEPOSIT_LATE",
+    label: RULE_LABEL.DEPOSIT_LATE,
+    legalBasis: DEPOSIT_LATE_BASIS,
     legalBasisStatus: "TODO_VERIFIER",
     detectability: "COMPUTED",
     prescriptionWindowYears: 3,
@@ -189,6 +213,8 @@ export const CASE_REGISTRY: CaseDefinition[] = [
   },
   {
     id: "DEPOSIT_CAP",
+    label: RULE_LABEL.DEPOSIT_CAP,
+    legalBasis: DEPOSIT_CAP_BASIS,
     legalBasisStatus: "TODO_VERIFIER",
     detectability: "COMPUTED",
     prescriptionWindowYears: 3,
@@ -199,6 +225,8 @@ export const CASE_REGISTRY: CaseDefinition[] = [
   },
   {
     id: "AGENCY_FEES_CAP",
+    label: RULE_LABEL.AGENCY_FEES_CAP,
+    legalBasis: AGENCY_FEES_BASIS,
     legalBasisStatus: "TODO_VERIFIER",
     detectability: "COMPUTED",
     prescriptionWindowYears: 3,
@@ -207,6 +235,8 @@ export const CASE_REGISTRY: CaseDefinition[] = [
   },
   {
     id: "PRIVATE_LANDLORD_FEES",
+    label: RULE_LABEL.PRIVATE_LANDLORD_FEES,
+    legalBasis: PRIVATE_FEES_BASIS,
     legalBasisStatus: "TODO_VERIFIER",
     detectability: "COMPUTED",
     prescriptionWindowYears: 3,

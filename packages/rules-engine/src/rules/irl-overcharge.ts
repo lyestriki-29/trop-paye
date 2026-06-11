@@ -12,7 +12,7 @@ const RULE_VERSION = "2024-04";
 const PRESCRIPTION_YEARS = 3;
 const SHIELD_FROM = "2022-07-01"; // T3 2022
 const SHIELD_TO = "2024-03-31"; // T1 2024
-const LEGAL_BASIS =
+export const LEGAL_BASIS =
   "Révision IRL — loi du 06/07/1989 art. 17-1 (clause de révision requise, plafond = variation de l'IRL du trimestre de référence) ; bouclier loyer 3,5 % T3-2022→T1-2024 (lois 16/08/2022 et 07/07/2023).";
 
 const day = (iso: string): string => iso.slice(0, 10);

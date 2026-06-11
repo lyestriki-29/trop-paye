@@ -195,6 +195,10 @@ export interface EffectiveDateRange {
  */
 export interface CaseDefinition {
   id: string;
+  /** Libellé FR public (page « Méthode & sources » générée depuis le registre). */
+  label: string;
+  /** Base légale publique du cas (les marqueurs internes sont strippés au rendu). */
+  legalBasis: string;
   legalBasisStatus: LegalBasisStatus;
   detectability: CaseDetectability;
   /** Versionnement par date d'effet (métadonnée ; le calcul reste dans evaluate). */

@@ -12,7 +12,7 @@ const RULE_ID = "DPE_FREEZE" as const;
 const RULE_VERSION = "2022-08-24";
 const FREEZE_FROM = "2022-08-24";
 const PRESCRIPTION_YEARS = 3;
-const LEGAL_BASIS =
+export const LEGAL_BASIS =
   "Gel des loyers F/G — loi Climat et résilience art. 159 ; loi du 06/07/1989 art. 17-1-I (interdiction d'augmentation depuis le 24/08/2022).";
 
 const isFG = (c: DpeClass): boolean => c === "F" || c === "G";
