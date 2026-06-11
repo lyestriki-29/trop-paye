@@ -60,10 +60,18 @@ export function QuittanceCard({
                     : "flex items-baseline justify-between gap-6 border-b border-dashed border-line py-2.5"
                 }
               >
-                <dt className={`text-sm ${row.highlight ? "font-medium text-ink" : "text-ink/70"}`}>
+                <dt
+                  className={`shrink-0 text-sm ${row.highlight ? "font-medium text-ink" : "text-ink/70"}`}
+                >
                   {row.label}
                 </dt>
-                <dd className="tabular whitespace-nowrap font-mono text-sm text-ink">
+                {/* Montants : jamais coupés. Textes longs (descriptif logement) :
+                    retour à la ligne au lieu d'être tronqués (retour Lyes 2026-06-11). */}
+                <dd
+                  className={`tabular font-mono text-sm text-ink ${
+                    row.cents !== undefined ? "whitespace-nowrap" : "min-w-0 break-words text-right"
+                  }`}
+                >
                   {row.cents !== undefined ? formatEUR(row.cents, { decimals: true }) : row.text}
                 </dd>
               </div>

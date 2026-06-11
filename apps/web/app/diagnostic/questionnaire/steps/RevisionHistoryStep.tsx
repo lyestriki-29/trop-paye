@@ -58,7 +58,7 @@ function FreeRows({ draft, setField }: StepProps) {
   );
 }
 
-export function RevisionHistoryStep({ draft, setField }: StepProps) {
+export function RevisionHistoryStep({ draft, setField, goNext }: StepProps) {
   const mode = revisionsEditorMode(draft);
   // Bail < 1 an : mode FREE forcé par revisionsEditorMode — message dédié,
   // éditeur libre directement utilisable (retour Lyes 2026-06-11).
@@ -67,10 +67,22 @@ export function RevisionHistoryStep({ draft, setField }: StepProps) {
   return (
     <div className="space-y-5">
       <p className="text-sm text-ink/60">
-        Facultatif. Si vous connaissez les hausses datées de votre loyer, ajoutez-les : le
-        calcul sera plus précis. Sinon, passez — nous estimerons à partir des loyers de départ
-        et actuel.
+        Facultatif. Si vous connaissez les hausses de votre loyer, ajoutez-les : le calcul
+        sera plus précis. Sinon, passez : nous estimerons à partir des loyers de départ et
+        actuel.
       </p>
+
+      {/* Friction réduite (retour Lyes 2026-06-11) : sortie en un clic, l'estimation
+          se fait sur les loyers de départ/actuel (confiance ajustée par le moteur). */}
+      <Button
+        variant="ghost"
+        onClick={() => {
+          setField("revisions", []);
+          goNext?.();
+        }}
+      >
+        Je ne sais pas, passer cette étape →
+      </Button>
       {draft.rentInputMode === "CC" ? (
         /* TODO_COPY — rappel du mode CC sur les hausses (hors copy deck §2). */
         <p className="text-xs text-ink/55">

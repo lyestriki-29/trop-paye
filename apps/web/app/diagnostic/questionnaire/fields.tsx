@@ -111,6 +111,107 @@ export function DateField({
   );
 }
 
+const MONTHS = [
+  "Janvier",
+  "Février",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Août",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "Décembre",
+] as const;
+
+const SELECT_CLS =
+  "h-12 rounded-field border border-line bg-paper px-3 text-sm text-ink transition hover:border-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink";
+
+/**
+ * Mois + année (décision Lyes 2026-06-11 : pas de date exacte, le date picker
+ * natif casse l'expérience). Valeur ISO au 1er du mois — approximation
+ * CONSERVATRICE pour le moteur : autour d'une date pivot (gel 24/08/2022), le
+ * 1er du mois classe le bail AVANT le pivot, donc jamais de droit sur-estimé.
+ */
+export function MonthYearField({
+  label,
+  hint,
+  value,
+  onChange,
+  fromYear = 1989,
+}: {
+  label: string;
+  hint?: string;
+  /** ISO AAAA-MM-JJ (jour figé au 01) ou chaîne vide. */
+  value: string;
+  onChange: (v: string) => void;
+  fromYear?: number;
+}) {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const month = value ? Number(value.slice(5, 7)) : 0;
+  const year = value ? Number(value.slice(0, 4)) : 0;
+  const years: number[] = [];
+  for (let y = currentYear; y >= fromYear; y -= 1) years.push(y);
+
+  // Sélection partielle tolérée : la valeur ne sort que complète (mois ET année).
+  const emit = (m: number, y: number) => {
+    if (m >= 1 && y >= fromYear) onChange(`${y}-${String(m).padStart(2, "0")}-01`);
+    else onChange("");
+  };
+
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-ink/80">{label}</legend>
+      <div className="mt-2.5 grid grid-cols-[1fr_auto] gap-2">
+        <select
+          aria-label="Mois"
+          value={month || ""}
+          onChange={(e) => emit(Number(e.target.value), year || currentYear)}
+          className={SELECT_CLS}
+        >
+          <option value="" disabled>
+            Mois
+          </option>
+          {MONTHS.map((m, i) => (
+            <option
+              key={m}
+              value={i + 1}
+              disabled={(year || currentYear) === currentYear && i + 1 > currentMonth}
+            >
+              {m}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Année"
+          value={year || ""}
+          onChange={(e) => {
+            const y = Number(e.target.value);
+            // Mois futur devenu invalide après changement d'année → on le purge.
+            const m = y === currentYear && month > currentMonth ? 0 : month;
+            emit(m, y);
+          }}
+          className={`${SELECT_CLS} tabular font-mono`}
+        >
+          <option value="" disabled>
+            Année
+          </option>
+          {years.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+      </div>
+      {hint ? <p className="mt-1.5 text-xs text-ink/50">{hint}</p> : null}
+    </fieldset>
+  );
+}
+
 export interface Choice<T extends string> {
   value: T;
   label: string;

@@ -1,15 +1,16 @@
 "use client";
 
 import type { StepProps } from "../use-diagnostic-form";
-import { DateField } from "../fields";
+import { MonthYearField } from "../fields";
 
+/** Mois + année suffisent (décision Lyes 2026-06-11) : moins de friction que le
+    date picker natif, et l'approximation au 1er du mois reste conservatrice. */
 export function LeaseStep({ draft, setField }: StepProps) {
   return (
-    <DateField
-      label="Date de signature du bail"
-      hint="Sert à dater les révisions et la prescription (3 ans)."
+    <MonthYearField
+      label="Quand avez-vous signé votre bail ?"
+      hint="Le mois et l'année suffisent. Sert à dater les révisions et la prescription (3 ans)."
       value={draft.leaseSignedAt ?? ""}
-      max={new Date().toISOString().slice(0, 10)}
       onChange={(v) => setField("leaseSignedAt", v || undefined)}
     />
   );

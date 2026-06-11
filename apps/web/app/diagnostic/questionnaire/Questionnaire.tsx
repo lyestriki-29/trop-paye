@@ -107,7 +107,11 @@ export function Questionnaire() {
               </h1>
               {step.subtitle ? <p className="mt-2 text-ink/60">{step.subtitle}</p> : null}
               <div className="mt-8">
-                <step.Component draft={draft} setField={setField} />
+                <step.Component
+                  draft={draft}
+                  setField={setField}
+                  goNext={() => setStepIndex(Math.min(STEPS.length - 1, i + 1))}
+                />
               </div>
             </motion.div>
 
