@@ -3,6 +3,7 @@ import { after } from "next/server";
 import { brand, formatEUR } from "@troppaye/shared";
 import { getVerdictForSession } from "@/lib/diagnostic/verdict-read";
 import { getVerdictTeaser } from "@/lib/diagnostic/verdict-teaser";
+import { getReferentials } from "@/lib/referentials";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { trackEvent } from "@/lib/track";
 import { CaptureView } from "./CaptureView";
@@ -79,12 +80,21 @@ export default async function VerdictPage({ params }: VerdictPageProps) {
     // Jalon funnel PRD §5 — dédupliqué à la lecture par count(distinct dossier_id).
     // after() : la mesure ne retarde jamais l'affichage du verdict.
     after(() => trackEvent("verdict_affiche", { dossierId: data.dossierId }));
+
+    // Boosters (LOT 2) : snapshot + référentiels passés au module client pour
+    // l'aperçu live ; le serveur reste autoritaire (booster-actions.ts).
+    const referentials = data.snapshot ? await getReferentials() : null;
     return (
       <VerdictView
         verdict={data.verdict}
         addressLabel={data.addressLabel}
         dossierId={data.dossierId}
         dpeNumber={data.dpeNumber}
+        boosters={
+          data.snapshot && referentials
+            ? { verdictId, snapshot: data.snapshot, referentials }
+            : undefined
+        }
       />
     );
   }

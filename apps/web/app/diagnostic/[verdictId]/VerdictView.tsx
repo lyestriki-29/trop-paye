@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { stripInternalMarkers, type VerdictGlobal } from "@troppaye/rules-engine";
+import {
+  stripInternalMarkers,
+  type DossierSnapshot,
+  type Referentials,
+  type VerdictGlobal,
+} from "@troppaye/rules-engine";
+import { BoostersModule } from "./BoostersModule";
 import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
 import { prescriptionInfo } from "@/lib/diagnostic/prescription";
@@ -22,11 +28,14 @@ export function VerdictView({
   addressLabel,
   dossierId,
   dpeNumber,
+  boosters,
 }: {
   verdict: VerdictGlobal;
   addressLabel: string;
   dossierId: string;
   dpeNumber: string | null;
+  /** Données du module « Vérifications complémentaires » (LOT 2) — propriétaire seul. */
+  boosters?: { verdictId: string; snapshot: DossierSnapshot; referentials: Referentials };
 }) {
   const shortRef = `TP-${dossierId.slice(0, 8).toUpperCase()}`;
   const irregular = verdict.outcome === "IRREGULAR";
@@ -76,6 +85,17 @@ export function VerdictView({
         ) : (
           <VerdictInsufficient results={verdict.results} addressLabel={addressLabel} />
         )}
+
+        {/* Boosters (LOT 2) : cartes optionnelles, aperçu live, persistance serveur.
+            Pas proposé sur INSUFFICIENT_DATA (compléter le diagnostic d'abord). */}
+        {boosters && verdict.outcome !== "INSUFFICIENT_DATA" ? (
+          <BoostersModule
+            verdictId={boosters.verdictId}
+            dossierId={dossierId}
+            snapshot={boosters.snapshot}
+            referentials={boosters.referentials}
+          />
+        ) : null}
 
         {/* Signaux d'orientation — NON chiffrés, à part des montants (3 régimes distincts).
             Déjà au premier plan dans l'état « orientation ». */}

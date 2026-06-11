@@ -1,4 +1,4 @@
-import type { VerdictGlobal } from "@troppaye/rules-engine";
+import type { DossierSnapshot, VerdictGlobal } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getSessionToken } from "./session";
 import { mapVerdictRow } from "./verdict-map";
@@ -11,6 +11,8 @@ export interface VerdictForSession {
   dossierId: string;
   /** N° ADEME du DPE (copy deck « confiance élevée ») — null si non renseigné. */
   dpeNumber: string | null;
+  /** Snapshot moteur du dossier (boosters LOT 2) — null pour les dossiers legacy. */
+  snapshot: DossierSnapshot | null;
 }
 
 /**
@@ -37,7 +39,7 @@ export async function getVerdictForSession(verdictId: string): Promise<VerdictFo
 
   const { data: dossier } = await admin
     .from("dossiers")
-    .select("session_token, address_label, dpe_number")
+    .select("session_token, address_label, dpe_number, engine_snapshot")
     .eq("id", v.dossier_id)
     .single();
   if (!dossier || !dossier.session_token || dossier.session_token !== token) return null;
@@ -48,5 +50,8 @@ export async function getVerdictForSession(verdictId: string): Promise<VerdictFo
     addressLabel: dossier.address_label ?? "",
     dossierId: v.dossier_id,
     dpeNumber: dossier.dpe_number ?? null,
+    snapshot: dossier.engine_snapshot
+      ? (dossier.engine_snapshot as unknown as DossierSnapshot)
+      : null,
   };
 }

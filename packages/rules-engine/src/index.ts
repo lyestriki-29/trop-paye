@@ -19,6 +19,7 @@ export {
   anniversariesBetween,
   mostRecentAnniversaryISO,
   quarterFromMonthISO,
+  shiftISO,
 } from "./internal/dates";
 export { buildRentHistory, type RentHistoryInput } from "./internal/rent-history";
 export {
