@@ -46,6 +46,37 @@ export default async function FunnelPage() {
     .order("created_at", { ascending: false })
     .limit(30);
 
+  // Liste d'attente ACTIONNABLE (revue 2026-06-11) : la promesse « on vous
+  // recontacte sous 7 jours » a besoin d'une liste, pas d'un compteur.
+  const { data: waitEvents } = await admin
+    .from("funnel_events")
+    .select("dossier_id, created_at")
+    .eq("event", "waitlist_rejointe")
+    .order("created_at", { ascending: true });
+  const waitIds = [...new Set((waitEvents ?? []).map((e) => e.dossier_id).filter(Boolean))] as string[];
+  const firstSeen = new Map<string, string>();
+  for (const e of waitEvents ?? []) {
+    if (e.dossier_id && !firstSeen.has(e.dossier_id)) firstSeen.set(e.dossier_id, e.created_at);
+  }
+  const [{ data: waitDossiers }, { data: waitLeads }] = waitIds.length
+    ? await Promise.all([
+        admin.from("dossiers").select("id, status, address_label").in("id", waitIds),
+        admin.from("leads").select("dossier_id, email, phone").in("dossier_id", waitIds),
+      ])
+    : [{ data: [] }, { data: [] }];
+  const leadByDossier = new Map((waitLeads ?? []).map((l) => [l.dossier_id, l]));
+  // Encore DIAGNOSED = pas converti : c'est la file de recontact.
+  const waitlist = (waitDossiers ?? [])
+    .filter((d) => d.status === "DIAGNOSED")
+    .map((d) => ({
+      id: d.id,
+      address: d.address_label ?? "Adresse inconnue",
+      email: leadByDossier.get(d.id)?.email ?? null,
+      phone: leadByDossier.get(d.id)?.phone ?? null,
+      since: firstSeen.get(d.id) ?? null,
+    }))
+    .sort((a, b) => (a.since ?? "").localeCompare(b.since ?? ""));
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -80,6 +111,42 @@ export default async function FunnelPage() {
           )}
         </p>
       </div>
+
+      <h2 className="mt-8 font-display text-lg font-bold">
+        Liste d&apos;attente pilote : à recontacter ({waitlist.length})
+      </h2>
+      <p className="mt-1 text-sm text-ink/55">
+        Promesse affichée au locataire : recontact sous 7 jours. Les plus anciens d&apos;abord.
+      </p>
+      <ul className="mt-3 space-y-2">
+        {waitlist.map((w) => (
+          <li
+            key={w.id}
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-card border border-line bg-paper px-4 py-3 text-sm"
+          >
+            <span className="tabular font-mono text-xs text-ink/45">
+              {w.since?.slice(0, 10) ?? "?"}
+            </span>
+            <Link
+              href={`/admin/dossiers/${w.id}`}
+              className="font-medium underline-offset-2 hover:underline"
+            >
+              {w.address}
+            </Link>
+            {w.email ? (
+              <a href={`mailto:${w.email}`} className="font-mono text-xs text-refund-text">
+                {w.email}
+              </a>
+            ) : (
+              <span className="font-mono text-xs text-stamp">sans email ?!</span>
+            )}
+            {w.phone ? <span className="tabular font-mono text-xs text-ink/55">{w.phone}</span> : null}
+          </li>
+        ))}
+        {waitlist.length === 0 ? (
+          <li className="text-sm text-ink/50">Personne en attente pour l&apos;instant.</li>
+        ) : null}
+      </ul>
 
       <h2 className="mt-8 font-display text-lg font-bold">Derniers événements</h2>
       <ul className="mt-3 space-y-1">

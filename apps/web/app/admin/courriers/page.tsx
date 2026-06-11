@@ -30,6 +30,15 @@ export default async function CourriersPage() {
     .eq("post_status", "TO_POST")
     .order("executed_at", { ascending: true });
 
+  // Revue 2026-06-11 : un courrier rendu PUIS mis en pause/verrou (réponse
+  // bailleur, contestation, délai accordé) ne doit pas être posté aveuglément —
+  // on remonte l'état de séquence pour que l'opérateur tranche.
+  const dossierIds = [...new Set((toPost ?? []).map((a) => a.dossier_id))];
+  const { data: dossierStates } = dossierIds.length
+    ? await admin.from("dossiers").select("id, recovery_state").in("id", dossierIds)
+    : { data: [] };
+  const stateById = new Map((dossierStates ?? []).map((d) => [d.id, d.recovery_state]));
+
   const items = (toPost ?? []).map((a) => {
     const payload = (a.payload ?? {}) as LetterPayload;
     return {
@@ -38,8 +47,9 @@ export default async function CourriersPage() {
       type: a.type,
       renderedAt: a.executed_at,
       letterBody: payload.letterBody ?? "(courrier non rendu)",
-      landlordName: payload.landlordName ?? "—",
-      landlordAddress: payload.landlordAddress ?? "—",
+      landlordName: payload.landlordName ?? "(bailleur non renseigné)",
+      landlordAddress: payload.landlordAddress ?? "(adresse non renseignée)",
+      paused: stateById.get(a.dossier_id) !== "SCHEDULED",
     };
   });
 
@@ -69,6 +79,12 @@ export default async function CourriersPage() {
                 <p className="mt-1 font-mono text-xs text-ink/55">
                   {item.landlordName} · {item.landlordAddress}
                 </p>
+                {item.paused ? (
+                  <p className="mt-1 text-xs font-bold text-stamp">
+                    ⚠ Séquence en pause ou verrouillée depuis le rendu : vérifier le dossier
+                    avant de poster (réponse bailleur, délai accordé, escalade ?).
+                  </p>
+                ) : null}
               </div>
               <Link
                 href={`/admin/dossiers/${item.dossierId}`}

@@ -78,7 +78,7 @@ export function PayoutForm({
         />
         <Field
           id="payout-iban"
-          label="IBAN (France) — commence par FR76…"
+          label="IBAN (France), il commence par FR"
           value={iban}
           onChange={(e) => setIban(e.target.value)}
           autoComplete="off"

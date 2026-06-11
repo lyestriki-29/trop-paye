@@ -30,6 +30,8 @@ export async function sendBrevoEmail(params: {
   try {
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
+      // 10 s max par email : un Brevo lent ne doit pas faire dériver le cron.
+      signal: AbortSignal.timeout(10_000),
       headers: {
         "api-key": env.BREVO_API_KEY,
         "content-type": "application/json",

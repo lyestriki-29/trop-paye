@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { brand } from "@troppaye/shared";
 import { requireAuthPage } from "@/lib/auth/guards";
 import { claimDossierForUser } from "@/lib/dossier/claim";
@@ -41,9 +42,10 @@ export default async function MandatePage({
     .maybeSingle();
   const hasPayout = Boolean(payout);
 
-  // Mesure pilote : un passage sur l'écran liste d'attente = un lead chaud à recontacter.
+  // Mesure pilote : un passage sur l'écran liste d'attente = un lead chaud à
+  // recontacter. after() : ne retarde pas le rendu.
   if (dossier.status === "DIAGNOSED" && !env.MANDATE_ENABLED) {
-    await trackEvent("waitlist_rejointe", { dossierId });
+    after(() => trackEvent("waitlist_rejointe", { dossierId }));
   }
   /** Référence courte : 8 premiers caractères (comme le PDF de mandat, actions.ts),
       préfixe « TP- » de la grammaire documentaire (charte §1, QuittanceCard). */
@@ -92,7 +94,15 @@ export default async function MandatePage({
             <PayoutForm dossierId={dossierId} alreadySaved={hasPayout} />
           </>
         ) : (
-          <Confirmation dossierId={dossierId} dossierRef={dossierRef} status={dossier.status} />
+          <>
+            <Confirmation dossierId={dossierId} dossierRef={dossierRef} status={dossier.status} />
+            {/* Revue 2026-06-11 : l'IBAN doit rester saisissable APRÈS le passage en
+                étude (le parcours naturel upload ses pièces puis revient) — sinon le
+                dossier gagne sans pouvoir reverser. */}
+            {!hasPayout && ["IN_REVIEW", "RECOVERY", "ESCALATED"].includes(dossier.status) ? (
+              <PayoutForm dossierId={dossierId} alreadySaved={false} />
+            ) : null}
+          </>
         )}
       </main>
     </>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { after } from "next/server";
 import { brand, formatEUR } from "@troppaye/shared";
 import { getVerdictForSession } from "@/lib/diagnostic/verdict-read";
 import { getVerdictTeaser } from "@/lib/diagnostic/verdict-teaser";
@@ -48,7 +49,8 @@ export default async function VerdictPage({ params }: VerdictPageProps) {
   const data = await getVerdictForSession(verdictId);
   if (data) {
     // Jalon funnel PRD §5 — dédupliqué à la lecture par count(distinct dossier_id).
-    await trackEvent("verdict_affiche", { dossierId: data.dossierId });
+    // after() : la mesure ne retarde jamais l'affichage du verdict.
+    after(() => trackEvent("verdict_affiche", { dossierId: data.dossierId }));
     return (
       <VerdictView
         verdict={data.verdict}

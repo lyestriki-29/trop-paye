@@ -41,6 +41,14 @@ export async function flushOutbox(limit = 25): Promise<FlushResult> {
     return { sent: 0, failed: 0, skipped: true };
   }
   const admin = getSupabaseAdmin();
+
+  // Reprise des lignes orphelines (revue 2026-06-11) : un crash/redeploy entre le
+  // claim et l'update finale laissait des `sending` perdues à jamais. Le cron est
+  // mono-instance et espacé de 15 min : une ligne encore `sending` au début d'un
+  // flush est forcément un reliquat de crash → re-queue (pire cas rare : doublon
+  // d'email, préférable à une notification client silencieusement perdue).
+  await admin.from("outbox_emails").update({ status: "queued" }).eq("status", "sending");
+
   const { data: queued } = await admin
     .from("outbox_emails")
     .select("id, to_email, subject, body")
