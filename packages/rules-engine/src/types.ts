@@ -51,6 +51,13 @@ export interface DossierSnapshot {
       alimente un SIGNAL d'orientation, jamais un chiffrage automatique. */
   rentSupplementDeclared?: boolean;
   rentSupplementCents?: number;
+  /**
+   * Critères d'interdiction du complément cochés par le locataire (loi 3DS, LOT 1.2).
+   * Ids de `COMPLEMENT_3DS_CRITERIA` (référentiel UI). Le critère DPE F/G est
+   * re-déduit côté moteur depuis la classe (non décochable). Alimente un signal
+   * d'orientation PRIORITAIRE si ≥ 1 critère + bail dans le périmètre — jamais chiffré.
+   */
+  complementCriteria?: string[];
   revisionQuarter?: string; // "T2" — trimestre IRL de référence
   /** Origine du trimestre : lu dans le bail, ou déduit du mois de signature (spec §3). */
   revisionQuarterSource?: "BAIL" | "DEDUCED";

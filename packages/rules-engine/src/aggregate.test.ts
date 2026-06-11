@@ -106,6 +106,48 @@ describe("evaluateAll (agrégateur)", () => {
     expect(signal).not.toContain("interdit");
   });
 
+  it("3DS : bail 2023 + DPE D + critère « humidité » coché → signal INTERDIT prioritaire (non chiffré)", () => {
+    const v = evaluateAll(
+      mk(
+        {
+          dpeHistory: [{ class: "D", date: "2021-01-01", source: "ADEME_API" }],
+          leaseSignedAt: "2023-04-01",
+          rentSupplementDeclared: true,
+          rentSupplementCents: 9000,
+          complementCriteria: ["humidite_murs"],
+          rentHistory: [
+            { type: "INITIAL", date: "2023-04-01", rentCents: 90000, source: "quittance" },
+          ],
+        },
+        "2024-06-01",
+      ),
+    );
+    expect(v.totalRecoverableCents).toBe(0); // jamais chiffré
+    const signal = v.signals.find((s) => s.includes("Complément de loyer"));
+    expect(signal).toContain("interdit");
+    expect(signal).toContain("PRIORITÉ");
+  });
+
+  it("3DS : bail 2021 (avant le pivot) + critère coché → signal générique (pas « interdit »)", () => {
+    const v = evaluateAll(
+      mk(
+        {
+          dpeHistory: [{ class: "D", date: "2020-01-01", source: "ADEME_API" }],
+          leaseSignedAt: "2021-05-01",
+          rentSupplementDeclared: true,
+          complementCriteria: ["humidite_murs"],
+          rentHistory: [
+            { type: "INITIAL", date: "2021-05-01", rentCents: 90000, source: "quittance" },
+          ],
+        },
+        "2024-06-01",
+      ),
+    );
+    const signal = v.signals.find((s) => s.includes("Complément de loyer"));
+    expect(signal).toBeDefined();
+    expect(signal).not.toContain("interdit");
+  });
+
   it("pas de signal complément de loyer sans déclaration", () => {
     const v = evaluateAll(
       mk(

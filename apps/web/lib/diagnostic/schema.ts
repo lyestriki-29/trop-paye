@@ -49,6 +49,8 @@ export const diagnosticSchema = z
         signal d'orientation du moteur, jamais un chiffrage. */
     rentSupplement: z.enum(["OUI", "NON", "NSP"]).optional(),
     rentSupplementCents: z.number().int().positive().optional(),
+    /** Critères 3DS cochés (LOT 1.2) : ids de COMPLEMENT_3DS_CRITERIA. */
+    complementCriteria: z.array(z.string().max(64)).max(20).optional(),
     revisionQuarter: z.string().optional(),
     /** « Je ne sais pas » (spec §3) : trimestre à déduire du mois de signature. */
     revisionQuarterUnknown: z.boolean().optional(),
@@ -166,6 +168,7 @@ export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapsho
       input.depositPaidCents !== undefined ? input.depositPaidCents * n : undefined,
     rentSupplementDeclared: input.rentSupplement === "OUI" ? true : undefined,
     rentSupplementCents: input.rentSupplement === "OUI" ? input.rentSupplementCents : undefined,
+    complementCriteria: input.rentSupplement === "OUI" ? input.complementCriteria : undefined,
     revisionQuarter,
     revisionQuarterSource,
     rentEstimated,

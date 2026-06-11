@@ -3,6 +3,7 @@
 import { estimateMonthlyChargesCents } from "@troppaye/rules-engine";
 import type { StepProps } from "../use-diagnostic-form";
 import { ChoiceField, MoneyField } from "../fields";
+import { COMPLEMENT_3DS_CRITERIA } from "@/lib/diagnostic/complement-3ds";
 
 /**
  * Étape loyer (spec questionnaire §2) : les deux montants partagent le même mode
@@ -18,6 +19,15 @@ export function RentStep({ draft, setField }: StepProps) {
   // Coloc (LOT 1.3) : en mode « ma part », les montants saisis sont reconstitués
   // en total (× nombre de colocataires) côté serveur. Le verdict reste sur le total.
   const share = draft.isShared === true && (draft.rentBasis ?? "TOTAL") === "SHARE";
+  // Critères 3DS (LOT 1.2) : DPE F/G coché d'office depuis l'étape 3, non décochable.
+  const dpeFG = draft.dpe?.class === "F" || draft.dpe?.class === "G";
+  const criteria = draft.complementCriteria ?? [];
+  const toggleCriterion = (id: string) => {
+    const set = new Set(criteria);
+    if (set.has(id)) set.delete(id);
+    else set.add(id);
+    setField("complementCriteria", [...set]);
+  };
 
   const chargesTooHigh =
     cc &&
@@ -119,12 +129,53 @@ export function RentStep({ draft, setField }: StepProps) {
         onChange={(v) => setField("rentSupplement", v)}
       />
       {draft.rentSupplement === "OUI" ? (
-        <MoneyField
-          label="Montant du complément (par mois, si indiqué)"
-          hint="Facultatif. Il est sur la même page du bail que le loyer de base."
-          cents={draft.rentSupplementCents}
-          onChange={(c) => setField("rentSupplementCents", c)}
-        />
+        <>
+          <MoneyField
+            label="Montant du complément (par mois, si indiqué)"
+            hint="Facultatif. Il est sur la même page du bail que le loyer de base."
+            cents={draft.rentSupplementCents}
+            onChange={(c) => setField("rentSupplementCents", c)}
+          />
+
+          {/* Checklist 3DS (LOT 1.2) : ≥ 1 critère + bail depuis le 18/08/2022 →
+              complément très probablement interdit. Référentiel TODO_VERIFIER. */}
+          <fieldset className="space-y-2.5">
+            <legend className="text-sm font-medium text-ink/80">
+              Le logement présente-t-il l'une de ces caractéristiques ?
+            </legend>
+            <p className="text-xs text-ink/50">
+              Cochez ce qui s'applique. Une seule suffit souvent à rendre le complément contestable.
+            </p>
+            {COMPLEMENT_3DS_CRITERIA.map((c) => {
+              const auto = c.autoFromDpeFG === true;
+              const checked = auto ? dpeFG : criteria.includes(c.id);
+              return (
+                <label
+                  key={c.id}
+                  className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${
+                    checked ? "border-ink/40 bg-ink/[0.03]" : "border-line"
+                  } ${auto ? "opacity-90" : "cursor-pointer hover:border-ink/30"}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    disabled={auto}
+                    onChange={auto ? undefined : () => toggleCriterion(c.id)}
+                    className="mt-0.5 h-4 w-4 accent-ink"
+                  />
+                  <span>
+                    {c.label}
+                    {auto ? (
+                      <span className="mt-0.5 block text-xs text-ink/45">
+                        Détecté automatiquement depuis votre DPE.
+                      </span>
+                    ) : null}
+                  </span>
+                </label>
+              );
+            })}
+          </fieldset>
+        </>
       ) : null}
     </div>
   );
