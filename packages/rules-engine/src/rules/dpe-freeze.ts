@@ -63,6 +63,11 @@ export function evaluateDpeFreeze(input: RuleInput): RuleResult {
   if (rentEstimated) {
     steps.push({ label: "Loyers hors charges estimés depuis des montants charges comprises" });
   }
+  // Loyers reconstitués depuis la part d'un colocataire (LOT 1.3) : audit + plafond MEDIUM.
+  const rentFromShare = dossier.rentReconstructedFromShare === true;
+  if (rentFromShare) {
+    steps.push({ label: "Loyers reconstitués depuis la part d'un colocataire (× nombre de colocataires)" });
+  }
   const base = (partial: Partial<RuleResult>): RuleResult => {
     const result: RuleResult = {
       ruleId: RULE_ID,
@@ -75,7 +80,7 @@ export function evaluateDpeFreeze(input: RuleInput): RuleResult {
       computation: { ruleId: RULE_ID, ruleVersion: RULE_VERSION, steps },
       ...partial,
     };
-    if (rentEstimated && result.confidence === "HIGH") result.confidence = "MEDIUM";
+    if ((rentEstimated || rentFromShare) && result.confidence === "HIGH") result.confidence = "MEDIUM";
     return result;
   };
 

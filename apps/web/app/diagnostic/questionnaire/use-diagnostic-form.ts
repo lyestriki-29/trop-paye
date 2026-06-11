@@ -28,6 +28,12 @@ export interface DiagnosticDraft {
   address?: AddressSuggestion;
   surfaceM2?: number;
   furnished?: boolean;
+  /** Colocation (LOT 1.3) : toggle étape 2. */
+  isShared?: boolean;
+  /** Nombre total de colocataires (n) — requis en saisie « ma part ». */
+  tenantCount?: number;
+  /** Base de saisie des loyers (étape 5) : total du logement, ou part personnelle. */
+  rentBasis?: "TOTAL" | "SHARE";
   dpe?: DpeDraft | null;
   dpeUnknown?: boolean;
   leaseSignedAt?: string;
@@ -108,6 +114,10 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
     inseeCode: draft.address?.inseeCode || undefined,
     surfaceM2: draft.surfaceM2,
     furnished: draft.furnished,
+    isShared: draft.isShared,
+    tenantCount: draft.isShared ? draft.tenantCount : undefined,
+    // « ma part » n'a de sens qu'en coloc ; hors coloc on force le total (n=1).
+    rentBasis: draft.isShared ? (draft.rentBasis ?? "TOTAL") : "TOTAL",
     dpe: draft.dpe ?? null,
     leaseSignedAt: draft.leaseSignedAt,
     initialRentCents: draft.initialRentCents,

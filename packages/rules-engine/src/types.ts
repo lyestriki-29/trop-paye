@@ -59,6 +59,12 @@ export interface DossierSnapshot {
    * spec questionnaire §2) → les règles chiffrées plafonnent la confiance à MEDIUM.
    */
   rentEstimated?: boolean;
+  /**
+   * Loyers reconstitués depuis la part d'un colocataire (total = part × nombre de
+   * colocataires, LOT 1.3). Le moteur ne voit que le total ; ce flag signale que
+   * ce total est une reconstitution → les règles chiffrées plafonnent à MEDIUM.
+   */
+  rentReconstructedFromShare?: boolean;
   previousTenantRentCents?: number;
   deposit?: DepositInput;
   /**

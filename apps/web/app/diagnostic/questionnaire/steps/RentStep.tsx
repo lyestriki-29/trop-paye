@@ -15,6 +15,9 @@ export function RentStep({ draft, setField }: StepProps) {
   const mode = draft.rentInputMode ?? "HC";
   const cc = mode === "CC";
   const suffix = cc ? "charges comprises" : "hors charges";
+  // Coloc (LOT 1.3) : en mode « ma part », les montants saisis sont reconstitués
+  // en total (× nombre de colocataires) côté serveur. Le verdict reste sur le total.
+  const share = draft.isShared === true && (draft.rentBasis ?? "TOTAL") === "SHARE";
 
   const chargesTooHigh =
     cc &&
@@ -24,6 +27,20 @@ export function RentStep({ draft, setField }: StepProps) {
 
   return (
     <div className="space-y-6">
+      {/* Coloc : total du logement, ou part personnelle (reconstituée × n). TODO_COPY. */}
+      {draft.isShared ? (
+        <ChoiceField
+          label="Les montants que vous saisissez :"
+          hint="Vous ne connaissez que votre part ? On reconstitue le loyer total du logement."
+          choices={[
+            { value: "TOTAL", label: "Le loyer total du logement" },
+            { value: "SHARE", label: "Ma part" },
+          ]}
+          value={draft.rentBasis ?? "TOTAL"}
+          onChange={(v) => setField("rentBasis", v)}
+        />
+      ) : null}
+
       <ChoiceField
         label="Mes montants sont :"
         /* Phrase actée par Lyes (2026-06-11) : guider vers le CC si le HC est inconnu. */
@@ -44,13 +61,13 @@ export function RentStep({ draft, setField }: StepProps) {
       />
 
       <MoneyField
-        label={`Loyer mensuel de départ (${suffix})`}
+        label={`${share ? "Votre part — loyer de départ" : "Loyer mensuel de départ"} (${suffix})`}
         hint="Le loyer inscrit au bail, à la signature."
         cents={draft.initialRentCents}
         onChange={(c) => setField("initialRentCents", c)}
       />
       <MoneyField
-        label={`Loyer mensuel actuel (${suffix})`}
+        label={`${share ? "Votre part — loyer actuel" : "Loyer mensuel actuel"} (${suffix})`}
         hint={cc ? "Ce que vous payez aujourd'hui, charges comprises." : "Ce que vous payez aujourd'hui, hors charges."}
         cents={draft.currentRentCents}
         onChange={(c) => setField("currentRentCents", c)}

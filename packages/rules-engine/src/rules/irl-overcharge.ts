@@ -44,6 +44,11 @@ export function evaluateIrlOvercharge(input: RuleInput): RuleResult {
   if (rentEstimated) {
     steps.push({ label: "Loyers hors charges estimés depuis des montants charges comprises" });
   }
+  // Loyers reconstitués depuis la part d'un colocataire (LOT 1.3) : audit + plafond MEDIUM.
+  const rentFromShare = dossier.rentReconstructedFromShare === true;
+  if (rentFromShare) {
+    steps.push({ label: "Loyers reconstitués depuis la part d'un colocataire (× nombre de colocataires)" });
+  }
   // Trimestre déduit du mois de signature (spec questionnaire §3) : trace seule,
   // pas de double pénalité de confiance (saisie déjà déclarative).
   if (dossier.revisionQuarterSource === "DEDUCED") {
@@ -66,7 +71,7 @@ export function evaluateIrlOvercharge(input: RuleInput): RuleResult {
       },
       ...partial,
     };
-    if (rentEstimated && result.confidence === "HIGH") result.confidence = "MEDIUM";
+    if ((rentEstimated || rentFromShare) && result.confidence === "HIGH") result.confidence = "MEDIUM";
     return result;
   };
 

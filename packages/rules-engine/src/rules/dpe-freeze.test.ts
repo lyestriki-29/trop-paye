@@ -53,6 +53,25 @@ describe("DPE_FREEZE", () => {
     );
   });
 
+  it("loyers reconstitués depuis la part d'un colocataire → confiance plafonnée à MEDIUM + ligne d'audit", () => {
+    const r = evaluateDpeFreeze(
+      mk(
+        {
+          rentReconstructedFromShare: true,
+          dpeHistory: [dpe("F", "2021-06-01")],
+          rentHistory: [rent("INITIAL", "2022-01-01", 85000), rent("REVISION", "2023-09-01", 89000)],
+        },
+        "2024-09-01",
+      ),
+    );
+    // Ce scénario (source quittance + DPE ADEME non rétroactif) serait HIGH sans le drapeau.
+    expect(r.outcome).toBe("IRREGULAR");
+    expect(r.confidence).toBe("MEDIUM");
+    expect(r.computation.steps.map((s) => s.label)).toContain(
+      "Loyers reconstitués depuis la part d'un colocataire (× nombre de colocataires)",
+    );
+  });
+
   it("1. logement non-F/G avec hausse → COMPLIANT", () => {
     const r = evaluateDpeFreeze(
       mk(

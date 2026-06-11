@@ -18,6 +18,12 @@ export const diagnosticSchema = z
     inseeCode: z.string().optional(),
     surfaceM2: z.number().positive().max(10000).optional(),
     furnished: z.boolean().optional(),
+    /** Colocation (LOT 1.3) : toggle étape 2. */
+    isShared: z.boolean().optional(),
+    /** Nombre total de colocataires (n) ; requis si saisie « ma part ». */
+    tenantCount: z.number().int().min(2).max(20).optional(),
+    /** Base de saisie des loyers (étape 5) : total du logement, ou part personnelle. */
+    rentBasis: z.enum(["TOTAL", "SHARE"]).optional(),
     dpe: z
       .object({
         class: dpeClassSchema,
@@ -53,6 +59,14 @@ export const diagnosticSchema = z
     chargesEstimated: z.boolean().optional(),
   })
   .superRefine((val, ctx) => {
+    // Saisie « ma part » : le nombre de colocataires est requis pour reconstituer le total.
+    if (val.rentBasis === "SHARE" && (val.tenantCount === undefined || val.tenantCount < 2)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["tenantCount"],
+        message: "Indiquez le nombre de colocataires (au moins 2) pour reconstituer le loyer total.",
+      });
+    }
     if (val.rentInputMode !== "CC") return;
     const charges = val.chargesCents;
     if (charges === undefined) {
@@ -92,12 +106,24 @@ export type DiagnosticInput = z.infer<typeof diagnosticSchema>;
  * si les charges sont estimées (barème), `rentEstimated` plafonne la confiance à MEDIUM.
  */
 export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapshot {
-  const charges = input.rentInputMode === "CC" ? input.chargesCents : undefined;
+  // Colocation (LOT 1.3) : en saisie « ma part », on reconstitue le total household
+  // = part × n AVANT toute conversion, pour que le moteur ne voie QUE le total.
+  // En saisie « total » (ou hors coloc), n = 1 → snapshot identique au tunnel actuel.
+  const n = input.rentBasis === "SHARE" && input.tenantCount ? input.tenantCount : 1;
+  // Charges aussi à l'échelle du logement (part × n) pour rester cohérent en mode CC.
+  const charges =
+    input.rentInputMode === "CC" && input.chargesCents !== undefined
+      ? input.chargesCents * n
+      : undefined;
   // Le zod ci-dessus garantit charges < montant ; repli défensif sur le montant brut.
-  const hc = (cents: number): number =>
-    charges === undefined ? cents : (ccToHcCents(cents, charges) ?? cents);
+  const hc = (cents: number): number => {
+    const total = cents * n;
+    return charges === undefined ? total : (ccToHcCents(total, charges) ?? total);
+  };
   const rentEstimated =
     input.rentInputMode === "CC" && input.chargesEstimated === true ? true : undefined;
+  const rentReconstructedFromShare =
+    input.rentBasis === "SHARE" && input.tenantCount ? true : undefined;
 
   // Trimestre IRL : saisi dans le bail, ou déduit du mois de signature (spec §3).
   // Sans date de bail, il reste vide (comportement actuel de la règle).
@@ -134,11 +160,15 @@ export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapsho
       asOf,
     }),
     revisionClause: input.revisionClause,
-    depositPaidCents: input.depositPaidCents,
+    // Dépôt aussi à l'échelle du logement (× n) en mode « ma part » : le plafond
+    // DEPOSIT_CAP se calcule sur le loyer total reconstitué.
+    depositPaidCents:
+      input.depositPaidCents !== undefined ? input.depositPaidCents * n : undefined,
     rentSupplementDeclared: input.rentSupplement === "OUI" ? true : undefined,
     rentSupplementCents: input.rentSupplement === "OUI" ? input.rentSupplementCents : undefined,
     revisionQuarter,
     revisionQuarterSource,
     rentEstimated,
+    rentReconstructedFromShare,
   };
 }
