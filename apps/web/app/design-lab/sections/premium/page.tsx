@@ -55,7 +55,8 @@ export default function PremiumLab() {
     <main className="pb-20">
       <nav className="border-b border-line bg-paper-2 px-6 py-2 text-xs text-ink/60">
         <span className="font-medium">Design-lab · premium v2.1</span>
-        <span className="ml-3">Variantes à arbitrer — A est LIVE, B est l&apos;alternative.</span>
+        {/* Arbitrage Lyes 2026-06-11 : A retenue (live home + /resultats), B archivée. */}
+        <span className="ml-3 font-medium text-refund-text">✓ Arbitré : variante A retenue.</span>
         <Link
           href="/design-lab/sections/gabarit-guide"
           className="ml-3 font-medium underline-offset-2 hover:underline"
