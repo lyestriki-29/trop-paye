@@ -28,6 +28,14 @@ export const env = {
   STORAGE_BUCKET: process.env.SUPABASE_STORAGE_BUCKET ?? "pieces",
   EMAIL_PROVIDER: (process.env.EMAIL_PROVIDER ?? "outbox") as "outbox" | "resend" | "brevo",
   EMAIL_FROM: process.env.EMAIL_FROM ?? "TropPayé <no-reply@troppaye.fr>",
+  /** Clé API Brevo — vide = l'outbox s'accumule sans envoi réel (comportement historique). */
+  BREVO_API_KEY: process.env.BREVO_API_KEY ?? "",
+  /**
+   * Signature de mandats (palier 2). Décision Lyes 2026-06-11 : FALSE par défaut
+   * tant que société + formalités R124 n'existent pas — l'écran mandat affiche
+   * la liste d'attente du pilote au lieu du formulaire de signature.
+   */
+  MANDATE_ENABLED: process.env.MANDATE_ENABLED === "true",
   GEO_API_BASE: process.env.GEO_API_BASE ?? "https://data.geopf.fr/geocodage",
   ADEME_DPE_API_BASE:
     process.env.ADEME_DPE_API_BASE ?? "https://data.ademe.fr/data-fair/api/v1/datasets",
