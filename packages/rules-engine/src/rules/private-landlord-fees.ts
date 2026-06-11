@@ -23,10 +23,11 @@ export function evaluatePrivateLandlordFees(input: RuleInput): RuleResult | null
   if (paid === undefined) return null;
   if (dossier.agencyUsed === true) return null;
 
-  const deadline = dossier.leaseSignedAt
-    ? shiftISO(dossier.leaseSignedAt, { years: PRESCRIPTION_YEARS })
-    : undefined;
-  if (deadline && day(asOf) > deadline) return null;
+  // Sans date de bail, impossible d'établir la non-prescription → non chiffré
+  // (revue 2026-06-12, conservateur — cohérent avec AGENCY_FEES_CAP). [AVOCAT]
+  if (!dossier.leaseSignedAt) return null;
+  const deadline = shiftISO(dossier.leaseSignedAt, { years: PRESCRIPTION_YEARS });
+  if (day(asOf) > deadline) return null;
 
   const recoverable = Math.max(0, paid);
   const steps: ComputationStep[] = [

@@ -20,8 +20,13 @@ const day = (iso: string): string => iso.slice(0, 10);
  */
 export function evaluateAgencyFeesCap(input: RuleInput): RuleResult | null {
   const { dossier, referentials, asOf } = input;
+  // Garde miroir de PRIVATE_LANDLORD_FEES (revue 2026-06-12) : pas d'agence
+  // déclarée = pas d'honoraires d'agence, même si un champ périmé traînait.
+  if (dossier.agencyUsed === false) return null;
   const paid = dossier.agencyFeesPaidCents;
-  if (paid === undefined) return null;
+  const edlPaid = dossier.edlFeesPaidCents;
+  // EDL facturé seul = aussi évaluable (revue : il était ignoré en silence).
+  if (paid === undefined && edlPaid === undefined) return null;
 
   const ref = referentials.agencyFees;
   const insee = dossier.inseeCode;
@@ -33,26 +38,27 @@ export function evaluateAgencyFeesCap(input: RuleInput): RuleResult | null {
   const caps = ref.capsByZone[zone];
   if (!caps) return null;
 
-  // Prescription : honoraires payés à l'entrée ; au-delà de 3 ans, non chiffré. [AVOCAT]
-  const deadline = dossier.leaseSignedAt
-    ? shiftISO(dossier.leaseSignedAt, { years: PRESCRIPTION_YEARS })
-    : undefined;
-  if (deadline && day(asOf) > deadline) return null;
+  // Prescription : sans date de bail, on ne peut PAS établir que la créance
+  // n'est pas prescrite → non chiffré (revue 2026-06-12, conservateur). [AVOCAT]
+  if (!dossier.leaseSignedAt) return null;
+  const deadline = shiftISO(dossier.leaseSignedAt, { years: PRESCRIPTION_YEARS });
+  if (day(asOf) > deadline) return null;
 
   const feeCap = Math.round(surface * caps.feePerM2Cents);
   const edlCap = Math.round(surface * caps.edlPerM2Cents);
-  const feeExcess = Math.max(0, paid - feeCap);
-  const edlPaid = dossier.edlFeesPaidCents ?? 0;
-  const edlExcess = Math.max(0, edlPaid - edlCap);
+  const feePaid = paid ?? 0;
+  const feeExcess = Math.max(0, feePaid - feeCap);
+  const edl = edlPaid ?? 0;
+  const edlExcess = Math.max(0, edl - edlCap);
   const recoverable = feeExcess + edlExcess;
 
   const steps: ComputationStep[] = [
     { label: `Plafond honoraires (zone ${zone}, ${surface} m²)`, cents: feeCap },
-    { label: "Honoraires payés", cents: paid },
+    { label: "Honoraires payés", cents: feePaid },
   ];
-  if (edlPaid > 0) {
+  if (edl > 0) {
     steps.push({ label: "État des lieux : plafond", cents: edlCap });
-    steps.push({ label: "État des lieux payé", cents: edlPaid });
+    steps.push({ label: "État des lieux payé", cents: edl });
   }
   steps.push({ label: "Excédent récupérable", cents: recoverable });
 

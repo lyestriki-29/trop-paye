@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 /**
  * JSON-LD : AboutPage → Organization + 2 Person. jobTitle = clés du copy deck §7
- * (jamais inventés) ; garde-fou : Nicolas n'est jamais « juriste ».
+ * (jamais inventés) ; le qualificatif de Nicolas est verrouillé par NICOLAS_ROLE.
  */
 const jsonLd = {
   "@context": "https://schema.org",

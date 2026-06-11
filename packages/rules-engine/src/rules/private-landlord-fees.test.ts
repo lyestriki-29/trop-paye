@@ -10,7 +10,8 @@ const INITIAL: RentEvent = {
 };
 
 const mk = (dossier: Partial<RuleInput["dossier"]>, asOf = "2024-09-01"): RuleInput => ({
-  dossier: { dpeHistory: [], rentHistory: [INITIAL], ...dossier },
+  // leaseSignedAt par défaut : sans date de bail, plus de chiffrage (revue 2026-06-12).
+  dossier: { dpeHistory: [], rentHistory: [INITIAL], leaseSignedAt: "2023-01-01", ...dossier },
   referentials: { irl: [], shieldRatePct: 3.5 },
   asOf,
 });
@@ -37,6 +38,13 @@ describe("PRIVATE_LANDLORD_FEES (frais d'un bailleur particulier)", () => {
   it("bail prescrit (> 3 ans) → null (non chiffré)", () => {
     const r = evaluatePrivateLandlordFees(
       mk({ leaseSignedAt: "2020-01-01", privateLandlordFeesPaidCents: 25000 }, "2024-09-01"),
+    );
+    expect(r).toBeNull();
+  });
+
+  it("bail sans date → null (prescription inétablissable, revue 2026-06-12)", () => {
+    const r = evaluatePrivateLandlordFees(
+      mk({ leaseSignedAt: undefined, privateLandlordFeesPaidCents: 25000 }),
     );
     expect(r).toBeNull();
   });

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  CASE_REGISTRY,
   evaluateAll,
   formatEur,
   shiftISO,
@@ -11,44 +12,20 @@ import {
 } from "@troppaye/rules-engine";
 import {
   answersFromSnapshot,
+  boosterAnswersSchema,
   mergeBoosterAnswers,
   type BoosterAnswers,
-  type BoosterChecklistItem,
   CHARGES_REVIEW_ITEMS,
   FORBIDDEN_FEES_ITEMS,
 } from "@/lib/diagnostic/boosters";
 import { ChoiceField, MoneyField } from "@/app/diagnostic/questionnaire/fields";
 import { Button } from "@/components/ui/Button";
+import { BoosterChecklist } from "./BoosterChecklist";
 import { submitBoosters } from "./booster-actions";
 
-function Checklist({
-  items,
-  checked,
-  onToggle,
-}: {
-  items: BoosterChecklistItem[];
-  checked: string[];
-  onToggle: (id: string) => void;
-}) {
-  return (
-    <div className="space-y-2">
-      {items.map((item) => (
-        <label
-          key={item.id}
-          className="flex cursor-pointer items-start gap-3 rounded-lg border border-line px-4 py-3 text-sm hover:border-ink/30"
-        >
-          <input
-            type="checkbox"
-            checked={checked.includes(item.id)}
-            onChange={() => onToggle(item.id)}
-            className="mt-0.5 h-4 w-4 accent-ink"
-          />
-          <span>{item.label}</span>
-        </label>
-      ))}
-    </div>
-  );
-}
+/** Fenêtre de prescription lue dans le registre (jamais recopiée en dur — revue). */
+const PRESCRIPTION_YEARS =
+  CASE_REGISTRY.find((c) => c.id === "AGENCY_FEES_CAP")?.prescriptionWindowYears ?? 3;
 
 /**
  * « Vérifications complémentaires » (LOT 2) : 4 cartes optionnelles sous le
@@ -76,10 +53,14 @@ export function BoostersModule({
   const [error, setError] = useState<string | null>(null);
 
   // Reprise : brouillon local prioritaire sur les réponses déjà persistées.
+  // Validé par le MÊME schéma zod que le serveur (revue 2026-06-12) : un
+  // brouillon corrompu/forgé est ignoré au lieu d'être casté aveuglément.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(storageKey);
-      if (raw) setAnswers((a) => ({ ...a, ...(JSON.parse(raw) as BoosterAnswers) }));
+      if (!raw) return;
+      const parsed = boosterAnswersSchema.safeParse(JSON.parse(raw));
+      if (parsed.success) setAnswers((a) => ({ ...a, ...parsed.data }));
     } catch {
       /* brouillon illisible : on garde le snapshot */
     }
@@ -113,9 +94,10 @@ export function BoostersModule({
     return next.totalRecoverableCents - base.totalRecoverableCents;
   }, [snapshot, referentials, answers, asOf]);
 
-  // Carte honoraires : pas proposée si le bail est manifestement prescrit (> 3 ans).
+  // Carte honoraires : pas proposée si le bail est manifestement prescrit.
   const prescribed =
-    snapshot.leaseSignedAt !== undefined && shiftISO(snapshot.leaseSignedAt, { years: 3 }) < asOf;
+    snapshot.leaseSignedAt !== undefined &&
+    shiftISO(snapshot.leaseSignedAt, { years: PRESCRIPTION_YEARS }) < asOf;
 
   const hasInput =
     answers.agencyUsed !== undefined ||
@@ -188,7 +170,7 @@ export function BoostersModule({
         <div>
           <p className="text-sm font-medium text-ink/80">Frais interdits au quotidien</p>
           <div className="mt-2">
-            <Checklist
+            <BoosterChecklist
               items={FORBIDDEN_FEES_ITEMS}
               checked={answers.forbiddenFees ?? []}
               onToggle={toggle("forbiddenFees")}
@@ -199,7 +181,7 @@ export function BoostersModule({
         <div>
           <p className="text-sm font-medium text-ink/80">Vos charges</p>
           <div className="mt-2">
-            <Checklist
+            <BoosterChecklist
               items={CHARGES_REVIEW_ITEMS}
               checked={answers.chargesReviewItems ?? []}
               onToggle={toggle("chargesReviewItems")}

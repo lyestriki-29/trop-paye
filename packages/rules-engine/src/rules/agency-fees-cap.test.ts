@@ -20,7 +20,16 @@ const AGENCY: AgencyFeeReferential = {
 };
 
 const mk = (dossier: Partial<RuleInput["dossier"]>, asOf = "2024-09-01"): RuleInput => ({
-  dossier: { dpeHistory: [], rentHistory: [INITIAL(90000)], inseeCode: "75056", surfaceM2: 30, ...dossier },
+  // leaseSignedAt par défaut : sans date de bail, la règle ne chiffre plus
+  // (prescription inétablissable — durcissement revue 2026-06-12).
+  dossier: {
+    dpeHistory: [],
+    rentHistory: [INITIAL(90000)],
+    inseeCode: "75056",
+    surfaceM2: 30,
+    leaseSignedAt: "2023-01-01",
+    ...dossier,
+  },
   referentials: { irl: [], shieldRatePct: 3.5, agencyFees: AGENCY },
   asOf,
 });
@@ -75,5 +84,24 @@ describe("AGENCY_FEES_CAP (plafond honoraires d'agence)", () => {
       mk({ leaseSignedAt: "2020-01-01", agencyFeesPaidCents: 50000 }, "2024-09-01"),
     );
     expect(r).toBeNull();
+  });
+
+  it("bail sans date → null (prescription inétablissable, revue 2026-06-12)", () => {
+    const r = evaluateAgencyFeesCap(
+      mk({ leaseSignedAt: undefined, agencyFeesPaidCents: 50000 }),
+    );
+    expect(r).toBeNull();
+  });
+
+  it("agencyUsed=false (champ honoraires fantôme) → null : garde miroir, pas de double comptage", () => {
+    const r = evaluateAgencyFeesCap(mk({ agencyUsed: false, agencyFeesPaidCents: 50000 }));
+    expect(r).toBeNull();
+  });
+
+  it("état des lieux facturé SEUL → évalué (plus d'angle mort silencieux)", () => {
+    // EDL plafond = 30 × 3 = 9000 ; payé 12000 → excédent 3000, sans honoraires saisis.
+    const r = evaluateAgencyFeesCap(mk({ edlFeesPaidCents: 12000 }));
+    expect(r?.outcome).toBe("IRREGULAR");
+    expect(r?.recoverableCents).toBe(3000);
   });
 });

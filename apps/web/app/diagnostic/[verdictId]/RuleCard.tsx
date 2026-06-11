@@ -1,4 +1,9 @@
-import { CONFIDENCE_LABEL, RULE_LABEL, type RuleResult } from "@troppaye/rules-engine";
+import {
+  CONFIDENCE_LABEL,
+  RULE_LABEL,
+  stripInternalMarkers,
+  type RuleResult,
+} from "@troppaye/rules-engine";
 import { Amount } from "@/components/Amount";
 import { frenchDate } from "@/lib/format-date";
 
@@ -97,7 +102,10 @@ export function RuleCard({ rule }: { rule: RuleResult }) {
         </p>
       ) : null}
 
-      <p className="mt-3 text-xs leading-relaxed text-ink/45">{rule.legalBasis}</p>
+      {/* Marqueurs internes (TODO_VERIFIER/[AVOCAT]) strippés au rendu public (revue 2026-06-12). */}
+      <p className="mt-3 text-xs leading-relaxed text-ink/45">
+        {stripInternalMarkers(rule.legalBasis)}
+      </p>
     </div>
   );
 }

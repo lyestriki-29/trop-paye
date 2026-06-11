@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { z } from "zod";
 import { evaluateAll, type DossierSnapshot } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -13,6 +14,7 @@ import { trackEvent } from "@/lib/track";
 
 const RATE_WINDOW_MS = 10 * 60_000;
 const RATE_MAX_PER_SESSION = 10;
+const RATE_MAX_PER_IP = 40; // IP partagées (NAT, campus) : plafond plus large
 
 const submitSchema = boosterAnswersSchema.extend({
   verdictId: z.string().regex(UUID_RE),
@@ -38,6 +40,12 @@ export async function submitBoosters(raw: unknown): Promise<SubmitBoostersResult
   const token = await getSessionToken();
   if (!token) return { error: "TODO_COPY — session expirée" };
   if (!checkRateLimit(`boosters:s:${token}`, RATE_MAX_PER_SESSION, RATE_WINDOW_MS)) {
+    return { error: "TODO_COPY — trop de tentatives, réessayez plus tard" };
+  }
+  // Le cookie étant contrôlé par le client, double plafond par IP (revue 2026-06-12).
+  const forwardedFor = (await headers()).get("x-forwarded-for");
+  const ip = forwardedFor?.split(",")[0]?.trim() || "unknown";
+  if (!checkRateLimit(`boosters:ip:${ip}`, RATE_MAX_PER_IP, RATE_WINDOW_MS)) {
     return { error: "TODO_COPY — trop de tentatives, réessayez plus tard" };
   }
 
@@ -69,7 +77,18 @@ export async function submitBoosters(raw: unknown): Promise<SubmitBoostersResult
   const referentials = await getReferentials();
   const verdict = evaluateAll({ dossier: snapshot, referentials, asOf });
 
-  // Nouveau verdict (audit trail conservé) + snapshot enrichi sur le dossier.
+  // Ordre voulu (revue 2026-06-12, pas de transaction multi-table en PostgREST) :
+  // snapshot D'ABORD (source de vérité, erreur vérifiée), verdict ENSUITE. Si
+  // l'INSERT échoue après l'UPDATE, l'état reste cohérent : le prochain calcul
+  // repart du snapshot enrichi. NB : le snapshot est écrasé en place — les
+  // entrées des verdicts précédents ne sont pas reconstituables (historisation
+  // = décision DB à trancher, différé de la revue).
+  const { error: sErr } = await admin
+    .from("dossiers")
+    .update({ engine_snapshot: snapshot as unknown as Json })
+    .eq("id", v.dossier_id);
+  if (sErr) return { error: "TODO_COPY — enregistrement impossible, réessayez" };
+
   const { data: inserted, error: vErr } = await admin
     .from("verdicts")
     .insert({
@@ -85,11 +104,6 @@ export async function submitBoosters(raw: unknown): Promise<SubmitBoostersResult
     .select("id")
     .single();
   if (vErr || !inserted) return { error: "TODO_COPY — enregistrement impossible, réessayez" };
-
-  await admin
-    .from("dossiers")
-    .update({ engine_snapshot: snapshot as unknown as Json })
-    .eq("id", v.dossier_id);
 
   // Jalon funnel — aucun montant ni PII dans l'événement.
   await trackEvent("booster_applique", { dossierId: v.dossier_id });

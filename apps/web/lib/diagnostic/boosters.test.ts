@@ -42,6 +42,37 @@ describe("mergeBoosterAnswers (merge pur partagé client/serveur)", () => {
     expect(s.chargesReviewItems).toEqual(["taxe_fonciere"]);
   });
 
+  it("flip agence → particulier sur snapshot ENRICHI : les champs agence sont purgés (revue)", () => {
+    // 1er passage : agence + honoraires persistés dans le snapshot.
+    const enriched = mergeBoosterAnswers(SNAP, {
+      agencyUsed: true,
+      agencyFeesPaidCents: 50000,
+      edlFeesPaidCents: 12000,
+    });
+    // 2e passage : l'utilisateur corrige (pas d'agence, frais bailleur).
+    const flipped = mergeBoosterAnswers(enriched, {
+      agencyUsed: false,
+      privateLandlordFeesPaidCents: 20000,
+    });
+    expect(flipped.agencyFeesPaidCents).toBeUndefined(); // plus de champ fantôme
+    expect(flipped.edlFeesPaidCents).toBeUndefined();
+    expect(flipped.privateLandlordFeesPaidCents).toBe(20000);
+    expect(flipped.agencyUsed).toBe(false);
+  });
+
+  it("rétractation : checklist vidée → champ purgé du snapshot (le panneau possède ses champs)", () => {
+    const enriched = mergeBoosterAnswers(SNAP, { forbiddenFees: ["quittance_facturee"] });
+    const retracted = mergeBoosterAnswers(enriched, { forbiddenFees: [] });
+    expect(retracted.forbiddenFees).toBeUndefined();
+  });
+
+  it("doublons de checklist dédupliqués (compteur du signal fiable)", () => {
+    const s = mergeBoosterAnswers(SNAP, {
+      forbiddenFees: ["quittance_facturee", "quittance_facturee"],
+    });
+    expect(s.forbiddenFees).toEqual(["quittance_facturee"]);
+  });
+
   it("ne mute pas le snapshot d'origine", () => {
     const before = JSON.stringify(SNAP);
     mergeBoosterAnswers(SNAP, { agencyUsed: true, agencyFeesPaidCents: 40000 });
