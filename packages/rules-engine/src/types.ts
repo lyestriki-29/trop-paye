@@ -111,6 +111,44 @@ export interface RuleResult {
   subsidiaryOf?: RuleId;
 }
 
+export type LegalBasisStatus = "VERIFIED" | "TODO_VERIFIER" | "AVOCAT_PENDING";
+
+/** Mode de détection d'un cas : chiffré, signal déclaratif, ou escalade judiciaire. */
+export type CaseDetectability = "COMPUTED" | "DECLARED_SIGNAL" | "ESCALATION";
+
+/** Signal d'orientation NON chiffré émis par un cas (jamais sommé au total). */
+export interface Signal {
+  caseId: string;
+  message: string;
+  /** Dossier à examiner en PRIORITÉ en revue (ex. complément interdit F/G). */
+  priority?: boolean;
+}
+
+/** Plage de date d'effet d'un cas (versionnement temporel). */
+export interface EffectiveDateRange {
+  from?: string; // ISO inclusif
+  to?: string; // ISO inclusif
+}
+
+/**
+ * Entrée du registre de cas (LOT 0). Contrat commun à toutes les règles et
+ * signaux : `evaluate` rend un RuleResult (chiffré), une liste de Signal
+ * (orientation), ou null (cas non applicable). Si une clé de `requiredInputs`
+ * manque au snapshot, le cas est silencieusement NON évalué (jamais d'erreur).
+ */
+export interface CaseDefinition {
+  id: string;
+  legalBasisStatus: LegalBasisStatus;
+  detectability: CaseDetectability;
+  /** Versionnement par date d'effet (métadonnée ; le calcul reste dans evaluate). */
+  effectiveDateRange?: EffectiveDateRange;
+  /** Fenêtre de prescription en années (défaut 3, surchargeable par cas). */
+  prescriptionWindowYears?: number;
+  /** Clés du snapshot nécessaires : si une manque, le cas n'est pas évalué. */
+  requiredInputs: (keyof DossierSnapshot)[];
+  evaluate: (input: RuleInput) => RuleResult | Signal[] | null;
+}
+
 export interface VerdictGlobal {
   outcome: Outcome;
   totalRecoverableCents: number;
