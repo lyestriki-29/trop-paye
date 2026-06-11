@@ -186,6 +186,7 @@ export type Database = {
           landlord_name: string | null
           lease_renewed_at: string | null
           lease_signed_at: string | null
+          payment_claimed_at: string | null
           previous_tenant_rent_cents: number | null
           recovery_state: Database["public"]["Enums"]["recovery_state"]
           revision_clause: boolean | null
@@ -221,6 +222,7 @@ export type Database = {
           landlord_name?: string | null
           lease_renewed_at?: string | null
           lease_signed_at?: string | null
+          payment_claimed_at?: string | null
           previous_tenant_rent_cents?: number | null
           recovery_state?: Database["public"]["Enums"]["recovery_state"]
           revision_clause?: boolean | null
@@ -256,6 +258,7 @@ export type Database = {
           landlord_name?: string | null
           lease_renewed_at?: string | null
           lease_signed_at?: string | null
+          payment_claimed_at?: string | null
           previous_tenant_rent_cents?: number | null
           recovery_state?: Database["public"]["Enums"]["recovery_state"]
           revision_clause?: boolean | null

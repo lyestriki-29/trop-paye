@@ -72,7 +72,12 @@ export async function validateDossier(dossierId: string): Promise<AdminResult> {
     .maybeSingle();
   if (!claimed) return { error: "Dossier déjà traité." };
 
-  // Rétractation L221-18 : J0 = max(aujourd'hui, signature + 14 j) sauf exécution immédiate.
+  // Rétractation L221-18 (corrigé revue 2026-06-11) : le jour de la signature ne
+  // compte pas, le délai expire à la FIN du 14e jour, prorogé au 1er jour ouvré
+  // s'il tombe un week-end (L221-19 / art. R. computation) → le J0 part au plus
+  // tôt le LENDEMAIN de l'expiration. Jour de signature pris en Europe/Paris.
+  // Jours fériés non câblés (TODO_VERIFIER [AVOCAT]) : l'opérateur poste à la
+  // main et reste le dernier filet humain.
   let j0 = new Date().toISOString().slice(0, 10);
   if (!dossier.immediate_execution) {
     const { data: mandate } = await admin
@@ -81,9 +86,17 @@ export async function validateDossier(dossierId: string): Promise<AdminResult> {
       .eq("dossier_id", dossierId)
       .maybeSingle();
     if (mandate?.signed_at) {
-      const cooloff = new Date(mandate.signed_at);
-      cooloff.setDate(cooloff.getDate() + 14);
-      const cooloffISO = cooloff.toISOString().slice(0, 10);
+      // fr-CA → format YYYY-MM-DD directement.
+      const signedParisDay = new Intl.DateTimeFormat("fr-CA", {
+        timeZone: "Europe/Paris",
+      }).format(new Date(mandate.signed_at));
+      const expiry = new Date(`${signedParisDay}T00:00:00Z`);
+      expiry.setUTCDate(expiry.getUTCDate() + 14); // fin du 14e jour suivant la signature
+      while (expiry.getUTCDay() === 0 || expiry.getUTCDay() === 6) {
+        expiry.setUTCDate(expiry.getUTCDate() + 1); // prorogation samedi/dimanche
+      }
+      expiry.setUTCDate(expiry.getUTCDate() + 1); // J0 = lendemain de l'expiration
+      const cooloffISO = expiry.toISOString().slice(0, 10);
       if (cooloffISO > j0) j0 = cooloffISO;
     }
   }
@@ -285,13 +298,30 @@ export async function recordPayment(
   }
 
   const admin = getSupabaseAdmin();
-  const { data: dossier } = await admin
+  // Claim ATOMIQUE anti double-submit (revue 2026-06-11) : seul le premier appel
+  // concurrent pose payment_claimed_at — le second sort AVANT tout mouvement
+  // d'argent. Libéré en fin d'action (succès comme erreur).
+  const { data: claimedDossier } = await admin
     .from("dossiers")
-    .select("status, agreed_total_cents")
+    .update({ payment_claimed_at: new Date().toISOString() })
     .eq("id", dossierId)
-    .single();
+    .is("payment_claimed_at", null)
+    .select("status, agreed_total_cents")
+    .maybeSingle();
+  if (!claimedDossier) {
+    return {
+      error:
+        "Un encaissement est déjà en cours sur ce dossier (double-clic ?). Vérifier les mouvements avant de réessayer.",
+    };
+  }
+  const releaseClaim = async () => {
+    await admin.from("dossiers").update({ payment_claimed_at: null }).eq("id", dossierId);
+  };
+
+  const dossier = claimedDossier;
   const status = (dossier?.status ?? null) as DossierStatus | null;
   if (status !== "RECOVERY" && status !== "ESCALATED") {
+    await releaseClaim();
     return { error: "Encaissement possible seulement en recouvrement/escalade." };
   }
 
@@ -303,6 +333,7 @@ export async function recordPayment(
     .eq("dossier_id", dossierId)
     .maybeSingle();
   if (!payout) {
+    await releaseClaim();
     return { error: "Coordonnées de reversement absentes (IBAN client) : à recueillir d'abord." };
   }
 
@@ -335,7 +366,14 @@ export async function recordPayment(
     { dossier_id: dossierId, type: "PAYMENT_RECEIVED", executed_at: new Date().toISOString() },
     { dossier_id: dossierId, type: "PAYOUT_SENT", executed_at: new Date().toISOString() },
   ]);
-  if (fErr || aErr) return { error: "Encaissement enregistré partiellement — à vérifier." };
+  if (fErr || aErr) {
+    // On NE libère PAS le claim : état incohérent possible, intervention humaine
+    // requise avant tout nouvel encaissement (le message UI explique).
+    return {
+      error:
+        "Encaissement enregistré partiellement : vérifier les mouvements puis libérer le verrou (re-saisie bloquée volontairement).",
+    };
+  }
 
   await trackEvent("encaisse", { dossierId, metadata: { amountCents } });
   await trackEvent("reverse", { dossierId, metadata: { amountCents: tenant } });
@@ -359,6 +397,7 @@ export async function recordPayment(
     await admin.from("dossiers").update({ recovery_state: "PAUSED" }).eq("id", dossierId);
   }
 
+  await releaseClaim();
   refresh(dossierId);
   return { ok: true };
 }
