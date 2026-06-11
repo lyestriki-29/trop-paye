@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { brand, formatEUR } from "@troppaye/shared";
 import { getVerdictForSession } from "@/lib/diagnostic/verdict-read";
 import { getVerdictTeaser } from "@/lib/diagnostic/verdict-teaser";
+import { trackEvent } from "@/lib/track";
 import { VerdictView } from "./VerdictView";
 import { VerdictUnavailable } from "./VerdictUnavailable";
 import { TeaserView } from "./TeaserView";
@@ -46,6 +47,8 @@ export default async function VerdictPage({ params }: VerdictPageProps) {
   // Propriétaire (cookie de session du diagnostic) → verdict complet.
   const data = await getVerdictForSession(verdictId);
   if (data) {
+    // Jalon funnel PRD §5 — dédupliqué à la lecture par count(distinct dossier_id).
+    await trackEvent("verdict_affiche", { dossierId: data.dossierId });
     return (
       <VerdictView
         verdict={data.verdict}

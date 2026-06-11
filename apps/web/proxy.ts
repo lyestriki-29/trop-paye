@@ -11,6 +11,19 @@ export async function proxy(request: NextRequest) {
   // sans la reconstruire (évite de perdre d'éventuels en-têtes posés en amont).
   const response = NextResponse.next({ request });
 
+  // Attribution acquisition first-party : `?src=tiktok-hook1` → cookie 30 j.
+  // Premier contact conservé (pas d'écrasement) ; slug strict, jamais de PII.
+  const src = request.nextUrl.searchParams.get("src");
+  if (src && /^[\w-]{1,64}$/.test(src) && !request.cookies.get("tp_src")) {
+    response.cookies.set("tp_src", src, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

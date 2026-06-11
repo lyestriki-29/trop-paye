@@ -9,6 +9,7 @@ import { dpeByAddress, dpeByNumber, type DpeLookupResult } from "@/lib/providers
 import { getReferentials } from "@/lib/referentials";
 import { diagnosticSchema, toSnapshot } from "@/lib/diagnostic/schema";
 import { SESSION_COOKIE } from "@/lib/diagnostic/session";
+import { trackEvent } from "@/lib/track";
 
 // Échec fournisseur (`ok: false`) ≠ zéro résultat : l'UI bascule en saisie manuelle.
 export async function searchAddressAction(query: string): Promise<AddressSearchResult> {
@@ -26,14 +27,24 @@ export async function lookupDpeAction(input: {
   if (input.numero) {
     const numero = input.numero.trim();
     if (numero.length === 0 || numero.length > 64) return { ok: true, results: [] };
-    return dpeByNumber(numero);
+    return tracked(await dpeByNumber(numero), "numero");
   }
   if (input.label) {
     const label = input.label.trim();
     if (label.length < 3 || label.length > 200) return { ok: true, results: [] };
-    return dpeByAddress(label);
+    return tracked(await dpeByAddress(label), "adresse");
   }
   return { ok: true, results: [] };
+}
+
+/** Jauge n°1 du PRD §6 : taux de matching DPE ≥ 60 % — mesuré dès le jour 1. */
+async function tracked(res: DpeLookupResult, mode: string): Promise<DpeLookupResult> {
+  if (res.ok) {
+    await trackEvent(res.results.length > 0 ? "dpe_match_found" : "dpe_match_missed", {
+      metadata: { mode },
+    });
+  }
+  return res;
 }
 
 export type SubmitResult = { verdictId: string } | { error: string };

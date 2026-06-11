@@ -5,6 +5,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getSessionToken } from "@/lib/diagnostic/session";
 import { leadSchema, LEAD_CONSENT_VERSION, LEAD_PURPOSE } from "@/lib/leads/schema";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { trackEvent } from "@/lib/track";
 
 export type SubmitLeadResult = { ok: true } | { error: string };
 
@@ -15,29 +16,6 @@ const RATE_MAX_PER_IP = 20; // IP partagées (NAT, campus) : plafond plus large 
 // Même message pour « verdict inexistant » et « cookie d'un autre dossier » :
 // pas d'oracle d'existence sur les UUID de verdicts.
 const NOT_FOUND_ERROR = "TODO_COPY — dossier introuvable ou session expirée";
-
-/**
- * `leads` n'est pas encore dans `database.types.ts` (fichier GÉNÉRÉ : la
- * migration 0003 est appliquée par l'orchestrateur, qui relancera
- * `pnpm db:reset && pnpm db:types`). Cast structurel temporaire — à retirer
- * (revenir à `admin.from("leads")` typé) dès la régénération des types.
- */
-interface LeadUpsertRow {
-  dossier_id: string;
-  email: string;
-  phone: string | null;
-  consent_at: string;
-  consent_text_version: string;
-  purpose: string;
-}
-interface LeadsTableClient {
-  from(table: "leads"): {
-    upsert(
-      values: LeadUpsertRow,
-      options: { onConflict: "dossier_id" },
-    ): PromiseLike<{ error: { message: string } | null }>;
-  };
-}
 
 /**
  * Capture email+téléphone AVANT verdict (porte sur `/diagnostic/[verdictId]`).
@@ -92,8 +70,7 @@ export async function submitLead(raw: unknown): Promise<SubmitLeadResult> {
 
   // 6. Upsert idempotent sur dossier_id : un retry ou une correction d'email
   //    réécrit la même ligne (jamais de doublon, jamais destructif pour le dossier).
-  const leadsAdmin = admin as unknown as LeadsTableClient;
-  const { error } = await leadsAdmin.from("leads").upsert(
+  const { error } = await admin.from("leads").upsert(
     {
       dossier_id: verdict.dossier_id,
       email: parsed.data.email,
@@ -106,6 +83,9 @@ export async function submitLead(raw: unknown): Promise<SubmitLeadResult> {
   );
   // Message brut volontairement non propagé (détails internes / PII possibles).
   if (error) return { error: "TODO_COPY — enregistrement impossible, réessayez" };
+
+  // Jalon funnel PRD §5 — l'événement ne porte AUCUNE PII (dossier_id + src seulement).
+  await trackEvent("email_capture", { dossierId: verdict.dossier_id });
 
   return { ok: true };
 }
