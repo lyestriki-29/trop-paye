@@ -63,11 +63,11 @@ export const FAQ_COMPLETE: ReadonlyArray<FaqEntry> = [
     // Copy deck §1 amendé le 2026-06-11 (décision Lyes, même motif que ci-dessus).
     q: "Combien de temps ça prend ?",
     plain:
-      "La plupart des dossiers se règlent à l'amiable en 1 à 3 mois. S'il faut aller plus loin, nous vous aidons à saisir un avocat — toujours sans frais d'avance de notre part.",
+      "La plupart des dossiers se règlent à l'amiable en 1 à 3 mois. S'il faut aller plus loin, nous vous aidons à saisir un avocat, toujours sans frais d'avance de notre part.",
     a: (
       <>
         La plupart des dossiers se règlent à l&apos;amiable en 1 à 3 mois. S&apos;il faut
-        aller plus loin, nous vous aidons à saisir un avocat — toujours sans frais
+        aller plus loin, nous vous aidons à saisir un avocat, toujours sans frais
         d&apos;avance de notre part.
       </>
     ),

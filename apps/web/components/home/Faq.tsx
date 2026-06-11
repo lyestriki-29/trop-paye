@@ -28,7 +28,7 @@ const FAQ: ReadonlyArray<{ q: string; a: ReactNode }> = [
         {/* Décision Lyes 2026-06-11 : formulation VRAIE tant qu'aucune convention
             d'avocat partenaire n'est signée (anti-L121-2). Deck à amender. */}
         La plupart des dossiers se règlent à l&apos;amiable en 1 à 3 mois. S&apos;il faut
-        aller plus loin, nous vous aidons à saisir un avocat — toujours sans frais
+        aller plus loin, nous vous aidons à saisir un avocat, toujours sans frais
         d&apos;avance de notre part.
       </>
     ),

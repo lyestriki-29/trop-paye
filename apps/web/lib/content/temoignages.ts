@@ -1,7 +1,8 @@
 /**
  * Témoignages RÉELS — jamais d'exemple inventé (règle compteur/preuves).
- * Kilian : fourni par Lyes le 2026-06-11. [AVOCAT] avant diffusion publique :
- * accord écrit + formulation « sans préavis » à vérifier.
+ * Kilian : fourni par Lyes le 2026-06-11. Accord de Kilian CONFIRMÉ par Lyes le
+ * 2026-06-11 au soir (archiver l'écrit signé dans le dossier de conformité).
+ * [AVOCAT] : formulation « sans préavis » à vérifier avant diffusion large.
  */
 export interface Temoignage {
   id: string;
