@@ -28,14 +28,20 @@ describe("toSnapshot — colocation (LOT 1.3)", () => {
     expect(total).toEqual(ref);
   });
 
-  it("saisie « ma part », n=3 : loyers et dépôt reconstitués × 3, flag posé", () => {
+  it("saisie « ma part », n=3 : loyers reconstitués × 3, dépôt INCHANGÉ (total unique), flag posé", () => {
     const s = snapshot({ isShared: true, tenantCount: 3, rentBasis: "SHARE" });
     expect(s.rentReconstructedFromShare).toBe(true);
     expect(s.rentHistory.find((r) => r.type === "INITIAL")?.rentCents).toBe(240000);
     expect(
       s.rentHistory.find((r) => r.type === "REVISION" && r.date === "2023-01-01")?.rentCents,
     ).toBe(255000);
-    expect(s.depositPaidCents).toBe(240000);
+    // Le dépôt est un montant unique pour le logement → jamais × n (cf. revue).
+    expect(s.depositPaidCents).toBe(80000);
+  });
+
+  it("filtre les ids de critères 3DS inconnus (anti-payload forgé)", () => {
+    const s = snapshot({ rentSupplement: "OUI", complementCriteria: ["humidite_murs", "x_forge"] });
+    expect(s.complementCriteria).toEqual(["humidite_murs"]);
   });
 
   it("« ma part » sans nombre de colocataires → refus zod", () => {

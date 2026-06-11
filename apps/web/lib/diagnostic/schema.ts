@@ -5,6 +5,10 @@ import {
   quarterFromMonthISO,
   type DossierSnapshot,
 } from "@troppaye/rules-engine";
+import { COMPLEMENT_3DS_CRITERIA } from "@/lib/diagnostic/complement-3ds";
+
+/** Ids de critères 3DS connus : tout id reçu hors de cet ensemble est ignoré. */
+const KNOWN_3DS_IDS = new Set(COMPLEMENT_3DS_CRITERIA.map((c) => c.id));
 
 export const dpeClassSchema = z.enum(["A", "B", "C", "D", "E", "F", "G"]);
 
@@ -162,13 +166,17 @@ export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapsho
       asOf,
     }),
     revisionClause: input.revisionClause,
-    // Dépôt aussi à l'échelle du logement (× n) en mode « ma part » : le plafond
-    // DEPOSIT_CAP se calcule sur le loyer total reconstitué.
-    depositPaidCents:
-      input.depositPaidCents !== undefined ? input.depositPaidCents * n : undefined,
+    // Dépôt NON multiplié par n : un bail = un dépôt UNIQUE pour le logement, et le
+    // champ UI demande le dépôt versé (total), pas une quote-part. Le plafond
+    // DEPOSIT_CAP se compare bien au loyer total reconstitué (cf. revue 2026-06-11).
+    depositPaidCents: input.depositPaidCents,
     rentSupplementDeclared: input.rentSupplement === "OUI" ? true : undefined,
     rentSupplementCents: input.rentSupplement === "OUI" ? input.rentSupplementCents : undefined,
-    complementCriteria: input.rentSupplement === "OUI" ? input.complementCriteria : undefined,
+    // Filtrage anti-payload-forgé : seuls les ids connus du référentiel sont transmis.
+    complementCriteria:
+      input.rentSupplement === "OUI"
+        ? input.complementCriteria?.filter((id) => KNOWN_3DS_IDS.has(id))
+        : undefined,
     revisionQuarter,
     revisionQuarterSource,
     rentEstimated,
