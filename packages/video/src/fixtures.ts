@@ -28,11 +28,18 @@ export const demoStat = {
   source: "Source : SDES — parc locatif privé classé F/G, 01/01/2023",
 } as const;
 
-/** Témoignage FICTIF (post-pilote : remplacer par un dossier gagné réel consenti). */
+/**
+ * Témoignage RÉEL fourni par Lyes (2026-06-11) : Kilian, 3 ans dans une
+ * passoire thermique au 7ᵉ étage sans ascenseur (Paris 9ᵉ), 750 €/mois,
+ * 4 500 € récupérés + départ sans préavis. Filigrane SPÉCIMEN conservé
+ * jusqu'à confirmation de son accord écrit ([AVOCAT] : « sans préavis »
+ * à vérifier avant diffusion).
+ */
 export const demoTemoignage = {
-  quote: "J'ai tapé mon adresse un dimanche soir. Trois mois plus tard, 1 437 € sont revenus sur mon compte.",
-  author: "Léa, 24 ans — locataire à Paris 11ᵉ",
-  amountCents: 143_700,
+  quote:
+    "Je pensais que 750 € pour Paris, c'était une affaire. Septième étage sans ascenseur, passoire thermique : j'ai récupéré 4 500 € et j'ai pu partir sans préavis.",
+  author: "Kilian — locataire 3 ans à Paris 9ᵉ",
+  amountCents: 450_000,
 } as const;
 
 /** Hooks réseaux (brand.ts — curation banque étudiants Paris en attente de Lyes). */
@@ -54,5 +61,5 @@ export const explainerSteps = [
   },
 ] as const;
 
-/** Date de lancement du teaser — TODO_COPY : à figer par Lyes. */
-export const demoLaunch = { date: "Bientôt", handle: "@troppaye" } as const;
+/** Lancement annoncé « d'ici la semaine prochaine » (Lyes, 2026-06-11) — date exacte à figer. */
+export const demoLaunch = { date: "Juin 2026", handle: "@troppaye" } as const;
