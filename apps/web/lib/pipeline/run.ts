@@ -1,8 +1,6 @@
 import { ACTION_TEMPLATE, renderTemplate } from "@troppaye/templates";
 import { formatEur } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { getLreProvider } from "@/lib/providers/lre";
-import { queueEmail } from "@/lib/notify";
 
 export interface RunResult {
   processed: number;
@@ -52,14 +50,21 @@ async function runAll(actions: DueAction[], nowISO: string): Promise<RunResult> 
   return { processed, skipped };
 }
 
-/** Exécute une Action courrier. Idempotent (claim par `executed_at`) ; respecte recovery_state. */
+/**
+ * Exécute une Action courrier — circuit PAPIER du pilote (décision 2026-06-11,
+ * remplace le mock LRE qui notifiait le client d'un recommandé jamais posté) :
+ * le cron REND le courrier et le met en file `TO_POST` ; l'opérateur imprime,
+ * poste en recommandé et saisit le n° de suivi dans /admin/courriers — c'est
+ * CETTE saisie (markPosted) qui horodate l'envoi et notifie le client.
+ * Idempotent (claim par `executed_at`) ; respecte recovery_state.
+ */
 async function executeOne(action: DueAction, nowISO: string): Promise<boolean> {
   const template = ACTION_TEMPLATE[action.type];
   if (!template) return false; // non un courrier planifié (event admin)
 
   const admin = getSupabaseAdmin();
 
-  // 1) Claim atomique de l'action : seul le premier passage l'exécute (évite le double envoi).
+  // 1) Claim atomique de l'action : seul le premier passage l'exécute (évite le double rendu).
   const { data: claimed } = await admin
     .from("actions")
     .update({ executed_at: nowISO })
@@ -70,10 +75,10 @@ async function executeOne(action: DueAction, nowISO: string): Promise<boolean> {
   if (!claimed) return false;
 
   // 2) Garde-fou n°1 RE-LU APRÈS le claim (atomicité du verrou) : si la séquence a été mise en
-  //    pause/verrou entre-temps, on annule le claim et on n'envoie RIEN (l'envoi LRE est irrévocable).
+  //    pause/verrou entre-temps, on annule le claim et on ne met RIEN en file.
   const { data: dossier } = await admin
     .from("dossiers")
-    .select("user_id, status, recovery_state, address_label")
+    .select("user_id, status, recovery_state, address_label, landlord_name, landlord_address")
     .eq("id", action.dossier_id)
     .single();
   if (!dossier || dossier.recovery_state !== "SCHEDULED" || dossier.status !== "RECOVERY") {
@@ -92,41 +97,41 @@ async function executeOne(action: DueAction, nowISO: string): Promise<boolean> {
   const body = renderTemplate(template, {
     dossierRef: action.dossier_id.slice(0, 8),
     date: nowISO.slice(0, 10),
-    tenantName: "le locataire",
-    landlordName: "le bailleur",
+    tenantName: await resolveTenantName(dossier.user_id),
+    // validateDossier bloque désormais sans bailleur ; fallback pour les dossiers legacy.
+    landlordName: dossier.landlord_name ?? "le bailleur",
     tenantAddress: dossier.address_label ?? "—",
     recoverableAmount: formatEur(verdict?.total_recoverable_cents ?? 0),
     deadlineDays: "21",
     previousDate: nowISO.slice(0, 10),
   });
 
-  const receipt = await getLreProvider().send({
-    dossierId: action.dossier_id,
-    kind: action.type,
-    recipient: "bailleur (mock)",
-  });
-
-  await admin.from("actions").update({ payload: { lreRef: receipt.ref } }).eq("id", action.id);
-
-  // Notification non bloquante : la LRE est déjà partie, un échec d'outbox ne doit pas l'invalider.
-  try {
-    await queueEmail({
-      dossierId: action.dossier_id,
-      toEmail: await resolveEmail(dossier.user_id),
-      subject: "Avancement de votre dossier TropPayé",
-      body: `Un courrier (${action.type}) a été adressé au bailleur.\n\n${body}`,
-      template: action.type,
-    });
-  } catch {
-    /* outbox best-effort */
-  }
+  // 3) File « à poster » : courrier rendu + adresse postale dans le payload —
+  //    AUCUNE notification client ici (elle part à la saisie du n° de suivi).
+  await admin
+    .from("actions")
+    .update({
+      post_status: "TO_POST",
+      payload: {
+        letterBody: body,
+        landlordName: dossier.landlord_name ?? null,
+        landlordAddress: dossier.landlord_address ?? null,
+      },
+    })
+    .eq("id", action.id);
 
   return true;
 }
 
-async function resolveEmail(userId: string | null): Promise<string> {
-  if (!userId) return "outbox@troppaye.test";
+/** Nom du locataire pour l'en-tête du courrier (profil, sinon neutre). */
+async function resolveTenantName(userId: string | null): Promise<string> {
+  if (!userId) return "le locataire";
   const admin = getSupabaseAdmin();
-  const { data } = await admin.auth.admin.getUserById(userId);
-  return data.user?.email ?? "outbox@troppaye.test";
+  const { data } = await admin
+    .from("profiles")
+    .select("first_name, last_name")
+    .eq("id", userId)
+    .maybeSingle();
+  const name = [data?.first_name, data?.last_name].filter(Boolean).join(" ").trim();
+  return name || "le locataire";
 }

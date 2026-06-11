@@ -12,6 +12,7 @@ import {
   recordPayment,
   advanceTime,
   type AdminResult,
+  type LandlordReplyTag,
 } from "@/app/admin/actions";
 
 const BTN = "rounded-field px-4 py-2 text-sm font-medium disabled:opacity-40";
@@ -37,6 +38,9 @@ export function AdminActions({
   const [note, setNote] = useState("");
   const [reason, setReason] = useState("");
   const [amount, setAmount] = useState(String(Math.round(recoverableCents / 100)));
+  const [agreed, setAgreed] = useState("");
+  const [replyTag, setReplyTag] = useState<LandlordReplyTag>("PAIEMENT");
+  const [delayDays, setDelayDays] = useState("15");
 
   async function run(key: string, fn: () => Promise<AdminResult>) {
     setPending(key);
@@ -109,7 +113,7 @@ export function AdminActions({
       {status === "RECOVERY" || status === "ESCALATED" ? (
         <div className="space-y-3">
           {status === "RECOVERY" && recoveryState === "SCHEDULED" ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="space-y-3">
               <button
                 type="button"
                 disabled={pending !== null}
@@ -118,14 +122,44 @@ export function AdminActions({
               >
                 Avancer le temps (1 action)
               </button>
-              <button
-                type="button"
-                disabled={pending !== null}
-                onClick={() => run("reply", () => tagLandlordReply(dossierId))}
-                className={NEUTRAL}
-              >
-                Réponse bailleur → pause
-              </button>
+              {/* Les 4 réponses bailleur typées (PRD D2) — chacune son effet scripté. */}
+              <div className="flex flex-wrap items-end gap-2 border-t border-line pt-3">
+                <label className="text-xs text-ink/60">
+                  Réponse du bailleur
+                  <select
+                    value={replyTag}
+                    onChange={(e) => setReplyTag(e.target.value as LandlordReplyTag)}
+                    className="mt-1 block rounded-field border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-ink"
+                  >
+                    <option value="PAIEMENT">Annonce un paiement → pause</option>
+                    <option value="CONTESTATION_FORME">Conteste la forme → pause</option>
+                    <option value="DEMANDE_DELAI">Demande un délai → décale les relances</option>
+                    <option value="CONTESTATION_FOND">Conteste le fond → escalade (verrou)</option>
+                  </select>
+                </label>
+                {replyTag === "DEMANDE_DELAI" ? (
+                  <label className="text-xs text-ink/60">
+                    Délai (jours)
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={delayDays}
+                      onChange={(e) => setDelayDays(e.target.value.replace(/[^0-9]/g, ""))}
+                      className="mt-1 w-20 rounded-field border border-line bg-paper px-3 py-2 font-mono tabular text-sm outline-none focus:border-ink"
+                    />
+                  </label>
+                ) : null}
+                <button
+                  type="button"
+                  disabled={pending !== null || (replyTag === "DEMANDE_DELAI" && !delayDays)}
+                  onClick={() =>
+                    run("reply", () => tagLandlordReply(dossierId, replyTag, Number(delayDays) || 15))
+                  }
+                  className={NEUTRAL}
+                >
+                  {pending === "reply" ? "…" : "Taguer la réponse"}
+                </button>
+              </div>
             </div>
           ) : null}
 
@@ -151,24 +185,43 @@ export function AdminActions({
             </button>
           ) : null}
 
-          <div className="flex items-end gap-2 border-t border-line pt-3">
+          <div className="flex flex-wrap items-end gap-2 border-t border-line pt-3">
             <label className="text-xs text-ink/60">
-              Montant encaissé (€)
+              Versement encaissé (€)
               <input
                 type="text"
                 inputMode="numeric"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value.replace(/[^0-9]/g, ""))}
+                className="mt-1 w-28 rounded-field border border-line bg-paper px-3 py-2 font-mono tabular text-sm outline-none focus:border-ink"
+              />
+            </label>
+            <label className="text-xs text-ink/60">
+              Convenu au total (€, si échéancier)
+              <input
+                type="text"
+                inputMode="numeric"
+                value={agreed}
+                onChange={(e) => setAgreed(e.target.value.replace(/[^0-9]/g, ""))}
+                placeholder="vide = solde"
                 className="mt-1 w-32 rounded-field border border-line bg-paper px-3 py-2 font-mono tabular text-sm outline-none focus:border-ink"
               />
             </label>
             <button
               type="button"
               disabled={pending !== null || !amount}
-              onClick={() => run("pay", () => recordPayment(dossierId, Number(amount) * 100))}
+              onClick={() =>
+                run("pay", () =>
+                  recordPayment(
+                    dossierId,
+                    Number(amount) * 100,
+                    agreed ? Number(agreed) * 100 : undefined,
+                  ),
+                )
+              }
               className={`${BTN} bg-refund text-paper hover:bg-refund-text`}
             >
-              Enregistrer le paiement → gagné
+              {pending === "pay" ? "…" : "Enregistrer le versement"}
             </button>
           </div>
         </div>

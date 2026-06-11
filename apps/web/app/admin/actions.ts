@@ -8,6 +8,7 @@ import { actionScheduleFor } from "@/lib/pipeline/schedule";
 import { advanceDossier } from "@/lib/pipeline/run";
 import { getPaymentProvider } from "@/lib/providers/payment";
 import { queueEmail } from "@/lib/notify";
+import { trackEvent } from "@/lib/track";
 
 export type AdminResult = { ok: true } | { error: string };
 
@@ -26,12 +27,27 @@ async function loadStatus(dossierId: string): Promise<DossierStatus | null> {
   return (data?.status as DossierStatus | undefined) ?? null;
 }
 
-/** Valide un dossier → RECOVERY + planifie J0/J21/J35/J50. LOW = bloqué (garde-fou code). */
+/**
+ * Valide un dossier → RECOVERY + planifie J0/J21/J35/J50. Garde-fous code :
+ * LOW bloqué ; bailleur (nom + adresse postale) obligatoire — sans lui, aucun
+ * courrier ne peut physiquement partir ; rétractation L221-18 : sans demande
+ * d'exécution immédiate, le J0 attend signature du mandat + 14 jours.
+ */
 export async function validateDossier(dossierId: string): Promise<AdminResult> {
   await requireAdmin();
   const admin = getSupabaseAdmin();
-  const status = await loadStatus(dossierId);
-  if (status !== "IN_REVIEW") return { error: "Dossier non éligible à la validation." };
+  const { data: dossier } = await admin
+    .from("dossiers")
+    .select("status, landlord_name, landlord_address, immediate_execution")
+    .eq("id", dossierId)
+    .single();
+  if (dossier?.status !== "IN_REVIEW") return { error: "Dossier non éligible à la validation." };
+  if (!dossier.landlord_name?.trim() || !dossier.landlord_address?.trim()) {
+    return {
+      error:
+        "Bailleur manquant (nom + adresse postale) : à compléter avant validation — aucun courrier ne peut partir sans destinataire.",
+    };
+  }
 
   const { data: verdict } = await admin
     .from("verdicts")
@@ -56,7 +72,21 @@ export async function validateDossier(dossierId: string): Promise<AdminResult> {
     .maybeSingle();
   if (!claimed) return { error: "Dossier déjà traité." };
 
-  const j0 = new Date().toISOString().slice(0, 10);
+  // Rétractation L221-18 : J0 = max(aujourd'hui, signature + 14 j) sauf exécution immédiate.
+  let j0 = new Date().toISOString().slice(0, 10);
+  if (!dossier.immediate_execution) {
+    const { data: mandate } = await admin
+      .from("mandates")
+      .select("signed_at")
+      .eq("dossier_id", dossierId)
+      .maybeSingle();
+    if (mandate?.signed_at) {
+      const cooloff = new Date(mandate.signed_at);
+      cooloff.setDate(cooloff.getDate() + 14);
+      const cooloffISO = cooloff.toISOString().slice(0, 10);
+      if (cooloffISO > j0) j0 = cooloffISO;
+    }
+  }
   const { error: actErr } = await admin
     .from("actions")
     .insert(actionScheduleFor(j0).map((s) => ({ dossier_id: dossierId, type: s.type, scheduled_at: s.scheduled_at })));
@@ -94,17 +124,112 @@ export async function requestPiece(dossierId: string, note: string): Promise<Adm
   return { ok: true };
 }
 
-/** Tag : réponse du bailleur → met la séquence en PAUSE (aucune relance ne part). */
-export async function tagLandlordReply(dossierId: string): Promise<AdminResult> {
+/** Les 4 réponses bailleur typées du PRD D2, chacune avec son effet scripté. */
+export type LandlordReplyTag =
+  | "PAIEMENT"
+  | "CONTESTATION_FORME"
+  | "CONTESTATION_FOND"
+  | "DEMANDE_DELAI";
+
+/**
+ * Tag : réponse du bailleur (PRD D2). PAIEMENT / CONTESTATION_FORME → pause
+ * (traitement opérateur) ; CONTESTATION_FOND → escalade verrouillée ;
+ * DEMANDE_DELAI → décale les relances restantes de `delayDays` (séquence active).
+ */
+export async function tagLandlordReply(
+  dossierId: string,
+  tag: LandlordReplyTag,
+  delayDays = 15,
+): Promise<AdminResult> {
   await requireAdmin();
+  if (tag === "CONTESTATION_FOND") return tagContestation(dossierId);
+
   const admin = getSupabaseAdmin();
-  await admin.from("dossiers").update({ recovery_state: "PAUSED" }).eq("id", dossierId);
+  if (tag === "DEMANDE_DELAI") {
+    if (!Number.isInteger(delayDays) || delayDays < 1 || delayDays > 90) {
+      return { error: "Délai invalide (1 à 90 jours)." };
+    }
+    const { data: pending } = await admin
+      .from("actions")
+      .select("id, scheduled_at")
+      .eq("dossier_id", dossierId)
+      .is("executed_at", null)
+      .not("scheduled_at", "is", null);
+    for (const a of pending ?? []) {
+      const shifted = new Date(a.scheduled_at as string);
+      shifted.setDate(shifted.getDate() + delayDays);
+      await admin.from("actions").update({ scheduled_at: shifted.toISOString() }).eq("id", a.id);
+    }
+  } else {
+    // PAIEMENT / CONTESTATION_FORME : pause — l'opérateur encaisse ou répond, puis reprend.
+    await admin.from("dossiers").update({ recovery_state: "PAUSED" }).eq("id", dossierId);
+  }
+
   await admin.from("actions").insert({
     dossier_id: dossierId,
     type: "LANDLORD_REPLY",
     executed_at: new Date().toISOString(),
+    payload: { tag, ...(tag === "DEMANDE_DELAI" ? { delayDays } : {}) },
   });
   refresh(dossierId);
+  return { ok: true };
+}
+
+/**
+ * Saisie du n° de recommandé par l'opérateur (file /admin/courriers) : marque
+ * le courrier POSTED — c'est CE moment qui fait foi (et notifie le client),
+ * pas le rendu du PDF. Claim atomique sur post_status.
+ */
+export async function markPosted(actionId: string, trackingNumber: string): Promise<AdminResult> {
+  await requireAdmin();
+  const tracking = trackingNumber.trim();
+  if (tracking.length < 4 || tracking.length > 40) {
+    return { error: "Numéro de suivi invalide." };
+  }
+
+  const admin = getSupabaseAdmin();
+  const { data: posted } = await admin
+    .from("actions")
+    .update({
+      post_status: "POSTED",
+      tracking_number: tracking,
+      posted_at: new Date().toISOString(),
+    })
+    .eq("id", actionId)
+    .eq("post_status", "TO_POST")
+    .select("id, dossier_id, type")
+    .maybeSingle();
+  if (!posted) return { error: "Courrier introuvable ou déjà pointé." };
+
+  // Notification client (réelle, maintenant que le pli est posté) — best-effort.
+  try {
+    const { data: dossier } = await admin
+      .from("dossiers")
+      .select("user_id")
+      .eq("id", posted.dossier_id)
+      .single();
+    if (dossier?.user_id) {
+      const { data: u } = await admin.auth.admin.getUserById(dossier.user_id);
+      if (u.user?.email) {
+        await queueEmail({
+          dossierId: posted.dossier_id,
+          toEmail: u.user.email,
+          // TODO_COPY — notification d'envoi (hors copy deck).
+          subject: "Votre dossier TropPayé avance",
+          body: `Un courrier recommandé a été envoyé à votre bailleur (suivi n° ${tracking}). Vous n'avez rien à faire : nous suivons la réponse.`,
+          template: posted.type,
+        });
+      }
+    }
+  } catch {
+    /* outbox best-effort */
+  }
+
+  if (posted.type === "LETTER_J0") {
+    await trackEvent("j0_envoye", { dossierId: posted.dossier_id });
+  }
+  refresh(posted.dossier_id);
+  revalidatePath("/admin/courriers");
   return { ok: true };
 }
 
@@ -136,27 +261,57 @@ export async function tagContestation(dossierId: string): Promise<AdminResult> {
   return { ok: true };
 }
 
-/** Encaissement simulé : fund_movements (IN + commission + reversement) → WON. */
-export async function recordPayment(dossierId: string, amountCents: number): Promise<AdminResult> {
+/**
+ * Encaissement — gère le paiement TOTAL comme l'ÉCHELONNÉ (PRD D2, courrier
+ * J+35 « échéancier possible ») : chaque versement crée IN + OUT_FEE +
+ * OUT_TENANT (commission par encaissement, sur le cash réellement reçu —
+ * jamais sur l'économie future). `agreedTotalCents` (optionnel, 1ʳᵉ saisie)
+ * fige le montant convenu : WON quand Σ IN l'atteint ; sans accord → un
+ * versement = solde de tout compte (comportement historique).
+ * Pilote mono-opérateur : pas de verrou inter-versements (commenté, assumé).
+ */
+export async function recordPayment(
+  dossierId: string,
+  amountCents: number,
+  agreedTotalCents?: number,
+): Promise<AdminResult> {
   await requireAdmin();
   if (!Number.isInteger(amountCents) || amountCents <= 0) return { error: "Montant invalide." };
-  const status = await loadStatus(dossierId);
+  if (
+    agreedTotalCents !== undefined &&
+    (!Number.isInteger(agreedTotalCents) || agreedTotalCents < amountCents)
+  ) {
+    return { error: "Montant convenu invalide (inférieur au versement ?)." };
+  }
+
+  const admin = getSupabaseAdmin();
+  const { data: dossier } = await admin
+    .from("dossiers")
+    .select("status, agreed_total_cents")
+    .eq("id", dossierId)
+    .single();
+  const status = (dossier?.status ?? null) as DossierStatus | null;
   if (status !== "RECOVERY" && status !== "ESCALATED") {
     return { error: "Encaissement possible seulement en recouvrement/escalade." };
   }
 
-  const admin = getSupabaseAdmin();
-  // On verrouille d'abord la transition vers WON de façon ATOMIQUE : un seul appel concurrent
-  // gagne, ce qui empêche le double encaissement / double reversement.
-  assertTransition(status, "WON");
-  const { data: claimed } = await admin
-    .from("dossiers")
-    .update({ status: "WON", recovery_state: "LOCKED" })
-    .eq("id", dossierId)
-    .in("status", ["RECOVERY", "ESCALATED"])
+  // Reversement = virement manuel V1 : exiger les coordonnées AVANT d'enregistrer
+  // quoi que ce soit (sinon le dossier gagne sans pouvoir payer le locataire).
+  const { data: payout } = await admin
+    .from("payout_details")
     .select("id")
+    .eq("dossier_id", dossierId)
     .maybeSingle();
-  if (!claimed) return { error: "Dossier déjà clôturé (paiement déjà enregistré ?)." };
+  if (!payout) {
+    return { error: "Coordonnées de reversement absentes (IBAN client) : à recueillir d'abord." };
+  }
+
+  // Montant convenu : posé à la première saisie, jamais réécrit ensuite.
+  let agreed = dossier?.agreed_total_cents ?? null;
+  if (agreed === null && agreedTotalCents !== undefined) {
+    agreed = agreedTotalCents;
+    await admin.from("dossiers").update({ agreed_total_cents: agreed }).eq("id", dossierId);
+  }
 
   const { data: mandate } = await admin
     .from("mandates")
@@ -181,6 +336,28 @@ export async function recordPayment(dossierId: string, amountCents: number): Pro
     { dossier_id: dossierId, type: "PAYOUT_SENT", executed_at: new Date().toISOString() },
   ]);
   if (fErr || aErr) return { error: "Encaissement enregistré partiellement — à vérifier." };
+
+  await trackEvent("encaisse", { dossierId, metadata: { amountCents } });
+  await trackEvent("reverse", { dossierId, metadata: { amountCents: tenant } });
+
+  // Solde atteint (Σ IN ≥ convenu) ou paiement unique sans échéancier → WON.
+  const { data: movements } = await admin
+    .from("fund_movements")
+    .select("amount_cents, direction")
+    .eq("dossier_id", dossierId)
+    .eq("direction", "IN");
+  const totalIn = (movements ?? []).reduce((sum, m) => sum + m.amount_cents, 0);
+  if (agreed === null || totalIn >= agreed) {
+    assertTransition(status, "WON");
+    await admin
+      .from("dossiers")
+      .update({ status: "WON", recovery_state: "LOCKED" })
+      .eq("id", dossierId)
+      .in("status", ["RECOVERY", "ESCALATED"]);
+  } else {
+    // Versement intermédiaire : la séquence reste en pause (réponse bailleur taguée).
+    await admin.from("dossiers").update({ recovery_state: "PAUSED" }).eq("id", dossierId);
+  }
 
   refresh(dossierId);
   return { ok: true };

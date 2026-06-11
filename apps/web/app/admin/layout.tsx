@@ -13,6 +13,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
           <nav className="flex items-center gap-5 text-sm text-ink/70">
             <Link href="/admin" className="hover:text-ink">Dossiers</Link>
+            <Link href="/admin/courriers" className="hover:text-ink">Courriers</Link>
+            <Link href="/admin/funnel" className="hover:text-ink">Funnel</Link>
             <Link href="/admin/articles" className="hover:text-ink">Articles</Link>
             <span className="hidden sm:inline">{user.email}</span>
             <form action={signOut}>
