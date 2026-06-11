@@ -4,10 +4,15 @@ import { brand } from "@troppaye/shared";
 import { requireAuthPage } from "@/lib/auth/guards";
 import { claimDossierForUser } from "@/lib/dossier/claim";
 import { getDossierDetail } from "@/lib/dossier/read";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { env } from "@/lib/env";
+import { trackEvent } from "@/lib/track";
 import { Logo } from "@/components/brand/Logo";
 import { Confirmation } from "./Confirmation";
 import { MandateForm } from "./MandateForm";
+import { PayoutForm } from "./PayoutForm";
 import { PiecesUpload } from "./PiecesUpload";
+import { Waitlist } from "./Waitlist";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +32,19 @@ export default async function MandatePage({
 
   const { dossier, verdict, pieces } = detail;
   const missing = [...new Set((verdict?.results ?? []).flatMap((r) => r.missingData ?? []))];
+
+  // Coordonnées de reversement déjà saisies ? (jamais l'IBAN lui-même côté page.)
+  const { data: payout } = await getSupabaseAdmin()
+    .from("payout_details")
+    .select("id")
+    .eq("dossier_id", dossierId)
+    .maybeSingle();
+  const hasPayout = Boolean(payout);
+
+  // Mesure pilote : un passage sur l'écran liste d'attente = un lead chaud à recontacter.
+  if (dossier.status === "DIAGNOSED" && !env.MANDATE_ENABLED) {
+    await trackEvent("waitlist_rejointe", { dossierId });
+  }
   /** Référence courte : 8 premiers caractères (comme le PDF de mandat, actions.ts),
       préfixe « TP- » de la grammaire documentaire (charte §1, QuittanceCard). */
   const dossierRef = `TP-${dossierId.slice(0, 8).toUpperCase()}`;
@@ -48,23 +66,31 @@ export default async function MandatePage({
 
       <main className="mx-auto max-w-xl px-6 pb-16 sm:pb-20">
         {dossier.status === "DIAGNOSED" ? (
-          <MandateForm
-            dossierId={dossierId}
-            dossierRef={dossierRef}
-            addressLabel={dossier.address_label ?? ""}
-            recoverableCents={verdict?.totalRecoverableCents ?? 0}
-          />
+          env.MANDATE_ENABLED ? (
+            <MandateForm
+              dossierId={dossierId}
+              dossierRef={dossierRef}
+              addressLabel={dossier.address_label ?? ""}
+              recoverableCents={verdict?.totalRecoverableCents ?? 0}
+            />
+          ) : (
+            // Palier 2 fermé : liste d'attente pilote (cf. Waitlist.tsx).
+            <Waitlist dossierRef={dossierRef} />
+          )
         ) : dossier.status === "MANDATE_PENDING" ? (
-          <PiecesUpload
-            dossierId={dossierId}
-            pieces={pieces.map((p) => ({
-              id: p.id,
-              kind: p.kind,
-              status: p.status,
-              reason: p.reason,
-            }))}
-            missingData={missing}
-          />
+          <>
+            <PiecesUpload
+              dossierId={dossierId}
+              pieces={pieces.map((p) => ({
+                id: p.id,
+                kind: p.kind,
+                status: p.status,
+                reason: p.reason,
+              }))}
+              missingData={missing}
+            />
+            <PayoutForm dossierId={dossierId} alreadySaved={hasPayout} />
+          </>
         ) : (
           <Confirmation dossierId={dossierId} dossierRef={dossierRef} status={dossier.status} />
         )}

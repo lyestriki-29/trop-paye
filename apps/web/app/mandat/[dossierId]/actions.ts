@@ -12,6 +12,8 @@ import { renderLegalPdf } from "@/lib/pdf/document-pdf";
 import { getSignatureProvider } from "@/lib/providers/signature";
 import { encryptBytes } from "@/lib/crypto";
 import { queueEmail } from "@/lib/notify";
+import { env } from "@/lib/env";
+import { trackEvent } from "@/lib/track";
 
 const MAX_PIECE_BYTES = 10 * 1024 * 1024;
 const PIECE_KINDS = ["bail", "quittance", "dpe", "edl", "rib", "autre"] as const;
@@ -24,10 +26,24 @@ const signSchema = z.object({
   dossierId: z.string().uuid(),
   signerName: z.string().trim().min(2).max(120),
   consent: z.literal(true),
+  // Bailleur = destinataire des courriers : exigé À la signature (l'info est
+  // sur le bail/quittances que le locataire a sous les yeux à cette étape).
+  landlordName: z.string().trim().min(2).max(160),
+  landlordAddress: z.string().trim().min(10).max(300),
+  landlordKind: z.enum(["PARTICULIER", "SCI", "AGENCE"]),
+  // L221-18 : cochée = exécution immédiate demandée (J0 sans attendre 14 j).
+  immediateExecution: z.boolean(),
 });
 
 /** Signature MAISON du mandat : fige le PDF, scelle la preuve, passe le dossier en MANDATE_PENDING. */
 export const signMandate = withAuth(signSchema, async (input, { user }): Promise<ActionResult> => {
+  // Palier 2 fermé (décision 2026-06-11) : pas de signature tant que société +
+  // formalités R124 absentes — l'UI affiche la liste d'attente, ceci est la
+  // ceinture côté serveur si quelqu'un appelle l'action directement.
+  if (!env.MANDATE_ENABLED) {
+    return { error: "Le pilote est complet pour le moment — vous êtes sur la liste d'attente." };
+  }
+
   const admin = getSupabaseAdmin();
   const { data: dossier } = await admin
     .from("dossiers")
@@ -102,7 +118,18 @@ export const signMandate = withAuth(signSchema, async (input, { user }): Promise
   if (proofErr) return { error: "Impossible d'enregistrer la preuve de signature." };
 
   assertTransition(dossier.status as DossierStatus, "MANDATE_PENDING");
-  await admin.from("dossiers").update({ status: "MANDATE_PENDING" }).eq("id", input.dossierId);
+  await admin
+    .from("dossiers")
+    .update({
+      status: "MANDATE_PENDING",
+      landlord_name: input.landlordName,
+      landlord_address: input.landlordAddress,
+      landlord_kind: input.landlordKind,
+      immediate_execution: input.immediateExecution,
+    })
+    .eq("id", input.dossierId);
+
+  await trackEvent("mandat_signe", { dossierId: input.dossierId });
 
   if (user.email) {
     await queueEmail({
@@ -163,6 +190,44 @@ export async function uploadPiece(formData: FormData): Promise<ActionResult> {
   revalidatePath(`/mandat/${dossierId}`);
   return { ok: true };
 }
+
+const payoutSchema = z.object({
+  dossierId: z.string().uuid(),
+  holderName: z.string().trim().min(2).max(120),
+  iban: z
+    .string()
+    .transform((v) => v.replace(/\s+/g, "").toUpperCase())
+    // IBAN FR : « FR » + 2 chiffres de contrôle + 23 caractères (27 au total).
+    .pipe(z.string().regex(/^FR\d{2}[0-9A-Z]{23}$/, "IBAN français invalide")),
+});
+
+/**
+ * Coordonnées de reversement (virement manuel V1) : IBAN chiffré applicativement
+ * (AES-256-GCM, même clé que les pièces), table `payout_details` deny-all.
+ * Sans cette saisie, `recordPayment` refuse d'encaisser (pas de WON sans pouvoir
+ * reverser). Upsert : une re-saisie corrige la précédente.
+ */
+export const savePayoutDetails = withAuth(payoutSchema, async (input, { user }): Promise<ActionResult> => {
+  const admin = getSupabaseAdmin();
+  const { data: dossier } = await admin
+    .from("dossiers")
+    .select("id, user_id")
+    .eq("id", input.dossierId)
+    .single();
+  if (!dossier || dossier.user_id !== user.id) return { error: "Dossier introuvable." };
+
+  const ibanEncrypted = encryptBytes(Buffer.from(input.iban, "utf8")).toString("base64");
+  const { error } = await admin
+    .from("payout_details")
+    .upsert(
+      { dossier_id: input.dossierId, holder_name: input.holderName, iban_encrypted: ibanEncrypted },
+      { onConflict: "dossier_id" },
+    );
+  if (error) return { error: "Impossible d'enregistrer les coordonnées." };
+
+  revalidatePath(`/mandat/${input.dossierId}`);
+  return { ok: true };
+});
 
 /** Socle minimal de pièces fourni (bail + au moins une quittance) → passage en IN_REVIEW. */
 async function maybeAdvanceToReview(
