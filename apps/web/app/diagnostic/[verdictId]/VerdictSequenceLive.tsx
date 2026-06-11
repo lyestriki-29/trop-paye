@@ -164,17 +164,28 @@ export function VerdictSequenceLive({
               <span className="sr-only">{formatEUR(totalRecoverableCents, { decimals: true })}</span>
             </span>
           </p>
-          <p className="mt-3 text-base text-ink/70">
-            récupérables
-            {futureMonthlySavingCents > 0 ? (
-              <>
-                {" · "}
-                <span className="font-mono tabular">+ {formatEUR(futureMonthlySavingCents, { decimals: true })}</span>
-                /mois d&apos;économie à venir
-              </>
-            ) : null}
-          </p>
+          <p className="mt-3 text-base text-ink/70">récupérables</p>
         </Reveal>
+
+        {/* Double bénéfice (demande Lyes 2026-06-12) : on ne récupère pas
+            seulement le passé, le loyer BAISSE pour la suite (hausse illégale
+            supprimée). TODO_COPY — formulation brouillon, hors copy deck. */}
+        {futureMonthlySavingCents > 0 ? (
+          <Reveal delay={t.cta - 0.55} className="mt-6 rounded-card bg-refund/10 px-5 py-4">
+            <p className="text-sm font-semibold text-refund-text">
+              Et pour la suite : votre loyer baisse.
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-ink/75">
+              Une fois la hausse illégale supprimée, vous payez{" "}
+              <span className="font-mono font-semibold tabular">
+                {formatEUR(futureMonthlySavingCents, { decimals: true })}
+              </span>{" "}
+              de moins chaque mois, soit{" "}
+              <span className="font-mono tabular">{formatEUR(futureMonthlySavingCents * 12)}</span>{" "}
+              par an tant que vous restez dans le logement.
+            </p>
+          </Reveal>
+        ) : null}
 
         <Reveal delay={t.cta - 0.4} className="mt-8">
           <ConfidenceNote confidence={confidence} dpeNumber={dpeNumber} />

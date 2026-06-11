@@ -29,6 +29,13 @@ export function VerdictUnquantified({
         sont respectées. En revanche, un point relevé ci-dessous relève d&apos;une démarche
         juridique distincte — il ne se traduit pas par un montant automatique.
       </p>
+      {/* Double bénéfice (demande Lyes 2026-06-12) : l'enjeu d'une contestation
+          n'est pas qu'un remboursement, c'est un loyer plus bas chaque mois.
+          TODO_COPY [AVOCAT] — formulation brouillon, sans promesse de résultat. */}
+      <p className="mt-3 leading-relaxed text-ink/70">
+        L&apos;enjeu est concret : faire supprimer un complément de loyer ou une situation
+        irrégulière, c&apos;est un loyer plus bas chaque mois, pas seulement un remboursement.
+      </p>
 
       <ul className="reveal-2 mt-7 space-y-3">
         {signals.map((signal, i) => (

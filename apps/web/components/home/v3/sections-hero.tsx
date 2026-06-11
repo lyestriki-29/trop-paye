@@ -86,6 +86,13 @@ export function HeroV3() {
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink/70">
                 {brand.hero.subtitle}
               </p>
+              {/* Double bénéfice (demande Lyes 2026-06-12) : récupérer le passé
+                  ET faire baisser le loyer pour la suite. TODO_COPY — brouillon
+                  hors deck, ton sans promesse de résultat (règles §6 du deck). */}
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-ink/70">
+                Et souvent, votre loyer <Marker>baisse pour de bon</Marker> :
+                hausse illégale supprimée, complément de loyer contesté.
+              </p>
               <div className="mt-9">
                 <HeroAddress />
               </div>
