@@ -44,28 +44,31 @@ export const FAQ_COMPLETE: ReadonlyArray<FaqEntry> = [
     ),
   },
   {
-    // [AVOCAT] — copy deck §1, mot pour mot ; à valider avant mise en ligne.
+    // [AVOCAT] — copy deck §1 amendé le 2026-06-11 (décision Lyes) : « mettons en
+    // relation avec un partenaire » → « aidons à trouver un avocat » tant qu'aucune
+    // convention de partenariat n'est signée (anti-pratique trompeuse L121-2).
     q: "Est-ce que vous êtes des avocats ?",
     plain:
-      "Non, et nous ne donnons pas de conseil juridique. Nous fournissons une information générale, des calculs à partir de données publiques, et nous recouvrons les sommes avec votre mandat, dans le cadre légal du recouvrement amiable. Si votre dossier exige un avocat, nous vous mettons en relation avec un partenaire.",
+      "Non, et nous ne donnons pas de conseil juridique. Nous fournissons une information générale, des calculs à partir de données publiques, et nous recouvrons les sommes avec votre mandat, dans le cadre légal du recouvrement amiable. Si votre dossier exige un avocat, nous vous aidons à en trouver un.",
     a: (
       <>
         Non, et nous ne donnons pas de conseil juridique. Nous fournissons une information
         générale, des calculs à partir de données publiques, et nous recouvrons les sommes
         avec votre mandat, dans le cadre légal du recouvrement amiable. Si votre dossier
-        exige un avocat, nous vous mettons en relation avec un partenaire.
+        exige un avocat, nous vous aidons à en trouver un.
       </>
     ),
   },
   {
+    // Copy deck §1 amendé le 2026-06-11 (décision Lyes, même motif que ci-dessus).
     q: "Combien de temps ça prend ?",
     plain:
-      "La plupart des dossiers se règlent à l'amiable en 1 à 3 mois. S'il faut aller plus loin, nous vous proposons un avocat partenaire — toujours sans frais d'avance.",
+      "La plupart des dossiers se règlent à l'amiable en 1 à 3 mois. S'il faut aller plus loin, nous vous aidons à saisir un avocat — toujours sans frais d'avance de notre part.",
     a: (
       <>
         La plupart des dossiers se règlent à l&apos;amiable en 1 à 3 mois. S&apos;il faut
-        aller plus loin, nous vous proposons un avocat partenaire — toujours sans frais
-        d&apos;avance.
+        aller plus loin, nous vous aidons à saisir un avocat — toujours sans frais
+        d&apos;avance de notre part.
       </>
     ),
   },

@@ -48,6 +48,13 @@ export function Temoignages({ numero = "04" }: { numero?: string }) {
                 Dossier clos
               </Stamp>
             </figcaption>
+            {/* Mention de contexte VRAIE (décision Lyes 2026-06-11) : le dossier a été
+                mené avant le lancement — désamorce toute lecture « résultat TropPayé »
+                (L121-2) tant qu'aucun dossier n'a été traité par la plateforme.
+                [AVOCAT] accord écrit du témoin toujours requis avant diffusion large. */}
+            <p className="mt-4 font-mono text-xs text-ink/45">
+              Dossier mené en amont du lancement de TropPayé.
+            </p>
           </figure>
         </Reveal>
 
