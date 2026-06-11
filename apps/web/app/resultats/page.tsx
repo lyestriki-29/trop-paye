@@ -3,6 +3,7 @@ import { Confiance } from "@/components/home/Confiance";
 import { CtaFinal } from "@/components/home/CtaFinal";
 import { Reveal } from "@/components/home/Reveal";
 import { RevealInit } from "@/components/home/RevealInit";
+import { Temoignages } from "@/components/home/Temoignages";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
 import { getPublicStats } from "@/lib/public-stats";
@@ -41,6 +42,8 @@ export default async function ResultatsPage() {
         </header>
 
         <Confiance stats={stats} />
+
+        <Temoignages numero="03" />
 
         <section className="mx-auto max-w-container px-6 py-8 sm:py-12">
           <Reveal>

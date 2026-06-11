@@ -38,7 +38,7 @@ export function Faq() {
     <section className="mx-auto max-w-container px-6 py-16 sm:py-20">
       <Reveal>
         <p aria-hidden className="font-mono text-xs font-medium tracking-widest text-ink/45">
-          04
+          05
         </p>
         {/* TODO_COPY : intitulé de section non couvert par le copy deck. */}
         <h2 className="mt-2 font-display text-xl font-extrabold tracking-display sm:text-2xl">

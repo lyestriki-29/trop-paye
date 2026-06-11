@@ -19,6 +19,8 @@ export interface QuittanceCardProps {
   children?: ReactNode; // annotations, CTA, mentions
   /** Espacement généreux du moment verdict (séquence signature, charte §4). */
   spotlight?: boolean;
+  /** Bord inférieur de ticket perforé (premium v2.1 — reçus, preuves). */
+  perforated?: boolean;
   className?: string;
 }
 
@@ -30,10 +32,15 @@ export function QuittanceCard({
   total,
   children,
   spotlight = false,
+  perforated = false,
   className,
 }: QuittanceCardProps) {
   return (
-    <section className={`overflow-hidden rounded-card border border-line bg-paper ${className ?? ""}`}>
+    <section
+      className={`overflow-hidden rounded-card border border-line bg-paper ${
+        perforated ? "receipt-edge rounded-b-none border-b-0 pb-3" : ""
+      } ${className ?? ""}`}
+    >
       <header
         className={`flex items-center justify-between gap-4 border-b border-line bg-paper-2 py-3 font-mono text-[11px] uppercase tracking-widest text-ink/55 ${spotlight ? "px-7 sm:px-12" : "px-5"}`}
       >

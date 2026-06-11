@@ -26,6 +26,30 @@ body {
   line-height: 1.6;
 }
 
+/* Grain papier (premium v2.1, charte §5 « la preuve est la décoration ») :
+   bruit SVG fixe, composité GPU, quasi invisible mais la matière change tout. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Bord de ticket perforé (bas de carte-quittance, premium v2.1). */
+.receipt-edge {
+  --zz: 10px;
+  -webkit-mask-image: conic-gradient(from -45deg at bottom, transparent 90deg, black 0);
+  -webkit-mask-size: calc(var(--zz) * 2) 100%;
+  -webkit-mask-position: bottom;
+  mask-image: conic-gradient(from -45deg at bottom, transparent 90deg, black 0);
+  mask-size: calc(var(--zz) * 2) 100%;
+  mask-position: bottom;
+}
+
 /* Montants en euros : chiffres tabulaires (charte §2). */
 .tabular {
   font-variant-numeric: tabular-nums;
@@ -77,4 +101,39 @@ body {
     opacity: 1;
     transform: none;
   }
+
+  /* Surligneur animé (premium v2.1) : balaie au reveal de la section… */
+  [data-reveal] .tp-marker {
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--reveal-delay, 0s) + 0.3s);
+  }
+  [data-reveal="in"] .tp-marker {
+    transform: scaleX(1);
+  }
+  /* …et au chargement dans le hero (reveal-1/2/3 = animation, pas d'observer). */
+  .reveal-1 .tp-marker,
+  .reveal-2 .tp-marker,
+  .reveal-3 .tp-marker {
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: tp-marker-sweep 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) 0.55s forwards;
+  }
+
+  /* Tampon qui claque (premium v2.1) : scale 1.7 → 1 au reveal. */
+  [data-reveal] .tp-stamp {
+    opacity: 0;
+    transform: rotate(var(--stamp-rotate, -8deg)) scale(1.7);
+    transition:
+      opacity 0.18s ease-out calc(var(--reveal-delay, 0s) + 0.45s),
+      transform 0.28s cubic-bezier(0.2, 1.4, 0.3, 1) calc(var(--reveal-delay, 0s) + 0.45s);
+  }
+  [data-reveal="in"] .tp-stamp {
+    opacity: 1;
+    transform: rotate(var(--stamp-rotate, -8deg)) scale(1);
+  }
+}
+
+@keyframes tp-marker-sweep {
+  to { transform: scaleX(1); }
 }

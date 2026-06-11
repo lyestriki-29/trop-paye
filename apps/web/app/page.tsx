@@ -6,6 +6,7 @@ import { Hero } from "@/components/home/Hero";
 import { Passoires } from "@/components/home/Passoires";
 import { RevealInit } from "@/components/home/RevealInit";
 import { Steps } from "@/components/home/Steps";
+import { Temoignages } from "@/components/home/Temoignages";
 import { FAQ_COMPLETE } from "@/components/public/FaqComplete";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { SiteHeader } from "@/components/ui/SiteHeader";
@@ -41,6 +42,7 @@ export default async function Home() {
         <Steps />
         <Confiance stats={stats} />
         <Passoires />
+        <Temoignages />
         <Faq />
         <CtaFinal />
       </main>

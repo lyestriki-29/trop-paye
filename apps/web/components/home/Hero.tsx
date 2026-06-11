@@ -15,7 +15,7 @@ function SpecimenQuittance() {
       <div className="absolute inset-0 translate-x-2.5 translate-y-2.5 rounded-card border border-line bg-paper-2" />
       <div className="relative rotate-1 transition duration-300 hover:rotate-0">
         <QuittanceCard
-          className="shadow-xl"
+          className="shadow-deep"
           reference="Réf. dossier TP-2026-0117"
           kind="Quittance de loyer"
           meta="12 rue des Lilas, 75011 Paris"
@@ -45,7 +45,8 @@ export function Hero() {
   return (
     <section className="mx-auto grid max-w-container items-center gap-14 px-6 pb-24 pt-14 sm:pt-20 lg:grid-cols-[7fr_5fr]">
       <div>
-        <h1 className="reveal-1 font-display text-2xl font-extrabold leading-[1.05] tracking-display sm:text-hero">
+        {/* Premium v2.1 : typo éditoriale géante fluide (text-mega). */}
+        <h1 className="reveal-1 font-display text-mega font-extrabold tracking-display">
           {/* brand.hero.title, mot pour mot — surligneur sur « trop payer ». */}
           Marre de{" "}
           <span className="whitespace-nowrap">
