@@ -1,4 +1,5 @@
 import type { Confidence, DpeClass, RuleInput, RuleResult, VerdictGlobal } from "./types";
+import { formatEur } from "./labels";
 import { evaluateDpeFreeze } from "./rules/dpe-freeze";
 import { evaluateIrlOvercharge } from "./rules/irl-overcharge";
 import { evaluateDepositLate } from "./rules/deposit-late";
@@ -61,14 +62,29 @@ export function evaluateAll(input: RuleInput): VerdictGlobal {
       "Logement classé F : interdiction de mise en location depuis le 01/01/2028 (décence énergétique). Orientation judiciaire, non chiffrée automatiquement. [AVOCAT]",
     );
   }
-  // Complément de loyer (retour Lyes 2026-06-11) : licite uniquement en zone
-  // d'encadrement pour des caractéristiques exceptionnelles ; contestation
-  // dans les 3 mois suivant la signature (CDC). Signal d'orientation, JAMAIS
-  // chiffré automatiquement. TODO_VERIFIER [AVOCAT] : base art. 140 loi ELAN.
+  // Complément de loyer (retours Lyes 2026-06-11) : licite uniquement en zone
+  // d'encadrement pour des caractéristiques exceptionnelles. Cas aggravé : sur
+  // un logement F/G, il est INTERDIT pour les baux conclus depuis le 18/08/2022
+  // (loi 2022-1158, art. 13 : TODO_VERIFIER date pivot exacte et périmètre).
+  // Fenêtre de contestation (3 mois CDC vs clause réputée non écrite +
+  // répétition 3 ans) : débattue, à trancher [AVOCAT] avant tout chiffrage —
+  // d'ici là : signal d'orientation, JAMAIS chiffré automatiquement.
   if (input.dossier.rentSupplementDeclared) {
-    signals.push(
-      "Complément de loyer mentionné au bail : il n'est licite qu'en zone d'encadrement, pour des caractéristiques exceptionnelles du logement, et se conteste dans les 3 mois suivant la signature du bail. À examiner en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]",
-    );
+    const signedAt = input.dossier.leaseSignedAt?.slice(0, 10);
+    const fgProhibited =
+      (cls === "F" || cls === "G") && (signedAt === undefined || signedAt >= "2022-08-18");
+    if (fgProhibited) {
+      const amount = input.dossier.rentSupplementCents
+        ? ` (${formatEur(input.dossier.rentSupplementCents)} par mois déclarés)`
+        : "";
+      signals.push(
+        `Complément de loyer sur un logement classé ${cls} : interdit pour les baux conclus depuis le 18/08/2022. Fort potentiel de récupération${amount} : dossier à examiner en PRIORITÉ en revue. La fenêtre de contestation est débattue : orientation, jamais chiffrée automatiquement. [AVOCAT]`,
+      );
+    } else {
+      signals.push(
+        "Complément de loyer mentionné au bail : il n'est licite qu'en zone d'encadrement, pour des caractéristiques exceptionnelles du logement, et se conteste dans les 3 mois suivant la signature du bail. À examiner en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]",
+      );
+    }
   }
 
   let outcome: VerdictGlobal["outcome"];

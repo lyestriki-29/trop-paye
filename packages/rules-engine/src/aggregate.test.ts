@@ -65,6 +65,47 @@ describe("evaluateAll (agrégateur)", () => {
     expect(v.signals.some((s) => s.includes("Complément de loyer"))).toBe(true);
   });
 
+  it("complément de loyer sur F/G avec bail post-18/08/2022 → signal INTERDIT prioritaire, toujours non chiffré", () => {
+    const v = evaluateAll(
+      mk(
+        {
+          dpeHistory: [{ class: "F", date: "2021-01-01", source: "ADEME_API" }],
+          leaseSignedAt: "2023-03-01",
+          rentSupplementDeclared: true,
+          rentSupplementCents: 12000, // le cas réel Lyes : 120 €/mois
+          rentHistory: [
+            { type: "INITIAL", date: "2023-03-01", rentCents: 90000, source: "quittance" },
+          ],
+        },
+        "2024-06-01",
+      ),
+    );
+    expect(v.totalRecoverableCents).toBe(0); // jamais chiffré tant que [AVOCAT] n'a pas tranché
+    const signal = v.signals.find((s) => s.includes("Complément de loyer"));
+    expect(signal).toContain("interdit");
+    expect(signal).toContain("PRIORITÉ");
+    expect(signal).toContain("120");
+  });
+
+  it("complément de loyer sur F mais bail AVANT le 18/08/2022 → signal générique (pas « interdit »)", () => {
+    const v = evaluateAll(
+      mk(
+        {
+          dpeHistory: [{ class: "F", date: "2020-01-01", source: "ADEME_API" }],
+          leaseSignedAt: "2021-05-01",
+          rentSupplementDeclared: true,
+          rentHistory: [
+            { type: "INITIAL", date: "2021-05-01", rentCents: 90000, source: "quittance" },
+          ],
+        },
+        "2024-06-01",
+      ),
+    );
+    const signal = v.signals.find((s) => s.includes("Complément de loyer"));
+    expect(signal).toBeDefined();
+    expect(signal).not.toContain("interdit");
+  });
+
   it("pas de signal complément de loyer sans déclaration", () => {
     const v = evaluateAll(
       mk(
