@@ -163,6 +163,22 @@ describe("evaluateAll (agrégateur)", () => {
     expect(v.signals.some((s) => s.includes("Complément de loyer"))).toBe(false);
   });
 
+  it("complément de loyer déclaré explicitement NON (false) → aucun signal", () => {
+    const v = evaluateAll(
+      mk(
+        {
+          dpeHistory: [{ class: "D", date: "2021-01-01", source: "ADEME_API" }],
+          rentSupplementDeclared: false,
+          rentHistory: [
+            { type: "INITIAL", date: "2023-01-01", rentCents: 90000, source: "quittance" },
+          ],
+        },
+        "2024-06-01",
+      ),
+    );
+    expect(v.signals.some((s) => s.includes("Complément de loyer"))).toBe(false);
+  });
+
   it("émet un signal d'orientation (non chiffré) pour un G loué après 2025", () => {
     const v = evaluateAll(
       mk(

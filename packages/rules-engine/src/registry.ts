@@ -75,6 +75,9 @@ const complementCase: CaseDefinition = {
   detectability: "DECLARED_SIGNAL",
   requiredInputs: ["rentSupplementDeclared"],
   evaluate: (input) => {
+    // Garde de truthiness : la porte requiredInputs laisse passer `false` (≠ undefined).
+    // On reproduit la sémantique d'origine `if (rentSupplementDeclared)` : NON ⇒ rien.
+    if (input.dossier.rentSupplementDeclared !== true) return null;
     const cls = latestDpeClassAt(input);
     const signedAt = input.dossier.leaseSignedAt?.slice(0, 10);
     // Critères 3DS cochés + DPE F/G re-déduit (étape 3, non décochable).
@@ -141,7 +144,9 @@ export const CASE_REGISTRY: CaseDefinition[] = [
     legalBasisStatus: "TODO_VERIFIER",
     detectability: "COMPUTED",
     prescriptionWindowYears: 3,
-    requiredInputs: ["depositPaidCents"],
+    // `furnished` requis : sans lui, le plafond (1 vs 2 mois) serait deviné à 1 mois
+    // par défaut → faux positif sur un meublé. Clé manquante = cas non évalué.
+    requiredInputs: ["depositPaidCents", "furnished"],
     evaluate: evaluateDepositCap,
   },
   decenceCase,

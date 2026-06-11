@@ -43,7 +43,12 @@ describe("DEPOSIT_CAP (plafond du dépôt de garantie)", () => {
   });
 
   it("dans le registre : dépôt non déclaré → aucun résultat DEPOSIT_CAP", () => {
-    const v = evaluateAll(mk({ rentHistory: [INITIAL(80000)] }));
+    const v = evaluateAll(mk({ furnished: false, rentHistory: [INITIAL(80000)] }));
+    expect(v.results.find((r) => r.ruleId === "DEPOSIT_CAP")).toBeUndefined();
+  });
+
+  it("dans le registre : « meublé ? » non répondu → DEPOSIT_CAP non évalué (pas de faux plafond 1 mois)", () => {
+    const v = evaluateAll(mk({ rentHistory: [INITIAL(80000)], depositPaidCents: 160000 }));
     expect(v.results.find((r) => r.ruleId === "DEPOSIT_CAP")).toBeUndefined();
   });
 
