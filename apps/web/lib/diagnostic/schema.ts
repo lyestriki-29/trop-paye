@@ -192,6 +192,7 @@ export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapsho
         ? input.depositPaidMonths * hc(input.initialRentCents)
         : input.depositPaidCents,
     rentSupplementDeclared: input.rentSupplement === "OUI" ? true : undefined,
+    rentSupplementUncertain: input.rentSupplement === "NSP" ? true : undefined,
     rentSupplementCents: input.rentSupplement === "OUI" ? input.rentSupplementCents : undefined,
     // OUI → true (justifié) ; NON → false (injustifié, prioritaire) ; NSP/absent
     // → undefined (incertain). La distinction NON/NSP est conservée pour le moteur.

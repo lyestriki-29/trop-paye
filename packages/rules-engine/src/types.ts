@@ -64,6 +64,12 @@ export interface DossierSnapshot {
   rentSupplementDeclared?: boolean;
   rentSupplementCents?: number;
   /**
+   * Le locataire ne sait pas s'il a un complément (« je ne sais pas »). Sert à la
+   * fourchette : borne basse sans complément, borne haute avec hypothèse complément
+   * (si le contexte le rend illégal). Distinct de `rentSupplementDeclared` (OUI ferme).
+   */
+  rentSupplementUncertain?: boolean;
+  /**
    * Le locataire a déclaré au moins une caractéristique exceptionnelle de
    * confort/localisation (vue remarquable, terrasse, hauteur sous plafond…)
    * pouvant justifier le complément. Sert à qualifier le signal (sans

@@ -1,5 +1,11 @@
 import { evaluateAll } from "./aggregate";
-import type { RuleInput, VerdictGlobal, VerdictRange } from "./types";
+import type {
+  DossierSnapshot,
+  Referentials,
+  RuleInput,
+  VerdictGlobal,
+  VerdictRange,
+} from "./types";
 
 /**
  * Évalue le dossier sur deux scénarios (bas/haut) et compose la fourchette.
@@ -22,4 +28,35 @@ export function evaluateRange(inputLow: RuleInput, inputHigh: RuleInput): Verdic
     isRange: low.totalRecoverableCents !== high.totalRecoverableCents,
     asOf: inputLow.asOf,
   };
+}
+
+/**
+ * Construit la fourchette à partir d'UN snapshot, en faisant varier la seule
+ * hypothèse du complément de loyer (décision Lyes 2026-06-12) :
+ * - borne basse : complément JAMAIS chiffré (loyer supposé tout compris) → zéro
+ *   double-comptage, plancher garanti ;
+ * - borne haute : complément chiffré si déclaré (OUI) ou incertain (NSP), à
+ *   condition que le contexte le rende illégal (F/G ou critère 3DS) ; sinon
+ *   identique à la borne basse.
+ * Le reste du dossier est inchangé. PUR.
+ */
+export function evaluateSnapshotRange(
+  snapshot: DossierSnapshot,
+  referentials: Referentials,
+  asOf: string,
+): VerdictRange {
+  const lowSnapshot: DossierSnapshot = {
+    ...snapshot,
+    rentSupplementDeclared: undefined,
+  };
+  const highSnapshot: DossierSnapshot =
+    snapshot.rentSupplementDeclared === true
+      ? snapshot
+      : snapshot.rentSupplementUncertain === true
+        ? { ...snapshot, rentSupplementDeclared: true }
+        : snapshot;
+  return evaluateRange(
+    { dossier: lowSnapshot, referentials, asOf },
+    { dossier: highSnapshot, referentials, asOf },
+  );
 }

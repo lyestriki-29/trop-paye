@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { evaluateRange } from "./range";
-import type { RuleInput } from "./types";
+import { evaluateRange, evaluateSnapshotRange } from "./range";
+import type { DossierSnapshot, RuleInput } from "./types";
 
 // Snapshot minimal : un retard de dépôt clair (chiffré HIGH, identique bas/haut).
 const baseReferentials = { irl: [], shieldRatePct: 3.5 };
@@ -50,5 +50,52 @@ describe("evaluateRange", () => {
     expect(range.isRange).toBe(true);
     // Les deux bornes gardent leur audit trail.
     expect(range.high.results.length).toBeGreaterThan(0);
+  });
+});
+
+describe("evaluateSnapshotRange — hypothèse complément", () => {
+  const ref = { irl: [], shieldRatePct: 3.5 };
+  // Logement F/G (complément interdit), bail post-pivot, montant complément inconnu.
+  const fgSnapshot: DossierSnapshot = {
+    dpeHistory: [{ class: "F", date: "2023-12-01", source: "ADEME_API" }],
+    rentHistory: [{ date: "2024-01-01", type: "INITIAL", rentCents: 100000, source: "déclaratif" }],
+    leaseSignedAt: "2024-01-01",
+  };
+
+  it("complément NSP sur F/G → fourchette : bas sans complément, haut avec estimation 9 %", () => {
+    const r = evaluateSnapshotRange({ ...fgSnapshot, rentSupplementUncertain: true }, ref, "2026-06-12");
+    expect(r.totalRecoverableLowCents).toBe(0);
+    expect(r.totalRecoverableHighCents).toBeGreaterThan(0);
+    expect(r.isRange).toBe(true);
+  });
+
+  it("complément OUI déclaré sur F/G → bas sans, haut avec (fourchette)", () => {
+    const r = evaluateSnapshotRange(
+      { ...fgSnapshot, rentSupplementDeclared: true, rentSupplementCents: 12000 },
+      ref,
+      "2026-06-12",
+    );
+    expect(r.totalRecoverableLowCents).toBe(0);
+    expect(r.totalRecoverableHighCents).toBeGreaterThan(0);
+  });
+
+  it("complément NON (ni déclaré ni incertain) → pas de fourchette sur le complément", () => {
+    const r = evaluateSnapshotRange(fgSnapshot, ref, "2026-06-12");
+    expect(r.totalRecoverableLowCents).toBe(r.totalRecoverableHighCents);
+    expect(r.isRange).toBe(false);
+  });
+
+  it("complément incertain mais logement NON F/G → pas chiffré, pas de fourchette", () => {
+    const r = evaluateSnapshotRange(
+      {
+        dpeHistory: [{ class: "C", date: "2023-12-01", source: "ADEME_API" }],
+        rentHistory: [{ date: "2024-01-01", type: "INITIAL", rentCents: 100000, source: "déclaratif" }],
+        leaseSignedAt: "2024-01-01",
+        rentSupplementUncertain: true,
+      },
+      ref,
+      "2026-06-12",
+    );
+    expect(r.totalRecoverableLowCents).toBe(r.totalRecoverableHighCents);
   });
 });
