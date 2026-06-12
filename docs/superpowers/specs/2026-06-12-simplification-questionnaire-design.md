@@ -103,20 +103,34 @@ Conversion mois → centimes sur le **loyer initial hors charges**. En
 colocation à la part (`rentBasis = "SHARE"`), pas de presets mois (le loyer
 reconstruit est le total du logement) → montant exact ou NSP.
 
-### Complément de loyer
-Aujourd'hui : checklist 9 critères 3DS + montant. Devient **OUI / NON / je ne
-sais pas** :
-- **OUI** → estimation **9 % du loyer** intégrée aux **deux bornes** (assumé
-  vendeur, service gratuit, décision Lyes). Valeur 9 % = hypothèse maison
-  `TODO_VERIFIER` + `AVOCAT_PENDING` (aucune source publique trouvée à
-  l'audit : ni OLAP ni observatoire). La checklist 3DS détaillée déménage en
-  carte post-verdict « affinez » (resserre / confirme l'interdiction).
-- **NON** → 0.
-- **NSP** → 0 en borne basse, 9 % en borne haute.
+### Complément de loyer (révisé 2026-06-12 — décision Lyes)
+Aujourd'hui : checklist 9 critères 3DS + montant, traité en **signal non
+chiffré**. On le rend chiffrable, mais **uniquement quand il est récupérable
+en droit** (Lyes : « seulement illégal, mais réfléchir à s'ils sont
+justifiables : parfois ils n'ont pas lieu d'être »).
 
-Le complément reste un **signal d'orientation** pour la qualification juridique
-(jamais une promesse) ; le 9 % sert l'estimation chiffrée de la fourchette,
-clairement marqué « estimation » à l'écran.
+**Nouvelle règle moteur `COMPLEMENT_OVERCHARGE`** (versionnée au 24/08/2022,
+`legalBasisStatus: AVOCAT_PENDING`, prescription 3 ans) :
+- **Logement F/G, bail postérieur au 24/08/2022** → complément **interdit**
+  (loi Climat) → récupérable **certain** → compte dans la **borne basse**.
+- **Hors F/G mais non justifiable** (aucune caractéristique exceptionnelle de
+  confort/localisation, ou critère 3DS rédhibitoire coché) → **contestable** →
+  compte dans la **borne haute** seulement (potentiel, charge de preuve au
+  bailleur).
+- **Complément justifié** (atouts réels, hors F/G) → 0 chiffré, **signal**
+  « à faire vérifier » conservé.
+- **Montant** : `rentSupplementCents` si connu ; sinon **estimation 9 % du
+  loyer** comme proxy (borne haute), valeur `TODO_VERIFIER` (aucune source
+  publique trouvée à l'audit). Toujours affiché « estimation », jamais promis.
+
+L'écran questionnaire ne demande plus que **OUI / NON / NSP** ; la checklist
+3DS détaillée (justifiabilité) déménage en carte post-verdict « affinez » et
+alimente la qualification légal/contestable. NSP → borne basse 0, borne haute
+= estimation si le contexte (F/G) le permet.
+
+⚠️ Cette règle ajoute une **tranche moteur dédiée** (Tranche 2bis) AVANT
+l'écran loyer, car elle chiffre une répétition juridiquement sensible :
+validation [AVOCAT] obligatoire avant prod.
 
 ### Tests
 - Helper pur de conversion mois → centimes (loyer initial HC), coloc exclue.
