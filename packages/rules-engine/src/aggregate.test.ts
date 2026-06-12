@@ -65,7 +65,7 @@ describe("evaluateAll (agrégateur)", () => {
     expect(v.signals.some((s) => s.includes("Complément de loyer"))).toBe(true);
   });
 
-  it("complément de loyer sur F/G avec bail post-18/08/2022 → signal INTERDIT prioritaire, toujours non chiffré", () => {
+  it("complément de loyer sur F/G avec bail post-18/08/2022 → CHIFFRÉ (répétition de l'indu)", () => {
     const v = evaluateAll(
       mk(
         {
@@ -80,11 +80,13 @@ describe("evaluateAll (agrégateur)", () => {
         "2024-06-01",
       ),
     );
-    expect(v.totalRecoverableCents).toBe(0); // jamais chiffré tant que [AVOCAT] n'a pas tranché
-    const signal = v.signals.find((s) => s.includes("Complément de loyer"));
-    expect(signal).toContain("interdit");
-    expect(signal).toContain("PRIORITÉ");
-    expect(signal).toContain("120");
+    // Désormais chiffré (décision Lyes 2026-06-12) : complément interdit = indu récupérable.
+    expect(v.totalRecoverableCents).toBeGreaterThan(0);
+    const r = v.results.find((x) => x.ruleId === "RENT_SUPPLEMENT");
+    expect(r?.outcome).toBe("IRREGULAR");
+    expect(r?.futureMonthlySavingCents).toBe(12000);
+    // Plus de signal complément quand il est chiffré.
+    expect(v.signals.find((s) => s.includes("Complément de loyer"))).toBeUndefined();
   });
 
   it("complément de loyer sur F mais bail AVANT le 18/08/2022 → signal générique (pas « interdit »)", () => {
@@ -106,7 +108,7 @@ describe("evaluateAll (agrégateur)", () => {
     expect(signal).not.toContain("interdit");
   });
 
-  it("3DS : bail 2023 + DPE D + critère « humidité » coché → signal INTERDIT prioritaire (non chiffré)", () => {
+  it("3DS : bail 2023 + DPE D + critère « humidité » coché → CHIFFRÉ (complément interdit)", () => {
     const v = evaluateAll(
       mk(
         {
@@ -122,10 +124,11 @@ describe("evaluateAll (agrégateur)", () => {
         "2024-06-01",
       ),
     );
-    expect(v.totalRecoverableCents).toBe(0); // jamais chiffré
-    const signal = v.signals.find((s) => s.includes("Complément de loyer"));
-    expect(signal).toContain("interdit");
-    expect(signal).toContain("PRIORITÉ");
+    // Critère 3DS rédhibitoire hors F/G → désormais chiffré.
+    expect(v.totalRecoverableCents).toBeGreaterThan(0);
+    const r = v.results.find((x) => x.ruleId === "RENT_SUPPLEMENT");
+    expect(r?.outcome).toBe("IRREGULAR");
+    expect(v.signals.find((s) => s.includes("Complément de loyer"))).toBeUndefined();
   });
 
   it("3DS : bail 2021 (avant le pivot) + critère coché → signal générique (pas « interdit »)", () => {

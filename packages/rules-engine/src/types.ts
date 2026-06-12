@@ -9,7 +9,8 @@ export type RuleId =
   | "DEPOSIT_LATE"
   | "DEPOSIT_CAP"
   | "AGENCY_FEES_CAP"
-  | "PRIVATE_LANDLORD_FEES";
+  | "PRIVATE_LANDLORD_FEES"
+  | "RENT_SUPPLEMENT";
 
 /** Zone d'encadrement des honoraires de location (décret ALUR). */
 export type AgencyZone = "TRES_TENDUE" | "TENDUE" | "RESTE";
@@ -62,6 +63,13 @@ export interface DossierSnapshot {
       alimente un SIGNAL d'orientation, jamais un chiffrage automatique. */
   rentSupplementDeclared?: boolean;
   rentSupplementCents?: number;
+  /**
+   * Le locataire a déclaré au moins une caractéristique exceptionnelle de
+   * confort/localisation (vue remarquable, terrasse, hauteur sous plafond…)
+   * pouvant justifier le complément. Sert à qualifier le signal (sans
+   * caractéristique → complément probablement injustifié, contestable). [AVOCAT]
+   */
+  rentSupplementExceptional?: boolean;
   /**
    * Critères d'interdiction du complément cochés par le locataire (loi 3DS, LOT 1.2).
    * Ids de `COMPLEMENT_3DS_CRITERIA` (référentiel UI). Le critère DPE F/G est

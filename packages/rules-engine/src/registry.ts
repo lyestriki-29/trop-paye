@@ -8,7 +8,7 @@
  * Les libellés sont repris VERBATIM de l'ancien `aggregate.ts` (audit + tests).
  */
 import type { CaseDefinition, DpeClass, RuleInput, Signal } from "./types";
-import { formatEur, RULE_LABEL } from "./labels";
+import { RULE_LABEL } from "./labels";
 import { evaluateDpeFreeze, LEGAL_BASIS as DPE_FREEZE_BASIS } from "./rules/dpe-freeze";
 import {
   evaluateIrlOvercharge,
@@ -21,6 +21,10 @@ import {
   evaluatePrivateLandlordFees,
   LEGAL_BASIS as PRIVATE_FEES_BASIS,
 } from "./rules/private-landlord-fees";
+import {
+  evaluateRentSupplement,
+  LEGAL_BASIS as RENT_SUPPLEMENT_BASIS,
+} from "./rules/rent-supplement";
 
 /** Classe DPE en vigueur à la date d'évaluation (la plus récente ≤ asOf). */
 export function latestDpeClassAt(input: RuleInput): DpeClass | undefined {
@@ -66,60 +70,20 @@ const decenceCase: CaseDefinition = {
 };
 
 /**
- * Date pivot : un complément de loyer est interdit (loi 3DS) pour les baux
- * conclus depuis cette date si le logement présente ≥ 1 caractéristique excluante.
- * Source : service-public.gouv.fr F34401, loi 2022-217 du 21/02/2022.
- * TODO_VERIFIER [AVOCAT] : périmètre exact (zones d'encadrement) et date pivot.
- */
-const COMPLEMENT_3DS_PIVOT = "2022-08-18";
-
-/**
- * Complément de loyer (LOT 1.2, loi 3DS) : licite uniquement en zone d'encadrement
- * pour des caractéristiques exceptionnelles. INTERDIT pour les baux conclus depuis
- * le 18/08/2022 si le logement présente ≥ 1 critère excluant (DPE F/G re-déduit
- * côté moteur + critères 3DS cochés par le locataire). Fenêtre de contestation
- * débattue [AVOCAT] → signal d'orientation, JAMAIS chiffré.
+ * Complément de loyer (LOT 1.2, loi 3DS). Désormais CHIFFRÉ quand le complément
+ * est interdit (logement F/G ou critère 3DS rédhibitoire, bail postérieur au
+ * 18/08/2022) : répétition de l'indu, prescription 3 ans. Sinon reste un signal
+ * d'orientation (contestation 3 mois). Logique dans `rules/rent-supplement.ts`.
  */
 const complementCase: CaseDefinition = {
   id: "RENT_SUPPLEMENT",
   label: "Complément de loyer",
-  legalBasis:
-    "Complément de loyer — loi du 06/07/1989 art. 17 (encadrement) ; loi 3DS (2022-217) : interdit si le logement présente une caractéristique excluante, pour les baux conclus depuis le 18/08/2022. TODO_VERIFIER [AVOCAT].",
+  legalBasis: RENT_SUPPLEMENT_BASIS,
   legalBasisStatus: "AVOCAT_PENDING",
   detectability: "DECLARED_SIGNAL",
+  prescriptionWindowYears: 3,
   requiredInputs: ["rentSupplementDeclared"],
-  evaluate: (input) => {
-    // Garde de truthiness : la porte requiredInputs laisse passer `false` (≠ undefined).
-    // On reproduit la sémantique d'origine `if (rentSupplementDeclared)` : NON ⇒ rien.
-    if (input.dossier.rentSupplementDeclared !== true) return null;
-    const cls = latestDpeClassAt(input);
-    const signedAt = input.dossier.leaseSignedAt?.slice(0, 10);
-    // Critères 3DS cochés + DPE F/G re-déduit (étape 3, non décochable).
-    const criteria = new Set(input.dossier.complementCriteria ?? []);
-    if (cls === "F" || cls === "G") criteria.add("dpe_fg");
-    const dateInScope = signedAt === undefined || signedAt >= COMPLEMENT_3DS_PIVOT;
-    const prohibited = criteria.size > 0 && dateInScope;
-    if (prohibited) {
-      const amount = input.dossier.rentSupplementCents
-        ? ` (${formatEur(input.dossier.rentSupplementCents)} par mois déclarés)`
-        : "";
-      const n = criteria.size;
-      return [
-        {
-          caseId: "RENT_SUPPLEMENT",
-          priority: true,
-          message: `Complément de loyer très probablement interdit : le logement présente ${n} caractéristique${n > 1 ? "s" : ""} excluant un complément pour les baux conclus depuis le 18/08/2022 (loi 3DS)${amount}. Dossier à examiner en PRIORITÉ en revue. La fenêtre de contestation est débattue (3 mois suivant la signature) : orientation, jamais chiffrée automatiquement. [AVOCAT]`,
-        },
-      ];
-    }
-    return [
-      {
-        caseId: "RENT_SUPPLEMENT",
-        message:
-          "Complément de loyer mentionné au bail : il n'est licite qu'en zone d'encadrement, pour des caractéristiques exceptionnelles du logement, et se conteste dans les 3 mois suivant la signature du bail. À examiner en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]",
-      },
-    ];
-  },
+  evaluate: evaluateRentSupplement,
 };
 
 /**
