@@ -16,6 +16,7 @@ export type DepositMonthPreset = 1 | 2 | 3;
 const depositAnswersBaseSchema = z.object({
   leaveDate: isoDate,
   edlConforme: z.boolean(),
+  addressTransmitted: z.boolean().optional(),
   depositMonths: depositMonthPresetSchema.optional(),
   depositCents: z.number().int().positive().max(MAX_CENTS).optional(),
   refunded: refundedSchema,
@@ -150,6 +151,9 @@ export function mergeDepositAnswers(
       edlConforme: answers.edlConforme,
       monthlyRentCents,
       ...refundFields(answers),
+      ...(answers.addressTransmitted !== undefined
+        ? { addressTransmitted: answers.addressTransmitted }
+        : {}),
       ...(answers.justifiedRetentionCents !== undefined
         ? { justifiedRetentionCents: answers.justifiedRetentionCents }
         : {}),
@@ -167,6 +171,7 @@ export function answersFromSnapshot(snapshot: DossierSnapshot): DepositAnswersDr
   return {
     leaveDate: dep.leaveDate,
     edlConforme: dep.edlConforme,
+    addressTransmitted: dep.addressTransmitted,
     depositCents: dep.depositCents,
     refunded,
     refundCents: dep.refundCents,

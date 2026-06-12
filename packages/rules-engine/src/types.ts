@@ -42,6 +42,8 @@ export interface DepositInput {
   depositCents: number;
   leaveDate: string; // remise des clés (ISO)
   edlConforme: boolean; // EDL de sortie conforme à l'entrée
+  /** Nouvelle adresse communiquée au bailleur ; si false, la majoration de retard ne court pas (art. 22). */
+  addressTransmitted?: boolean;
   monthlyRentCents: number; // loyer mensuel hors charges
   refundDate?: string;
   refundCents?: number;

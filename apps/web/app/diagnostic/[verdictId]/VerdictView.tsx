@@ -6,6 +6,7 @@ import {
   type VerdictGlobal,
 } from "@troppaye/rules-engine";
 import { BoostersModule } from "./BoostersModule";
+import { DepositModule } from "./DepositModule";
 import { VerdictStoryLine } from "@/components/story/injections";
 import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
@@ -35,7 +36,7 @@ export function VerdictView({
   addressLabel: string;
   dossierId: string;
   dpeNumber: string | null;
-  /** Données du module « Vérifications complémentaires » (LOT 2) — propriétaire seul. */
+  /** Données des modules post-verdict — propriétaire seul. */
   boosters?: { verdictId: string; snapshot: DossierSnapshot; referentials: Referentials };
 }) {
   const shortRef = `TP-${dossierId.slice(0, 8).toUpperCase()}`;
@@ -88,6 +89,19 @@ export function VerdictView({
         ) : (
           <VerdictInsufficient results={verdict.results} addressLabel={addressLabel} />
         )}
+
+        {/* Mini-tunnel dépôt (LOT 3) : même garde que les boosters post-verdict.
+            Pas proposé sur INSUFFICIENT_DATA (compléter le diagnostic d'abord). */}
+        {boosters &&
+        verdict.outcome !== "INSUFFICIENT_DATA" &&
+        !boosters.snapshot.rentReconstructedFromShare ? (
+          <DepositModule
+            verdictId={boosters.verdictId}
+            dossierId={dossierId}
+            snapshot={boosters.snapshot}
+            referentials={boosters.referentials}
+          />
+        ) : null}
 
         {/* Boosters (LOT 2) : cartes optionnelles, aperçu live, persistance serveur.
             Pas proposé sur INSUFFICIENT_DATA (compléter le diagnostic d'abord). */}

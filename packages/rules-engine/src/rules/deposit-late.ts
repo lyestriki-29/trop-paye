@@ -53,15 +53,28 @@ export function evaluateDepositLate(input: RuleInput): RuleResult {
   const justified = dep.justifiedRetentionCents ?? 0;
   const principal = Math.max(0, dep.depositCents - justified - refunded);
   const penaltyPerMonth = Math.round(dep.monthlyRentCents * 0.1);
-  const penalty = penaltyPerMonth * started;
+  const penaltyNeutralized = dep.addressTransmitted === false;
+  const penalty = penaltyNeutralized ? 0 : penaltyPerMonth * started;
   const recoverable = principal + penalty;
 
   steps.push({ label: "Solde du dépôt encore dû", cents: principal });
-  steps.push({ label: `Pénalité 10 %/mois × ${started} mois entamés`, cents: penalty });
+  if (penaltyNeutralized) {
+    steps.push({
+      label: "Majoration 10 %/mois neutralisée : nouvelle adresse non communiquée au bailleur (art. 22)",
+      cents: 0,
+    });
+  } else {
+    steps.push({ label: `Pénalité 10 %/mois × ${started} mois entamés`, cents: penalty });
+  }
 
   return base({
     outcome: recoverable > 0 ? "IRREGULAR" : "COMPLIANT",
     recoverableCents: recoverable,
     actionDeadline: deadline,
+    ...(penaltyNeutralized
+      ? {
+          legalBasis: `${LEGAL_BASIS} Exception : la majoration ne court pas si le locataire n'a pas communiqué sa nouvelle adresse au bailleur.`,
+        }
+      : {}),
   });
 }

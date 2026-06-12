@@ -31,6 +31,27 @@ describe("DEPOSIT_LATE", () => {
     expect(r.actionDeadline).toBe("2024-02-10");
   });
 
+  it("2B. nouvelle adresse non communiquée : principal seul, sans majoration", () => {
+    const r = evaluateDepositLate(
+      mk({ ...DEP, leaveDate: "2024-01-10", addressTransmitted: false }, "2024-03-15"),
+    );
+    expect(r.outcome).toBe("IRREGULAR");
+    expect(r.recoverableCents).toBe(100000);
+    expect(r.computation.steps).toContainEqual({
+      label: "Majoration 10 %/mois neutralisée : nouvelle adresse non communiquée au bailleur (art. 22)",
+      cents: 0,
+    });
+  });
+
+  it("2C. nouvelle adresse communiquée : comportement identique au cas sans champ", () => {
+    const r = evaluateDepositLate(
+      mk({ ...DEP, leaveDate: "2024-01-10", addressTransmitted: true }, "2024-03-15"),
+    );
+    expect(r.outcome).toBe("IRREGULAR");
+    expect(r.recoverableCents).toBe(118000);
+    expect(r.actionDeadline).toBe("2024-02-10");
+  });
+
   it("3. EDL non conforme → délai de 2 mois", () => {
     const r = evaluateDepositLate(
       mk({ ...DEP, edlConforme: false, leaveDate: "2024-01-10" }, "2024-03-15"),

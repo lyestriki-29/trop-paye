@@ -165,6 +165,18 @@ export function DepositModule({
           value={answers.edlConforme === undefined ? undefined : answers.edlConforme ? "yes" : "no"}
           onChange={(v) => set("edlConforme", v === "yes")}
         />
+        <ChoiceField
+          label="Avez-vous communiqué votre nouvelle adresse au bailleur ?"
+          choices={EDL_CHOICES}
+          value={
+            answers.addressTransmitted === undefined
+              ? undefined
+              : answers.addressTransmitted
+                ? "yes"
+                : "no"
+          }
+          onChange={(v) => set("addressTransmitted", v === "yes")}
+        />
         {allowMonthPresets ? (
           <div>
             <ChoiceField label="Montant du dépôt versé à l'entrée" choices={DEPOSIT_CHOICES} value={amountChoice} onChange={setAmountChoice} />
