@@ -321,6 +321,89 @@ export type Database = {
           },
         ]
       }
+      encadrement_reference: {
+        Row: {
+          code_grand_quartier: number
+          construction_period: string
+          effective_from: string
+          furnished: boolean
+          id: number
+          id_secteur: number
+          max_cents: number
+          millesime: number
+          min_cents: number
+          ref_cents: number
+          rooms: number
+          source: string
+          verified: boolean
+        }
+        Insert: {
+          code_grand_quartier: number
+          construction_period: string
+          effective_from: string
+          furnished: boolean
+          id?: never
+          id_secteur: number
+          max_cents: number
+          millesime: number
+          min_cents: number
+          ref_cents: number
+          rooms: number
+          source?: string
+          verified?: boolean
+        }
+        Update: {
+          code_grand_quartier?: number
+          construction_period?: string
+          effective_from?: string
+          furnished?: boolean
+          id?: never
+          id_secteur?: number
+          max_cents?: number
+          millesime?: number
+          min_cents?: number
+          ref_cents?: number
+          rooms?: number
+          source?: string
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encadrement_reference_code_grand_quartier_fkey"
+            columns: ["code_grand_quartier"]
+            isOneToOne: false
+            referencedRelation: "encadrement_zone"
+            referencedColumns: ["code_grand_quartier"]
+          },
+        ]
+      }
+      encadrement_zone: {
+        Row: {
+          code_grand_quartier: number
+          created_at: string
+          geometry: Json
+          id_secteur: number
+          nom_quartier: string
+          source: string
+        }
+        Insert: {
+          code_grand_quartier: number
+          created_at?: string
+          geometry: Json
+          id_secteur: number
+          nom_quartier: string
+          source?: string
+        }
+        Update: {
+          code_grand_quartier?: number
+          created_at?: string
+          geometry?: Json
+          id_secteur?: number
+          nom_quartier?: string
+          source?: string
+        }
+        Relationships: []
+      }
       fee_cap_zones: {
         Row: {
           effective_from: string

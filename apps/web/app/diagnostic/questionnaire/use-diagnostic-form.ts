@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { anniversariesBetween } from "@troppaye/rules-engine";
+import { anniversariesBetween, type ConstructionPeriod } from "@troppaye/rules-engine";
 import type { AddressSuggestion } from "@/lib/providers/geo";
 import { submitDiagnostic } from "@/app/diagnostic/actions";
 
@@ -28,6 +28,14 @@ export interface DiagnosticDraft {
   address?: AddressSuggestion;
   surfaceM2?: number;
   furnished?: boolean;
+  /** Nombre de pièces principales (1 à 4 ; 4 = « 4 et plus ») — clé du barème d'encadrement. */
+  roomCount?: number;
+  /** « Je ne sais pas » sur le nombre de pièces (UI : pilule sélectionnée). */
+  roomCountUnknown?: boolean;
+  /** Époque de construction (fourchette) — clé du barème d'encadrement. */
+  constructionPeriod?: ConstructionPeriod;
+  /** « Je ne sais pas » sur l'époque de construction (UI : pilule sélectionnée). */
+  constructionPeriodUnknown?: boolean;
   /** Colocation (LOT 1.3) : toggle étape 2. */
   isShared?: boolean;
   /** Nombre total de colocataires (n) — requis en saisie « ma part ». */
@@ -118,8 +126,14 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
     addressLabel: draft.address?.label ?? "",
     banId: draft.address?.banId || undefined,
     inseeCode: draft.address?.inseeCode || undefined,
+    // Coordonnées IGN conservées pour le géo-rattachement encadrement (point-in-polygon).
+    lat: draft.address?.lat,
+    lon: draft.address?.lon,
     surfaceM2: draft.surfaceM2,
     furnished: draft.furnished,
+    // NSP → undefined (le champ « unknown » reste local à l'UI, jamais envoyé).
+    roomCount: draft.roomCount,
+    constructionPeriod: draft.constructionPeriod,
     isShared: draft.isShared,
     tenantCount: draft.isShared ? draft.tenantCount : undefined,
     // « ma part » n'a de sens qu'en coloc ; hors coloc on force le total (n=1).

@@ -1,8 +1,17 @@
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import type { Referentials, IrlIndexEntry } from "@troppaye/rules-engine";
+import type { DossierSnapshot, Referentials, IrlIndexEntry } from "@troppaye/rules-engine";
+import { resolveRentControl } from "@/lib/diagnostic/rent-control";
 
-/** Charge les référentiels (IRL depuis la base) injectés dans le moteur pur. */
-export async function getReferentials(): Promise<Referentials> {
+/**
+ * Charge les référentiels injectés dans le moteur pur. Avec un `context`
+ * (dossier + date d'évaluation), résout en plus le loyer de référence majoré
+ * applicable au logement (encadrement) — sinon `rentControl` reste absent et la
+ * règle ENCADREMENT est inerte.
+ */
+export async function getReferentials(context?: {
+  snapshot: DossierSnapshot;
+  asOf: string;
+}): Promise<Referentials> {
   const { data } = await getSupabaseAdmin()
     .from("irl_index")
     .select("quarter, value, verified");
@@ -12,6 +21,10 @@ export async function getReferentials(): Promise<Referentials> {
     value: Number(r.value),
     verified: r.verified,
   }));
+
+  const rentControl = context
+    ? ((await resolveRentControl(context.snapshot, context.asOf)) ?? undefined)
+    : undefined;
 
   // TODO_VERIFIER [AVOCAT] : bouclier loyer = 3,5 % (métropole, T3-2022→T1-2024).
   // Valeur codée en dur — à confirmer à sa source officielle (loi pouvoir d'achat 2022).
@@ -30,5 +43,6 @@ export async function getReferentials(): Promise<Referentials> {
       },
       zoneByInsee: {},
     },
+    rentControl,
   };
 }

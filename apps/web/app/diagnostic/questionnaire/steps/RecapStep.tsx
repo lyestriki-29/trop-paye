@@ -16,6 +16,13 @@ function Row({ label, value, mono = false }: { label: string; value: string; mon
   );
 }
 
+const PERIOD_LABEL: Record<string, string> = {
+  BEFORE_1946: "Avant 1946",
+  "1946_1970": "1946 à 1970",
+  "1971_1990": "1971 à 1990",
+  AFTER_1990: "Après 1990",
+};
+
 export function RecapStep({ draft }: StepProps) {
   const dpe = draft.dpeUnknown
     ? "Inconnu"
@@ -39,6 +46,29 @@ export function RecapStep({ draft }: StepProps) {
       <Row
         label="Meublé"
         value={draft.furnished === undefined ? "—" : draft.furnished ? "Oui" : "Non"}
+      />
+      <Row
+        label="Nombre de pièces"
+        value={
+          draft.roomCount !== undefined
+            ? draft.roomCount === 4
+              ? "4 et +"
+              : String(draft.roomCount)
+            : draft.roomCountUnknown
+              ? "Je ne sais pas"
+              : "—"
+        }
+        mono
+      />
+      <Row
+        label="Époque de construction"
+        value={
+          draft.constructionPeriod
+            ? (PERIOD_LABEL[draft.constructionPeriod] ?? draft.constructionPeriod)
+            : draft.constructionPeriodUnknown
+              ? "Je ne sais pas"
+              : "—"
+        }
       />
       <Row label="DPE" value={dpe} />
       <Row

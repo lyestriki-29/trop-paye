@@ -56,7 +56,7 @@ export async function submitDiagnostic(raw: unknown): Promise<SubmitResult> {
 
   const asOf = new Date().toISOString().slice(0, 10);
   const snapshot = toSnapshot(input, asOf);
-  const referentials = await getReferentials();
+  const referentials = await getReferentials({ snapshot, asOf });
   const verdict = evaluateAll({ dossier: snapshot, referentials, asOf });
 
   const admin = getSupabaseAdmin();
@@ -85,6 +85,8 @@ export async function submitDiagnostic(raw: unknown): Promise<SubmitResult> {
       insee_code: input.inseeCode,
       surface_m2: input.surfaceM2,
       furnished: input.furnished,
+      rooms: input.roomCount,
+      construction_period: input.constructionPeriod,
       lease_signed_at: input.leaseSignedAt,
       initial_rent_cents: input.initialRentCents,
       current_rent_cents: input.currentRentCents,

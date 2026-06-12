@@ -30,6 +30,61 @@ export function HousingStep({ draft, setField }: StepProps) {
         onChange={(v) => setField("furnished", v === "yes")}
       />
 
+      {/* Pièces + époque (encadrement des loyers) : clés du barème. « Je ne sais
+          pas » accepté — le barème ne se résout alors pas, sans bloquer le tunnel.
+          TODO_COPY — libellés brouillon. */}
+      <ChoiceField
+        label="Combien de pièces principales ?"
+        hint="Séjour et chambres ; cuisine et salle de bain ne comptent pas."
+        choices={[
+          { value: "1", label: "1" },
+          { value: "2", label: "2" },
+          { value: "3", label: "3" },
+          { value: "4", label: "4 et +" },
+          { value: "nsp", label: "Je ne sais pas" },
+        ]}
+        value={
+          draft.roomCountUnknown
+            ? "nsp"
+            : draft.roomCount === undefined
+              ? undefined
+              : (String(draft.roomCount) as "1" | "2" | "3" | "4")
+        }
+        onChange={(v) => {
+          if (v === "nsp") {
+            setField("roomCountUnknown", true);
+            setField("roomCount", undefined);
+          } else {
+            setField("roomCount", Number(v));
+            setField("roomCountUnknown", false);
+          }
+        }}
+      />
+
+      <ChoiceField
+        label="Époque de construction de l'immeuble ?"
+        hint="Une fourchette suffit."
+        choices={[
+          { value: "BEFORE_1946", label: "Avant 1946" },
+          { value: "1946_1970", label: "1946 à 1970" },
+          { value: "1971_1990", label: "1971 à 1990" },
+          { value: "AFTER_1990", label: "Après 1990" },
+          { value: "nsp", label: "Je ne sais pas" },
+        ]}
+        value={
+          draft.constructionPeriodUnknown ? "nsp" : (draft.constructionPeriod ?? undefined)
+        }
+        onChange={(v) => {
+          if (v === "nsp") {
+            setField("constructionPeriodUnknown", true);
+            setField("constructionPeriod", undefined);
+          } else {
+            setField("constructionPeriod", v);
+            setField("constructionPeriodUnknown", false);
+          }
+        }}
+      />
+
       {/* Colocation (LOT 1.3) : le verdict porte toujours sur le loyer TOTAL du
           logement ; si l'utilisateur ne connaît que sa part, on reconstitue
           total = part × nombre de colocataires. TODO_COPY — libellés brouillon. */}

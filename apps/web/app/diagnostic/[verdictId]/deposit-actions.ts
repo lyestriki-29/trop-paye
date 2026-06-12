@@ -71,7 +71,7 @@ export async function submitDeposit(raw: unknown): Promise<SubmitDepositResult> 
   }
 
   const asOf = new Date().toISOString().slice(0, 10);
-  const referentials = await getReferentials();
+  const referentials = await getReferentials({ snapshot, asOf });
   const verdict = evaluateAll({ dossier: snapshot, referentials, asOf });
 
   const { error: sErr } = await admin
