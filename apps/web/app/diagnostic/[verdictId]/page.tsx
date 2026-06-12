@@ -7,7 +7,6 @@ import { getReferentials } from "@/lib/referentials";
 import { evaluateSnapshotRange } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { trackEvent } from "@/lib/track";
-import { CaptureView } from "./CaptureView";
 import { VerdictView } from "./VerdictView";
 import { VerdictUnavailable } from "./VerdictUnavailable";
 import { TeaserView } from "./TeaserView";
@@ -49,34 +48,18 @@ export async function generateMetadata({ params }: VerdictPageProps): Promise<Me
 export default async function VerdictPage({ params }: VerdictPageProps) {
   const { verdictId } = await params;
 
-  // Propriétaire (cookie de session du diagnostic) → capture PUIS verdict complet.
+  // Propriétaire (cookie de session du diagnostic) → verdict complet d'emblée.
   const data = await getVerdictForSession(verdictId);
   if (data) {
-    // Porte de capture (spec P2) : l'email d'abord, le verdict ensuite. Le lead
-    // est unique par dossier (index) : une fois posé, la porte ne réapparaît plus.
+    // Inversion 2026-06-12 (décision Lyes) : on NE masque plus le résultat. Le
+    // verdict s'affiche, puis on propose le récap par email. `hasLead` cache le
+    // module de capture une fois l'email posé (lead unique par dossier).
     const { data: lead } = await getSupabaseAdmin()
       .from("leads")
       .select("id")
       .eq("dossier_id", data.dossierId)
       .maybeSingle();
-
-    if (!lead) {
-      const shortRef = `TP-${data.dossierId.slice(0, 8).toUpperCase()}`;
-      const irregular = data.verdict.outcome === "IRREGULAR";
-      // Gabarit masqué de même longueur que le vrai montant : le montant réel
-      // ne quitte JAMAIS le serveur avant la capture.
-      const maskedAmount = irregular
-        ? formatEUR(data.verdict.totalRecoverableCents).replace(/\d/g, "8")
-        : null;
-      return (
-        <CaptureView
-          verdictId={verdictId}
-          shortRef={shortRef}
-          maskedAmount={maskedAmount}
-          irregular={irregular}
-        />
-      );
-    }
+    const hasLead = Boolean(lead);
 
     // Jalon funnel PRD §5 — dédupliqué à la lecture par count(distinct dossier_id).
     // after() : la mesure ne retarde jamais l'affichage du verdict.
@@ -84,7 +67,9 @@ export default async function VerdictPage({ params }: VerdictPageProps) {
 
     // Boosters (LOT 2) : snapshot + référentiels passés au module client pour
     // l'aperçu live ; le serveur reste autoritaire (booster-actions.ts).
-    const referentials = data.snapshot ? await getReferentials() : null;
+    const referentials = data.snapshot
+      ? await getReferentials({ snapshot: data.snapshot, asOf: data.verdict.asOf })
+      : null;
     // Fourchette (hypothèse complément) calculée à la lecture depuis le snapshot.
     const range =
       data.snapshot && referentials
@@ -97,6 +82,8 @@ export default async function VerdictPage({ params }: VerdictPageProps) {
         dossierId={data.dossierId}
         dpeNumber={data.dpeNumber}
         range={range}
+        verdictId={verdictId}
+        hasLead={hasLead}
         boosters={
           data.snapshot && referentials
             ? { verdictId, snapshot: data.snapshot, referentials }

@@ -60,6 +60,7 @@ export function VerdictSequenceLive({
   dpeNumber,
   prescription,
   mandateHref,
+  range,
 }: {
   reference: string;
   addressLabel: string;
@@ -70,6 +71,8 @@ export function VerdictSequenceLive({
   dpeNumber: string | null;
   prescription: PrescriptionInfo | null;
   mandateHref: string;
+  /** Fourchette basse/haute (hypothèse complément). null = montant unique. */
+  range: { lowCents: number; highCents: number } | null;
 }) {
   const reduced = useReducedMotion();
   const t = timeline(lines.length);
@@ -166,6 +169,32 @@ export function VerdictSequenceLive({
           </p>
           <p className="mt-3 text-base text-ink/70">récupérables</p>
         </Reveal>
+
+        {/* Fourchette PROÉMINENTE (demande Lyes 2026-06-12) : la borne basse est le
+            plancher sûr, la borne haute suppose un complément de loyer indu à
+            confirmer (motive le passage à l'étude). Calibrage du taux du complément
+            (9 %, hypothèse maison) = décision [AVOCAT], hors affichage. TODO_COPY. */}
+        {range ? (
+          <Reveal delay={t.cta - 0.5} className="mt-7 rounded-card border border-refund/40 bg-refund/5 px-5 py-4">
+            <p className="font-mono text-[11px] uppercase tracking-widest text-refund-text/80">
+              Fourchette d&apos;estimation
+            </p>
+            <p className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="tabular font-mono text-2xl font-medium text-ink sm:text-3xl">
+                {formatEUR(range.lowCents)}
+              </span>
+              <span className="text-ink/40">à</span>
+              <span className="tabular font-mono text-2xl font-medium text-refund-text sm:text-3xl">
+                {formatEUR(range.highCents)}
+              </span>
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-ink/70">
+              La borne basse est notre estimation prudente, solide dès aujourd&apos;hui.
+              La borne haute suppose un complément de loyer indu, que nous confirmons
+              ensemble après vérification de votre bail.
+            </p>
+          </Reveal>
+        ) : null}
 
         {/* Double bénéfice (demande Lyes 2026-06-12) : on ne récupère pas
             seulement le passé, le loyer BAISSE pour la suite (hausse illégale

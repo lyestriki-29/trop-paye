@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  formatEur,
   stripInternalMarkers,
   type DossierSnapshot,
   type Referentials,
@@ -9,6 +8,7 @@ import {
 } from "@troppaye/rules-engine";
 import { BoostersModule } from "./BoostersModule";
 import { DepositModule } from "./DepositModule";
+import { RecapCaptureModule } from "./RecapCaptureModule";
 import { VerdictStoryLine } from "@/components/story/injections";
 import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
@@ -33,6 +33,8 @@ export function VerdictView({
   dossierId,
   dpeNumber,
   range,
+  verdictId,
+  hasLead,
   boosters,
 }: {
   verdict: VerdictGlobal;
@@ -41,6 +43,9 @@ export function VerdictView({
   dpeNumber: string | null;
   /** Fourchette basse/haute (hypothèse complément) — null si non calculable. */
   range?: VerdictRange | null;
+  verdictId: string;
+  /** Email déjà capturé pour ce dossier → on masque le module récap. */
+  hasLead: boolean;
   /** Données des modules post-verdict — propriétaire seul. */
   boosters?: { verdictId: string; snapshot: DossierSnapshot; referentials: Referentials };
 }) {
@@ -81,19 +86,15 @@ export function VerdictView({
               dpeNumber={dpeNumber}
               prescription={prescriptionInfo(verdict.results, verdict.asOf)}
               mandateHref={`/mandat/${dossierId}`}
+              range={
+                range?.isRange
+                  ? {
+                      lowCents: range.totalRecoverableLowCents,
+                      highCents: range.totalRecoverableHighCents,
+                    }
+                  : null
+              }
             />
-            {/* Fourchette (hypothèse complément) : mention prudente, non chiffrée
-                en dur dans le compteur. Vérification du bail en back-office. TODO_COPY. */}
-            {range?.isRange ? (
-              <p className="mt-4 rounded-card bg-paper-2 px-4 py-3 text-sm text-ink/70">
-                Estimation prudente. Après vérification de votre bail (notamment un
-                éventuel complément de loyer), le montant récupérable pourrait atteindre{" "}
-                <strong className="font-mono tabular-nums text-refund">
-                  {formatEur(range.totalRecoverableHighCents)}
-                </strong>
-                .
-              </p>
-            ) : null}
             {/* Partage (Task 7) : un tiers n'ouvrira que le teaser anonymisé + OG. */}
             <ShareActions amountCents={verdict.totalRecoverableCents} />
             {/* Récit fondateur : une ligne, verdict POSITIF uniquement (phase 3). */}
@@ -106,6 +107,13 @@ export function VerdictView({
         ) : (
           <VerdictInsufficient results={verdict.results} addressLabel={addressLabel} />
         )}
+
+        {/* Capture email APRÈS le verdict (inversion 2026-06-12) : récap par email +
+            « avancer ensemble ». Masqué une fois l'email posé, et inutile tant que le
+            diagnostic est incomplet (INSUFFICIENT_DATA renvoie d'abord au tunnel). */}
+        {!hasLead && verdict.outcome !== "INSUFFICIENT_DATA" ? (
+          <RecapCaptureModule verdictId={verdictId} />
+        ) : null}
 
         {/* Mini-tunnel dépôt (LOT 3) : même garde que les boosters post-verdict.
             Pas proposé sur INSUFFICIENT_DATA (compléter le diagnostic d'abord). */}
