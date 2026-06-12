@@ -40,6 +40,25 @@ Le verdict expose alors une fourchette `[totalRecoverableLowCents,
 totalRecoverableHighCents]`. Si bas == haut (aucune estimation en jeu),
 l'UI affiche un montant unique, pas une fausse fourchette.
 
+### Complément de loyer = source PRINCIPALE de fourchette (décision Lyes 2026-06-12)
+Constat : **les locataires ne savent souvent pas s'ils ont un complément**, ni
+si leur loyer saisi l'inclut. On ne peut donc pas leur demander un « loyer hors
+complément » fiable. La fourchette absorbe cette incertitude, et **résout le
+risque de double-comptage** (complément ↔ loyer de base) relevé en revue :
+
+- **Borne basse (plancher garanti)** : le complément n'est **jamais** chiffré
+  séparément (on suppose le loyer saisi « tout compris »). → zéro double-comptage,
+  montant sûr quoi qu'il arrive.
+- **Borne haute (potentiel)** : le complément est chiffré quand il est déclaré
+  OUI **ou** NSP et que le contexte le rend illégal (F/G ou critère 3DS),
+  montant déclaré sinon estimation 9 %.
+- **L'équipe vérifie le bail réel ensuite** (back-office) et tranche entre les
+  deux bornes. Le locataire incertain n'est jamais bloqué.
+
+`toSnapshotRange` construit donc deux snapshots qui diffèrent sur
+`rentSupplementDeclared` : `undefined` en bas, `true` en haut (quand OUI/NSP).
+NON explicite → pas de complément dans les deux bornes.
+
 ### Forme retenue (à confirmer au plan, défaut recommandé)
 **Deux passes sur le snapshot**, pas de réécriture des règles : l'agrégateur
 construit deux `DossierSnapshot` (bas/haut) à partir d'un snapshot annoté des
