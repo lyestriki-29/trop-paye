@@ -12,6 +12,7 @@ export type FunnelEvent =
   | "dpe_match_missed"
   | "verdict_affiche"
   | "booster_applique"
+  | "deposit_tunnel_applique"
   | "email_capture"
   | "waitlist_rejointe"
   | "mandat_signe"
