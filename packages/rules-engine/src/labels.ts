@@ -12,6 +12,7 @@ export const RULE_LABEL: Record<RuleId, string> = {
   AGENCY_FEES_CAP: "Honoraires d'agence (plafond)",
   PRIVATE_LANDLORD_FEES: "Frais facturés par le bailleur",
   RENT_SUPPLEMENT: "Complément de loyer",
+  ENCADREMENT: "Encadrement des loyers (plafond)",
 };
 
 /** Niveau de confiance, en clair. */

@@ -5,6 +5,7 @@ export { evaluateDepositLate } from "./rules/deposit-late";
 export { evaluateDepositCap } from "./rules/deposit-cap";
 export { evaluateAgencyFeesCap } from "./rules/agency-fees-cap";
 export { evaluatePrivateLandlordFees } from "./rules/private-landlord-fees";
+export { evaluateRentCap } from "./rules/rent-cap";
 export { evaluateAll } from "./aggregate";
 export { evaluateRange, evaluateSnapshotRange } from "./range";
 export type { VerdictRange } from "./types";

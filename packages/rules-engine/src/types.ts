@@ -2,6 +2,8 @@
 
 export type DpeClass = "A" | "B" | "C" | "D" | "E" | "F" | "G";
 export type Confidence = "HIGH" | "MEDIUM" | "LOW";
+/** Tranche d'époque de construction (encadrement des loyers) — calque les époques du barème Paris. */
+export type ConstructionPeriod = "BEFORE_1946" | "1946_1970" | "1971_1990" | "AFTER_1990";
 export type Outcome = "IRREGULAR" | "COMPLIANT" | "INSUFFICIENT_DATA";
 export type RuleId =
   | "DPE_FREEZE"
@@ -10,7 +12,8 @@ export type RuleId =
   | "DEPOSIT_CAP"
   | "AGENCY_FEES_CAP"
   | "PRIVATE_LANDLORD_FEES"
-  | "RENT_SUPPLEMENT";
+  | "RENT_SUPPLEMENT"
+  | "ENCADREMENT";
 
 /** Zone d'encadrement des honoraires de location (décret ALUR). */
 export type AgencyZone = "TRES_TENDUE" | "TENDUE" | "RESTE";
@@ -55,7 +58,14 @@ export interface DossierSnapshot {
   leaseSignedAt?: string;
   furnished?: boolean;
   surfaceM2?: number;
+  /** Nombre de pièces principales (1 à 4 ; 4 = « 4 et plus ») — clé du barème d'encadrement. */
+  roomCount?: number;
+  /** Époque de construction (fourchette) — clé du barème d'encadrement. */
+  constructionPeriod?: ConstructionPeriod;
   inseeCode?: string;
+  /** Coordonnées de l'adresse (géocodage IGN) — géo-rattachement encadrement (I/O, hors moteur pur). */
+  lat?: number;
+  lon?: number;
   dpeHistory: DpeRecord[];
   rentHistory: RentEvent[];
   revisionClause?: boolean;
@@ -141,12 +151,40 @@ export interface AgencyFeeReferential {
   zoneByInsee: Record<string, AgencyZone>;
 }
 
+/**
+ * Loyer de référence (encadrement) DÉJÀ RÉSOLU pour le logement — INJECTÉ. Le
+ * géo-rattachement adresse → quartier → secteur, et la sélection par nombre de
+ * pièces / époque / meublé / millésime, se font HORS moteur (couche I/O, qui
+ * possède l'adresse et les polygones). Le moteur ne fait que comparer le loyer
+ * au plafond. Absent = logement hors zone d'encadrement → règle inerte.
+ */
+export interface RentControlReference {
+  /** Loyer de référence MAJORÉ = plafond légal, centimes par m². */
+  capPerM2Cents: number;
+  /** Loyer de référence, centimes par m² (audit trail). */
+  refPerM2Cents: number;
+  /** Loyer de référence minoré, centimes par m² (audit trail). */
+  minPerM2Cents: number;
+  /** Millésime du barème (année de l'arrêté). */
+  millesime: number;
+  /** Date d'effet la plus précoce de l'encadrement pour le secteur (ISO). */
+  effectiveFrom: string;
+  /** Libellés pour l'audit trail (secteur, époque). */
+  zoneLabel: string;
+  periodLabel: string;
+  /** Critères de sélection du barème (audit trail). */
+  rooms: number;
+  furnished: boolean;
+}
+
 export interface Referentials {
   irl: IrlIndexEntry[];
   /** Bouclier loyer : plafond de variation (métropole 3,5 %). */
   shieldRatePct: number;
   /** Plafonds + zonage des honoraires d'agence (LOT 2). Absent = règle inerte. */
   agencyFees?: AgencyFeeReferential;
+  /** Loyer de référence majoré résolu pour le logement. Absent = règle ENCADREMENT inerte. */
+  rentControl?: RentControlReference;
 }
 
 export interface RuleInput {

@@ -7,7 +7,7 @@ import type {
   RuleResult,
   Signal,
 } from "../types";
-import { maxISO, shiftISO } from "../internal/dates";
+import { maxISO, monthsElapsed, shiftISO } from "../internal/dates";
 
 const RULE_ID = "RENT_SUPPLEMENT" as const;
 const RULE_VERSION = "3DS-2022";
@@ -26,22 +26,6 @@ export const LEGAL_BASIS =
 
 const day = (iso: string): string => iso.slice(0, 10);
 const isFG = (c: DpeClass): boolean => c === "F" || c === "G";
-
-/**
- * Nombre de mensualités de complément versées dans [start, asOf] : nombre de fois
- * où le quantième de `start` a été atteint. 0 si `start` > `asOf` (bail futur saisi
- * en avance). Évite le sur-comptage d'`eachMonth` (qui ramène au 1er du mois et
- * compterait un mois de trop quand on multiplie par un montant fixe).
- */
-function monthsElapsed(startISO: string, asOfISO: string): number {
-  const s = day(startISO);
-  const a = day(asOfISO);
-  const raw =
-    (Number(a.slice(0, 4)) - Number(s.slice(0, 4))) * 12 +
-    (Number(a.slice(5, 7)) - Number(s.slice(5, 7))) +
-    (Number(a.slice(8, 10)) >= Number(s.slice(8, 10)) ? 1 : 0);
-  return Math.max(0, raw);
-}
 
 /** Classe DPE en vigueur à la date d'évaluation (la plus récente ≤ asOf). PUR. */
 function latestDpeClass(dpes: DpeRecord[], asOf: string): DpeClass | undefined {

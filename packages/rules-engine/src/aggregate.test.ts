@@ -46,6 +46,46 @@ describe("evaluateAll (agrégateur)", () => {
     expect(irl.subsidiaryOf).toBe("DPE_FREEZE");
   });
 
+  it("ENCADREMENT vs gel F/G : ne somme pas, garde la base la plus élevée (anti double-comptage)", () => {
+    const v = evaluateAll({
+      dossier: {
+        dpeHistory: [{ class: "F", date: "2021-06-01", source: "ADEME_API" }],
+        surfaceM2: 30,
+        leaseSignedAt: "2022-01-01",
+        revisionClause: false,
+        rentHistory: [
+          { type: "INITIAL", date: "2022-01-01", rentCents: 100000, source: "quittance" },
+          { type: "REVISION", date: "2023-09-01", rentCents: 110000, source: "quittance" },
+        ],
+      },
+      referentials: {
+        irl: [],
+        shieldRatePct: 3.5,
+        // Plafond 30 € /m² → 900 € de plafond ; loyer 1100 € → dépassement 200 €/mois,
+        // bien supérieur au gel sur la seule hausse de 100 €.
+        rentControl: {
+          capPerM2Cents: 3000,
+          refPerM2Cents: 2500,
+          minPerM2Cents: 1750,
+          millesime: 2024,
+          effectiveFrom: "2019-07-01",
+          zoneLabel: "Secteur test",
+          periodLabel: "1946-1970",
+          rooms: 2,
+          furnished: false,
+        },
+      },
+      asOf: "2024-09-01",
+    });
+    const enc = v.results.find((r) => r.ruleId === "ENCADREMENT")!;
+    const dpe = v.results.find((r) => r.ruleId === "DPE_FREEZE")!;
+    expect(enc.outcome).toBe("IRREGULAR");
+    expect(enc.subsidiaryOf).toBeUndefined();
+    expect(dpe.subsidiaryOf).toBe("ENCADREMENT");
+    // Total = l'encadrement seul, JAMAIS la somme encadrement + gel.
+    expect(v.totalRecoverableCents).toBe(enc.recoverableCents);
+  });
+
   it("émet un signal d'orientation (non chiffré) quand un complément de loyer est déclaré", () => {
     const v = evaluateAll(
       mk(

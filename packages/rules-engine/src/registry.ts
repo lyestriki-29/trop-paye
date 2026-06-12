@@ -25,6 +25,7 @@ import {
   evaluateRentSupplement,
   LEGAL_BASIS as RENT_SUPPLEMENT_BASIS,
 } from "./rules/rent-supplement";
+import { evaluateRentCap, LEGAL_BASIS as ENCADREMENT_BASIS } from "./rules/rent-cap";
 
 /** Classe DPE en vigueur à la date d'évaluation (la plus récente ≤ asOf). */
 export function latestDpeClassAt(input: RuleInput): DpeClass | undefined {
@@ -206,6 +207,18 @@ export const CASE_REGISTRY: CaseDefinition[] = [
     prescriptionWindowYears: 3,
     requiredInputs: ["privateLandlordFeesPaidCents"],
     evaluate: evaluatePrivateLandlordFees,
+  },
+  {
+    id: "ENCADREMENT",
+    label: RULE_LABEL.ENCADREMENT,
+    legalBasis: ENCADREMENT_BASIS,
+    legalBasisStatus: "TODO_VERIFIER",
+    detectability: "COMPUTED",
+    prescriptionWindowYears: 3,
+    // `surfaceM2` requis : le plafond se calcule au m². La référence d'encadrement
+    // (referentials.rentControl) est vérifiée dans evaluate (absente = règle inerte).
+    requiredInputs: ["surfaceM2"],
+    evaluate: evaluateRentCap,
   },
   decenceCase,
   complementCase,

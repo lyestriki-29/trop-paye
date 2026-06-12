@@ -1,6 +1,7 @@
 import type {
   Confidence,
   DossierSnapshot,
+  RuleId,
   RuleInput,
   RuleResult,
   VerdictGlobal,
@@ -35,17 +36,25 @@ export function evaluateAll(input: RuleInput): VerdictGlobal {
     else results.push(out);
   }
 
-  // Anti double-comptage : si DPE_FREEZE et IRL_OVERCHARGE sont tous deux
-  // irréguliers (même augmentation de loyer), retenir le recouvrable le plus
-  // élevé ; l'autre devient subsidiaire (non sommé).
-  const dpe = results.find((r) => r.ruleId === "DPE_FREEZE");
-  const irl = results.find((r) => r.ruleId === "IRL_OVERCHARGE");
-  // Immuable : le moteur est PUR — on ne mute pas les RuleResult, on reconstruit le tableau.
+  // Anti double-comptage des bases qui mesurent un même excès de loyer. Le gel
+  // F/G et l'IRL chiffrent une HAUSSE illégale ; l'encadrement chiffre le
+  // DÉPASSEMENT du plafond — or la hausse est incluse dans le dépassement (et
+  // réciproquement selon les cas), donc les sommer sur-estime le recouvrable. On
+  // ne retient que la base la plus élevée ; les autres deviennent subsidiaires
+  // (non sommées). [AVOCAT] : périmètre exact à confirmer (V1 prudente, jamais
+  // de sur-promesse). Immuable : on ne mute pas les RuleResult, on reconstruit.
+  const OVERAGE_RULES: RuleId[] = ["DPE_FREEZE", "IRL_OVERCHARGE", "ENCADREMENT"];
+  const overage = results.filter(
+    (r) => OVERAGE_RULES.includes(r.ruleId) && r.outcome === "IRREGULAR",
+  );
   let merged = results;
-  if (dpe && irl && dpe.outcome === "IRREGULAR" && irl.outcome === "IRREGULAR") {
-    const demoted = dpe.recoverableCents >= irl.recoverableCents ? "IRL_OVERCHARGE" : "DPE_FREEZE";
-    const primary = demoted === "IRL_OVERCHARGE" ? "DPE_FREEZE" : "IRL_OVERCHARGE";
-    merged = results.map((r) => (r.ruleId === demoted ? { ...r, subsidiaryOf: primary } : r));
+  if (overage.length > 1) {
+    const primary = overage.reduce((a, b) => (a.recoverableCents >= b.recoverableCents ? a : b));
+    merged = results.map((r) =>
+      overage.some((o) => o.ruleId === r.ruleId) && r.ruleId !== primary.ruleId
+        ? { ...r, subsidiaryOf: primary.ruleId }
+        : r,
+    );
   }
 
   const counted = merged.filter((r) => r.outcome === "IRREGULAR" && !r.subsidiaryOf);

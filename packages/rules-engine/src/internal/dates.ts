@@ -89,6 +89,23 @@ export function anniversariesBetween(anchorISO: string, asOfISO: string): string
   return out;
 }
 
+/**
+ * Nombre de mensualités versées dans [start, asOf] : combien de fois le quantième
+ * de `start` a été atteint. 0 si `start` > `asOf` (bail futur saisi en avance).
+ * Évite le sur-comptage d'`eachMonth` (qui ramène au 1er du mois et compterait un
+ * mois de trop quand on multiplie par un montant mensuel fixe). Partagé par les
+ * règles RENT_SUPPLEMENT et ENCADREMENT.
+ */
+export function monthsElapsed(startISO: string, asOfISO: string): number {
+  const s = startISO.slice(0, 10);
+  const a = asOfISO.slice(0, 10);
+  const raw =
+    (Number(a.slice(0, 4)) - Number(s.slice(0, 4))) * 12 +
+    (Number(a.slice(5, 7)) - Number(s.slice(5, 7))) +
+    (Number(a.slice(8, 10)) >= Number(s.slice(8, 10)) ? 1 : 0);
+  return Math.max(0, raw);
+}
+
 export function maxISO(a: string, b: string): string {
   return a.slice(0, 10) > b.slice(0, 10) ? a.slice(0, 10) : b.slice(0, 10);
 }
