@@ -81,6 +81,15 @@ export const diagnosticSchema = z
         message: "Indiquez le nombre de colocataires (au moins 2) pour reconstituer le loyer total.",
       });
     }
+    // Dépôt en mois interdit en coloc « ma part » : le loyer reconstitué (× n)
+    // fausserait la conversion mois → centimes (défense contre payload forgé).
+    if (val.rentBasis === "SHARE" && val.depositPaidMonths !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["depositPaidMonths"],
+        message: "Le dépôt en nombre de mois n'est pas disponible en colocation à la part.",
+      });
+    }
     if (val.rentInputMode !== "CC") return;
     const charges = val.chargesCents;
     if (charges === undefined) {
@@ -184,8 +193,16 @@ export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapsho
         : input.depositPaidCents,
     rentSupplementDeclared: input.rentSupplement === "OUI" ? true : undefined,
     rentSupplementCents: input.rentSupplement === "OUI" ? input.rentSupplementCents : undefined,
+    // OUI → true (justifié) ; NON → false (injustifié, prioritaire) ; NSP/absent
+    // → undefined (incertain). La distinction NON/NSP est conservée pour le moteur.
     rentSupplementExceptional:
-      input.rentSupplement === "OUI" ? input.rentSupplementExceptional === "OUI" : undefined,
+      input.rentSupplement !== "OUI" || input.rentSupplementExceptional === undefined
+        ? undefined
+        : input.rentSupplementExceptional === "OUI"
+          ? true
+          : input.rentSupplementExceptional === "NON"
+            ? false
+            : undefined,
     // Filtrage anti-payload-forgé : seuls les ids connus du référentiel sont transmis.
     complementCriteria:
       input.rentSupplement === "OUI"

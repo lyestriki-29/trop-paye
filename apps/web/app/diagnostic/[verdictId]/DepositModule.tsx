@@ -69,6 +69,11 @@ export function DepositModule({
   const [asOf] = useState(() => new Date().toISOString().slice(0, 10));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // « Autre montant » est un choix explicite : sans ce flag, cliquer « Autre »
+  // (qui vide depositMonths) ferait disparaître le champ de saisie du montant exact.
+  const [otherMode, setOtherMode] = useState(
+    () => answers.depositMonths === undefined && answers.depositCents !== undefined,
+  );
 
   useEffect(() => {
     try {
@@ -109,8 +114,9 @@ export function DepositModule({
     }
   }, [validAnswers, snapshot, referentials, asOf]);
 
-  const amountChoice =
-    choiceFromMonths(answers.depositMonths) ?? (answers.depositCents !== undefined ? "other" : undefined);
+  const amountChoice: DepositChoice | undefined = otherMode
+    ? "other"
+    : choiceFromMonths(answers.depositMonths);
   const equivalentCents = useMemo(() => {
     if (!answers.depositMonths) return null;
     try {
@@ -123,7 +129,12 @@ export function DepositModule({
   const set = <K extends keyof DepositAnswersDraft>(key: K, value: DepositAnswersDraft[K]) =>
     setAnswers((a) => ({ ...a, [key]: value }));
   const setAmountChoice = (choice: DepositChoice) => {
-    if (choice === "other") return setAnswers((a) => ({ ...a, depositMonths: undefined }));
+    if (choice === "other") {
+      setOtherMode(true);
+      setAnswers((a) => ({ ...a, depositMonths: undefined }));
+      return;
+    }
+    setOtherMode(false);
     setAnswers((a) => ({ ...a, depositMonths: MONTH_BY_CHOICE[choice], depositCents: undefined }));
   };
   const setRefunded = (refunded: RefundChoice) =>

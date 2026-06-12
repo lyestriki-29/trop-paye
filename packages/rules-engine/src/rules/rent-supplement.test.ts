@@ -74,10 +74,11 @@ describe("evaluateRentSupplement", () => {
     expect(out.outcome).toBe("IRREGULAR");
   });
 
-  it("hors F/G sans critère, sans caractéristique exceptionnelle → signal prioritaire « injustifié »", () => {
+  it("hors F/G, atout exceptionnel = NON (false) → signal prioritaire « injustifié »", () => {
     const out = evaluateRentSupplement(
       input({
         rentSupplementDeclared: true,
+        rentSupplementExceptional: false,
         leaseSignedAt: "2024-03-01",
         dpeHistory: [{ class: "C", date: "2024-01-01", source: "ADEME_API" }],
       }),
@@ -88,7 +89,21 @@ describe("evaluateRentSupplement", () => {
     expect(out[0]?.message).toContain("injustifié");
   });
 
-  it("hors F/G mais caractéristique exceptionnelle déclarée → signal non prioritaire", () => {
+  it("hors F/G, atout exceptionnel = NSP (undefined) → signal NON prioritaire (incertain)", () => {
+    const out = evaluateRentSupplement(
+      input({
+        rentSupplementDeclared: true,
+        leaseSignedAt: "2024-03-01",
+        dpeHistory: [{ class: "C", date: "2024-01-01", source: "ADEME_API" }],
+      }),
+    );
+    expect(Array.isArray(out)).toBe(true);
+    if (!Array.isArray(out)) return;
+    expect(out[0]?.priority).toBeFalsy();
+    expect(out[0]?.message).not.toContain("injustifié");
+  });
+
+  it("hors F/G mais caractéristique exceptionnelle déclarée (true) → signal non prioritaire", () => {
     const out = evaluateRentSupplement(
       input({
         rentSupplementDeclared: true,
@@ -100,6 +115,38 @@ describe("evaluateRentSupplement", () => {
     expect(Array.isArray(out)).toBe(true);
     if (!Array.isArray(out)) return;
     expect(out[0]?.priority).toBeFalsy();
+  });
+
+  it("bail signé dans le futur (saisi en avance) → aucun versement, recoverable 0", () => {
+    const out = evaluateRentSupplement(
+      input({
+        rentSupplementDeclared: true,
+        rentSupplementCents: 15000,
+        leaseSignedAt: "2026-06-20", // après asOf 2026-06-12
+        dpeHistory: [{ class: "F", date: "2026-06-01", source: "ADEME_API" }],
+      }),
+    );
+    expect(isResult(out)).toBe(true);
+    if (!isResult(out)) return;
+    expect(out.recoverableCents).toBe(0);
+    // IRREGULAR quand même : économie mensuelle future (complément interdit).
+    expect(out.outcome).toBe("IRREGULAR");
+    expect(out.futureMonthlySavingCents).toBe(15000);
+  });
+
+  it("bail signé en milieu de mois → pas de mois sur-compté", () => {
+    const out = evaluateRentSupplement(
+      input({
+        rentSupplementDeclared: true,
+        rentSupplementCents: 10000,
+        leaseSignedAt: "2026-01-15",
+        dpeHistory: [{ class: "F", date: "2026-01-01", source: "ADEME_API" }],
+      }),
+    );
+    expect(isResult(out)).toBe(true);
+    if (!isResult(out)) return;
+    // 15/01,15/02,15/03,15/04,15/05 = 5 versements au 12/06 (le 15/06 pas encore).
+    expect(out.recoverableCents).toBe(10000 * 5);
   });
 
   it("bail antérieur au 18/08/2022 → pas d'interdiction (signal, non chiffré)", () => {
@@ -125,8 +172,7 @@ describe("evaluateRentSupplement", () => {
     );
     expect(isResult(out)).toBe(true);
     if (!isResult(out)) return;
-    // Prescription 3 ans : la fenêtre démarre à asOf − 3 ans (2023-06), pas à 2022-09.
-    expect(out.recoverableCents).toBeLessThanOrEqual(10000 * 37);
-    expect(out.recoverableCents).toBeGreaterThanOrEqual(10000 * 36);
+    // Prescription 3 ans = exactement 36 mensualités (fenêtre asOf − 3 ans → asOf).
+    expect(out.recoverableCents).toBe(10000 * 36);
   });
 });

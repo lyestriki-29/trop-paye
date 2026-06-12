@@ -130,8 +130,13 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
     currentRentCents: draft.currentRentCents,
     // Lignes anniversaire ou libres, incomplètes ignorées (cf. effectiveRevisions).
     revisions: effectiveRevisions(draft, new Date().toISOString().slice(0, 10)),
-    depositPaidCents: draft.depositPaidMonths !== undefined ? undefined : draft.depositPaidCents,
-    depositPaidMonths: draft.depositPaidMonths,
+    // Dépôt en mois : interdit en coloc « ma part » (le loyer reconstitué ×n
+    // fausserait la conversion) → on n'envoie alors que le montant exact.
+    depositPaidMonths: draft.rentBasis === "SHARE" ? undefined : draft.depositPaidMonths,
+    depositPaidCents:
+      draft.rentBasis !== "SHARE" && draft.depositPaidMonths !== undefined
+        ? undefined
+        : draft.depositPaidCents,
     rentSupplement: draft.rentSupplement,
     rentSupplementCents: draft.rentSupplement === "OUI" ? draft.rentSupplementCents : undefined,
     rentSupplementExceptional:

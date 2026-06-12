@@ -7,7 +7,7 @@ import type {
   RuleResult,
   Signal,
 } from "../types";
-import { eachMonth, maxISO, shiftISO } from "../internal/dates";
+import { maxISO, shiftISO } from "../internal/dates";
 
 const RULE_ID = "RENT_SUPPLEMENT" as const;
 const RULE_VERSION = "3DS-2022";
@@ -26,6 +26,22 @@ export const LEGAL_BASIS =
 
 const day = (iso: string): string => iso.slice(0, 10);
 const isFG = (c: DpeClass): boolean => c === "F" || c === "G";
+
+/**
+ * Nombre de mensualités de complément versées dans [start, asOf] : nombre de fois
+ * où le quantième de `start` a été atteint. 0 si `start` > `asOf` (bail futur saisi
+ * en avance). Évite le sur-comptage d'`eachMonth` (qui ramène au 1er du mois et
+ * compterait un mois de trop quand on multiplie par un montant fixe).
+ */
+function monthsElapsed(startISO: string, asOfISO: string): number {
+  const s = day(startISO);
+  const a = day(asOfISO);
+  const raw =
+    (Number(a.slice(0, 4)) - Number(s.slice(0, 4))) * 12 +
+    (Number(a.slice(5, 7)) - Number(s.slice(5, 7))) +
+    (Number(a.slice(8, 10)) >= Number(s.slice(8, 10)) ? 1 : 0);
+  return Math.max(0, raw);
+}
 
 /** Classe DPE en vigueur à la date d'évaluation (la plus récente ≤ asOf). PUR. */
 function latestDpeClass(dpes: DpeRecord[], asOf: string): DpeClass | undefined {
@@ -62,11 +78,27 @@ export function evaluateRentSupplement(input: RuleInput): RuleResult | Signal[] 
   const prohibited = criteria.size > 0 && dateInScope;
 
   if (!prohibited) {
-    const justified = dossier.rentSupplementExceptional === true;
-    const message = justified
-      ? "Complément de loyer déclaré : il n'est licite qu'en zone d'encadrement, pour des caractéristiques exceptionnelles du logement dont la preuve incombe au bailleur, et se conteste dans les 3 mois suivant la signature du bail. À examiner en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]"
-      : "Complément de loyer déclaré SANS caractéristique exceptionnelle : il est probablement injustifié (la preuve d'une particularité de confort ou de localisation incombe au bailleur) et se conteste dans les 3 mois suivant la signature du bail. À examiner en PRIORITÉ en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]";
-    return [{ caseId: RULE_ID, priority: !justified, message }];
+    // `false` = le locataire affirme N'AVOIR aucun atout exceptionnel → injustifié,
+    // prioritaire. `undefined` = « je ne sais pas » → incertain, non prioritaire.
+    // `true` = atout déclaré → probablement justifié.
+    const exceptional = dossier.rentSupplementExceptional;
+    if (exceptional === false) {
+      return [
+        {
+          caseId: RULE_ID,
+          priority: true,
+          message:
+            "Complément de loyer déclaré SANS caractéristique exceptionnelle : il est probablement injustifié (la preuve d'une particularité de confort ou de localisation incombe au bailleur) et se conteste dans les 3 mois suivant la signature du bail. À examiner en PRIORITÉ en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]",
+        },
+      ];
+    }
+    return [
+      {
+        caseId: RULE_ID,
+        message:
+          "Complément de loyer déclaré : il n'est licite qu'en zone d'encadrement, pour des caractéristiques exceptionnelles du logement dont la preuve incombe au bailleur, et se conteste dans les 3 mois suivant la signature du bail. À examiner en revue. Orientation, jamais chiffrée automatiquement. [AVOCAT]",
+      },
+    ];
   }
 
   const steps: ComputationStep[] = [];
@@ -96,19 +128,22 @@ export function evaluateRentSupplement(input: RuleInput): RuleResult | Signal[] 
 
   const prescriptionStart = shiftISO(asOf, { years: -PRESCRIPTION_YEARS });
   const windowStart = signedAt ? maxISO(signedAt, prescriptionStart) : prescriptionStart;
-  const months = eachMonth(windowStart, asOf).length;
+  // Mensualités versées, bornées à la prescription (3 ans = 36 mensualités max).
+  const months = Math.min(monthsElapsed(windowStart, asOf), 12 * PRESCRIPTION_YEARS);
   const recoverable = monthly * months;
   const n = criteria.size;
 
   steps.push({ label: `Caractéristiques excluant le complément : ${n}` });
-  steps.push({ label: `Fenêtre de prescription : ${months} mois` });
+  steps.push({ label: `Mensualités de complément indu : ${months}` });
   steps.push({ label: "Trop-perçu récupérable (complément indu)", cents: recoverable });
   steps.push({ label: "Économie mensuelle à venir", cents: monthly });
 
   return {
     ruleId: RULE_ID,
     ruleVersion: RULE_VERSION,
-    outcome: recoverable > 0 ? "IRREGULAR" : "COMPLIANT",
+    // IRREGULAR dès qu'il y a une économie mensuelle (complément interdit), même si
+    // aucun versement passé encore (recoverable 0) — cohérent avec DPE_FREEZE.
+    outcome: recoverable > 0 || monthly > 0 ? "IRREGULAR" : "COMPLIANT",
     confidence: "MEDIUM",
     recoverableCents: recoverable,
     futureMonthlySavingCents: monthly,
