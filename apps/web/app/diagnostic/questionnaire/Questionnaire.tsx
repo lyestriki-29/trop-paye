@@ -1,39 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
-import type { DiagnosticDraft, StepProps } from "./use-diagnostic-form";
 import { useDiagnosticForm } from "./use-diagnostic-form";
-import { AddressStep, addressValid } from "./steps/AddressStep";
-import { HousingDpeStep, housingDpeValid } from "./steps/HousingDpeStep";
-import { RentStep, rentValid } from "./steps/RentStep";
-import { LeaseDetailsStep, leaseDetailsValid } from "./steps/LeaseDetailsStep";
-import { RecapStep, recapValid } from "./steps/RecapStep";
-
-interface StepDef {
-  title: string;
-  subtitle?: string;
-  Component: (p: StepProps) => ReactNode;
-  valid: (d: DiagnosticDraft) => boolean;
-}
-
-// Simplification 8→5 écrans (2026-06-12) : logement+DPE fusionnés, et
-// bail+révision+historique réunis sous « Votre bail ». Chaque écran fusionné
-// réutilise les composants existants en sous-sections (cf. HousingDpeStep/
-// LeaseDetailsStep). Rendu visuel à valider (écrans plus longs).
-const STEPS: StepDef[] = [
-  // Copy deck §2 — étape adresse : titre + aide mot pour mot.
-  { title: "Où habitez-vous ?", subtitle: "Nous utilisons votre adresse uniquement pour retrouver les données publiques de votre logement.", Component: AddressStep, valid: addressValid },
-  { title: "Votre logement", subtitle: "Quelques caractéristiques, puis son DPE.", Component: HousingDpeStep, valid: housingDpeValid },
-  // Copy deck §2 — étape loyer : titre + aide mot pour mot.
-  { title: "Quel est votre loyer hors charges ?", subtitle: "C'est le « loyer nu » ou « loyer hors charges » sur votre bail ou vos quittances — pas le total que vous virez chaque mois.", Component: RentStep, valid: rentValid },
-  { title: "Votre bail", subtitle: "Date, révision et augmentations — tout est facultatif.", Component: LeaseDetailsStep, valid: leaseDetailsValid },
-  { title: "Récapitulatif", subtitle: "Vérifiez avant de lancer le diagnostic.", Component: RecapStep, valid: recapValid },
-];
+import { STEPS } from "./tunnel-steps";
+import { QuestionnaireOnePage } from "./QuestionnaireOnePage";
 
 /** Chrome allégé du tunnel (plan P2 Task 4) : logo + « Étape X sur Y », rien d'autre. */
 function TunnelHeader({ step, total }: { step: number; total: number }) {
@@ -51,12 +26,40 @@ function TunnelHeader({ step, total }: { step: number; total: number }) {
   );
 }
 
-export function Questionnaire() {
+export function Questionnaire({ onePage = false }: { onePage?: boolean }) {
   const { draft, setField, stepIndex, setStepIndex, hydrated, submit, submitting, error } =
     useDiagnosticForm();
   const reduced = useReducedMotion();
 
   const i = Math.min(Math.max(stepIndex, 0), STEPS.length - 1);
+
+  // Au changement d'étape, remonter en haut de page (sinon on reste au niveau
+  // du bouton « Continuer », en bas). On saute le tout premier rendu pour ne
+  // pas voler le scroll de l'utilisateur qui reprend un brouillon.
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  }, [i, reduced]);
+
+  // Variante une-page (retour Lyes 2026-06-12) : même état de formulaire, rendu
+  // différent. L'early return est APRÈS tous les hooks (ordre stable).
+  if (onePage) {
+    return (
+      <QuestionnaireOnePage
+        draft={draft}
+        setField={setField}
+        hydrated={hydrated}
+        submit={submit}
+        submitting={submitting}
+        error={error}
+      />
+    );
+  }
+
   const step = STEPS[i]!;
   const isLast = i === STEPS.length - 1;
   const canNext = step.valid(draft);
