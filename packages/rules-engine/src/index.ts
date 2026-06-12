@@ -6,6 +6,8 @@ export { evaluateDepositCap } from "./rules/deposit-cap";
 export { evaluateAgencyFeesCap } from "./rules/agency-fees-cap";
 export { evaluatePrivateLandlordFees } from "./rules/private-landlord-fees";
 export { evaluateAll } from "./aggregate";
+export { evaluateRange } from "./range";
+export type { VerdictRange } from "./types";
 export { CASE_REGISTRY, latestDpeClassAt } from "./registry";
 export {
   RULE_LABEL,
