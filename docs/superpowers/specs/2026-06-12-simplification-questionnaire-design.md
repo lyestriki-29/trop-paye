@@ -123,10 +123,33 @@ justifiables : parfois ils n'ont pas lieu d'être »).
   loyer** comme proxy (borne haute), valeur `TODO_VERIFIER` (aucune source
   publique trouvée à l'audit). Toujours affiché « estimation », jamais promis.
 
-L'écran questionnaire ne demande plus que **OUI / NON / NSP** ; la checklist
-3DS détaillée (justifiabilité) déménage en carte post-verdict « affinez » et
-alimente la qualification légal/contestable. NSP → borne basse 0, borne haute
-= estimation si le contexte (F/G) le permet.
+**Question UI (décision Lyes 2026-06-12)** — on inverse la logique : au lieu de
+demander OUI/NON sur le complément abstrait, on demande au locataire si son
+logement a des **caractéristiques exceptionnelles** (ce qu'il sait juger), avec
+**exemples** affichés. Détail juridique sourcé :
+`docs/recherche-2026-06-12-complement-de-loyer.md`.
+
+1. « Payez-vous un complément de loyer ? » OUI / NON / NSP.
+2. Si OUI : « Votre logement a-t-il une de ces caractéristiques
+   exceptionnelles ? » avec exemples (cases ou OUI/NON) :
+   *vue exceptionnelle (monument, panorama), terrasse ou très grand balcon,
+   jardin privatif, hauteur sous plafond exceptionnelle, prestations haut de
+   gamme rares, exposition/luminosité exceptionnelle.* Libellé brouillon,
+   exemples NON limitatifs, [AVOCAT].
+
+Qualification (charge de preuve au bailleur) :
+- **F/G ou critère 3DS rédhibitoire coché** → complément **interdit** →
+  borne basse (répétition 3 ans).
+- **Hors F/G + AUCUNE caractéristique exceptionnelle** → **contestable** →
+  borne haute SI bail ≤ 3 mois (sinon forclusion probable → signal seul).
+  ⚠️ garde-fou de date : la contestation du caractère justifié se prescrit à
+  **3 mois après signature** (CDC), distinct de la répétition 3 ans du F/G.
+- **Au moins une caractéristique exceptionnelle déclarée (hors F/G)** →
+  probablement justifié → 0 chiffré, **signal** « à faire vérifier ».
+- NSP au complément → borne basse 0, borne haute = estimation si F/G.
+
+La checklist 3DS d'interdiction détaillée reste accessible en carte
+post-verdict « affinez » pour confirmer l'interdiction.
 
 ⚠️ Cette règle ajoute une **tranche moteur dédiée** (Tranche 2bis) AVANT
 l'écran loyer, car elle chiffre une répétition juridiquement sensible :
