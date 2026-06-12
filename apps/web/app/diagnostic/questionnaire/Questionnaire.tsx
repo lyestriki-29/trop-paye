@@ -9,12 +9,9 @@ import { Button } from "@/components/ui/Button";
 import type { DiagnosticDraft, StepProps } from "./use-diagnostic-form";
 import { useDiagnosticForm } from "./use-diagnostic-form";
 import { AddressStep, addressValid } from "./steps/AddressStep";
-import { HousingStep, housingValid } from "./steps/HousingStep";
-import { DpeStep, dpeValid } from "./steps/DpeStep";
-import { LeaseStep, leaseValid } from "./steps/LeaseStep";
+import { HousingDpeStep, housingDpeValid } from "./steps/HousingDpeStep";
 import { RentStep, rentValid } from "./steps/RentStep";
-import { RevisionStep, revisionValid } from "./steps/RevisionStep";
-import { RevisionHistoryStep, revisionHistoryValid } from "./steps/RevisionHistoryStep";
+import { LeaseDetailsStep, leaseDetailsValid } from "./steps/LeaseDetailsStep";
 import { RecapStep, recapValid } from "./steps/RecapStep";
 
 interface StepDef {
@@ -24,17 +21,17 @@ interface StepDef {
   valid: (d: DiagnosticDraft) => boolean;
 }
 
+// Simplification 8→5 écrans (2026-06-12) : logement+DPE fusionnés, et
+// bail+révision+historique réunis sous « Votre bail ». Chaque écran fusionné
+// réutilise les composants existants en sous-sections (cf. HousingDpeStep/
+// LeaseDetailsStep). Rendu visuel à valider (écrans plus longs).
 const STEPS: StepDef[] = [
   // Copy deck §2 — étape adresse : titre + aide mot pour mot.
   { title: "Où habitez-vous ?", subtitle: "Nous utilisons votre adresse uniquement pour retrouver les données publiques de votre logement.", Component: AddressStep, valid: addressValid },
-  { title: "Votre logement", subtitle: "Quelques caractéristiques.", Component: HousingStep, valid: housingValid },
-  { title: "Le DPE du logement", subtitle: "Le diagnostic énergétique conditionne le gel des loyers.", Component: DpeStep, valid: dpeValid },
-  { title: "Votre bail", Component: LeaseStep, valid: leaseValid },
+  { title: "Votre logement", subtitle: "Quelques caractéristiques, puis son DPE.", Component: HousingDpeStep, valid: housingDpeValid },
   // Copy deck §2 — étape loyer : titre + aide mot pour mot.
   { title: "Quel est votre loyer hors charges ?", subtitle: "C'est le « loyer nu » ou « loyer hors charges » sur votre bail ou vos quittances — pas le total que vous virez chaque mois.", Component: RentStep, valid: rentValid },
-  { title: "La révision du loyer", Component: RevisionStep, valid: revisionValid },
-  // Copy deck §2 — étape augmentations : titre mot pour mot.
-  { title: "Votre loyer a-t-il augmenté depuis votre arrivée ?", subtitle: "Facultatif — pour un calcul plus précis.", Component: RevisionHistoryStep, valid: revisionHistoryValid },
+  { title: "Votre bail", subtitle: "Date, révision et augmentations — tout est facultatif.", Component: LeaseDetailsStep, valid: leaseDetailsValid },
   { title: "Récapitulatif", subtitle: "Vérifiez avant de lancer le diagnostic.", Component: RecapStep, valid: recapValid },
 ];
 
