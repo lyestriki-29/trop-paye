@@ -220,3 +220,22 @@ export interface VerdictGlobal {
   signals: string[];
   asOf: string;
 }
+
+/**
+ * Fourchette de verdict : deux évaluations du même dossier — un scénario bas
+ * (« plancher sûr », estimations neutralisées) et un scénario haut
+ * (estimations appliquées). `totalRecoverableLowCents` ≤ `totalRecoverableHighCents`
+ * par construction (garde-fou min/max). La baisse de loyer engagée est celle
+ * du scénario bas. Si bas == haut, l'UI affiche un montant unique.
+ */
+export interface VerdictRange {
+  low: VerdictGlobal;
+  high: VerdictGlobal;
+  totalRecoverableLowCents: number;
+  totalRecoverableHighCents: number;
+  /** Baisse de loyer mensuelle engagée (scénario bas, prudent). */
+  futureMonthlySavingCents: number;
+  /** true si une estimation sépare les deux bornes (afficher une fourchette). */
+  isRange: boolean;
+  asOf: string;
+}
