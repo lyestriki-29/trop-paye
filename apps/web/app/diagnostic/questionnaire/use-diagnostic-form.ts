@@ -53,6 +53,8 @@ export interface DiagnosticDraft {
   revisions: { date: string; rentCents: number }[];
   /** Dépôt de garantie versé (LOT 1, règle DEPOSIT_CAP) : optionnel, vide = non évalué. */
   depositPaidCents?: number;
+  /** Dépôt versé en nombre de mois (boutons 1/2/3) ; converti en centimes côté serveur. */
+  depositPaidMonths?: 1 | 2 | 3;
   /** Mode de saisie des loyers (spec §2) : HC par défaut, CC = charges comprises. */
   rentInputMode?: "HC" | "CC";
   chargesCents?: number;
@@ -128,7 +130,8 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
     currentRentCents: draft.currentRentCents,
     // Lignes anniversaire ou libres, incomplètes ignorées (cf. effectiveRevisions).
     revisions: effectiveRevisions(draft, new Date().toISOString().slice(0, 10)),
-    depositPaidCents: draft.depositPaidCents,
+    depositPaidCents: draft.depositPaidMonths !== undefined ? undefined : draft.depositPaidCents,
+    depositPaidMonths: draft.depositPaidMonths,
     rentSupplement: draft.rentSupplement,
     rentSupplementCents: draft.rentSupplement === "OUI" ? draft.rentSupplementCents : undefined,
     rentSupplementExceptional:

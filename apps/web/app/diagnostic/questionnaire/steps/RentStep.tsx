@@ -1,9 +1,18 @@
 "use client";
 
-import { estimateMonthlyChargesCents } from "@troppaye/rules-engine";
+import { estimateMonthlyChargesCents, formatEur } from "@troppaye/rules-engine";
 import type { StepProps } from "../use-diagnostic-form";
 import { ChoiceField, MoneyField } from "../fields";
 import { COMPLEMENT_3DS_CRITERIA } from "@/lib/diagnostic/complement-3ds";
+
+type DepositChoice = "1" | "2" | "3" | "other";
+const DEPOSIT_MONTHS: Record<Exclude<DepositChoice, "other">, 1 | 2 | 3> = { "1": 1, "2": 2, "3": 3 };
+const DEPOSIT_CHOICES: { value: DepositChoice; label: string }[] = [
+  { value: "1", label: "1 mois" },
+  { value: "2", label: "2 mois" },
+  { value: "3", label: "3 mois" },
+  { value: "other", label: "Autre montant" },
+];
 
 /**
  * Étape loyer (spec questionnaire §2) : les deux montants partagent le même mode
@@ -34,6 +43,32 @@ export function RentStep({ draft, setField }: StepProps) {
     draft.chargesCents !== undefined &&
     ((draft.initialRentCents !== undefined && draft.chargesCents >= draft.initialRentCents) ||
       (draft.currentRentCents !== undefined && draft.chargesCents >= draft.currentRentCents));
+
+  // Dépôt en mois (boutons) : dérivé du draft. En coloc à la part, on garde le
+  // montant exact (le loyer reconstitué est un total, l'équivalent en mois trompe).
+  const depositChoice: DepositChoice | undefined =
+    draft.depositPaidMonths === 1
+      ? "1"
+      : draft.depositPaidMonths === 2
+        ? "2"
+        : draft.depositPaidMonths === 3
+          ? "3"
+          : draft.depositPaidCents !== undefined
+            ? "other"
+            : undefined;
+  const setDepositChoice = (c: DepositChoice) => {
+    if (c === "other") {
+      setField("depositPaidMonths", undefined);
+      return;
+    }
+    setField("depositPaidMonths", DEPOSIT_MONTHS[c]);
+    setField("depositPaidCents", undefined);
+  };
+  // Aperçu € : seulement en HC (en CC, la conversion a lieu côté serveur).
+  const depositEquivalentCents =
+    !cc && draft.depositPaidMonths !== undefined && draft.initialRentCents !== undefined
+      ? draft.depositPaidMonths * draft.initialRentCents
+      : null;
 
   return (
     <div className="space-y-6">
@@ -104,15 +139,37 @@ export function RentStep({ draft, setField }: StepProps) {
         </div>
       ) : null}
 
-      {/* Dépôt de garantie versé (LOT 1, règle DEPOSIT_CAP) : optionnel — vide =
-          « je ne sais pas / pas de dépôt », la règle n'est pas évaluée.
+      {/* Dépôt de garantie versé (LOT 1, règle DEPOSIT_CAP) : en mois (boutons) hors
+          coloc à la part, sinon montant exact. Facultatif — rien = « je ne sais pas ».
           TODO_COPY — libellés brouillon, hors copy deck. */}
-      <MoneyField
-        label="Montant du dépôt de garantie versé"
-        hint="Facultatif. Laissez vide si vous ne savez pas ou n'avez pas versé de dépôt. La loi le plafonne à 1 mois de loyer hors charges (2 mois si meublé)."
-        cents={draft.depositPaidCents}
-        onChange={(c) => setField("depositPaidCents", c)}
-      />
+      {share ? (
+        <MoneyField
+          label="Montant du dépôt de garantie versé"
+          hint="Facultatif. Laissez vide si vous ne savez pas. La loi le plafonne à 1 mois de loyer hors charges (2 mois si meublé)."
+          cents={draft.depositPaidCents}
+          onChange={(c) => setField("depositPaidCents", c)}
+        />
+      ) : (
+        <div className="space-y-3">
+          <ChoiceField
+            label="Dépôt de garantie versé"
+            hint="Facultatif. La plupart des baux demandent 1 mois (2 mois si meublé). Ne répondez pas si vous ne savez pas."
+            choices={DEPOSIT_CHOICES}
+            value={depositChoice}
+            onChange={setDepositChoice}
+          />
+          {depositChoice === "other" ? (
+            <MoneyField
+              label="Montant exact du dépôt"
+              cents={draft.depositPaidCents}
+              onChange={(c) => setField("depositPaidCents", c)}
+            />
+          ) : null}
+          {depositEquivalentCents !== null ? (
+            <p className="text-xs text-ink/55">Soit environ {formatEur(depositEquivalentCents)}.</p>
+          ) : null}
+        </div>
+      )}
 
       {/* Complément de loyer (retour Lyes 2026-06-11) : déclaratif, alimente un
           signal d'orientation du moteur (jamais un chiffrage automatique).

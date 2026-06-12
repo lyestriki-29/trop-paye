@@ -44,6 +44,23 @@ describe("toSnapshot — colocation (LOT 1.3)", () => {
     expect(s.complementCriteria).toEqual(["humidite_murs"]);
   });
 
+  it("dépôt en mois : converti sur le loyer initial HC (× mois)", () => {
+    // base : loyer initial 80000 HC, 2 mois → 160000.
+    const s = snapshot({ depositPaidMonths: 2, depositPaidCents: undefined });
+    expect(s.depositPaidCents).toBe(160000);
+  });
+
+  it("dépôt en mois en CC : converti sur le HC reconstitué (CC − charges)", () => {
+    const s = snapshot({
+      rentInputMode: "CC",
+      chargesCents: 10000,
+      initialRentCents: 90000, // CC ; HC = 80000
+      currentRentCents: 100000,
+      depositPaidMonths: 1,
+    });
+    expect(s.depositPaidCents).toBe(80000);
+  });
+
   it("caractéristique exceptionnelle : OUI → true ; NON → false ; sans complément → undefined", () => {
     expect(
       snapshot({ rentSupplement: "OUI", rentSupplementExceptional: "OUI" })

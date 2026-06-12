@@ -49,6 +49,9 @@ export const diagnosticSchema = z
     /** Dépôt de garantie versé (LOT 1, règle DEPOSIT_CAP) : optionnel ; absent =
         « je ne sais pas / pas de dépôt », la règle n'est pas évaluée. */
     depositPaidCents: z.number().int().positive().optional(),
+    /** Dépôt versé exprimé en nombre de mois de loyer (boutons 1/2/3) : converti
+        en centimes côté serveur (× loyer initial HC). Exclu en coloc à la part. */
+    depositPaidMonths: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
     /** Complément de loyer au bail (retour Lyes 2026-06-11) : OUI alimente la
         règle RENT_SUPPLEMENT (chiffrée si interdit, sinon signal). */
     rentSupplement: z.enum(["OUI", "NON", "NSP"]).optional(),
@@ -174,7 +177,11 @@ export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapsho
     // Dépôt NON multiplié par n : un bail = un dépôt UNIQUE pour le logement, et le
     // champ UI demande le dépôt versé (total), pas une quote-part. Le plafond
     // DEPOSIT_CAP se compare bien au loyer total reconstitué (cf. revue 2026-06-11).
-    depositPaidCents: input.depositPaidCents,
+    // Saisi en mois (boutons) → converti sur le loyer initial HC ; sinon montant exact.
+    depositPaidCents:
+      input.depositPaidMonths !== undefined
+        ? input.depositPaidMonths * hc(input.initialRentCents)
+        : input.depositPaidCents,
     rentSupplementDeclared: input.rentSupplement === "OUI" ? true : undefined,
     rentSupplementCents: input.rentSupplement === "OUI" ? input.rentSupplementCents : undefined,
     rentSupplementExceptional:
