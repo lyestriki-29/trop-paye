@@ -1,9 +1,11 @@
 import Link from "next/link";
 import {
+  formatEur,
   stripInternalMarkers,
   type DossierSnapshot,
   type Referentials,
   type VerdictGlobal,
+  type VerdictRange,
 } from "@troppaye/rules-engine";
 import { BoostersModule } from "./BoostersModule";
 import { DepositModule } from "./DepositModule";
@@ -30,12 +32,15 @@ export function VerdictView({
   addressLabel,
   dossierId,
   dpeNumber,
+  range,
   boosters,
 }: {
   verdict: VerdictGlobal;
   addressLabel: string;
   dossierId: string;
   dpeNumber: string | null;
+  /** Fourchette basse/haute (hypothèse complément) — null si non calculable. */
+  range?: VerdictRange | null;
   /** Données des modules post-verdict — propriétaire seul. */
   boosters?: { verdictId: string; snapshot: DossierSnapshot; referentials: Referentials };
 }) {
@@ -77,6 +82,18 @@ export function VerdictView({
               prescription={prescriptionInfo(verdict.results, verdict.asOf)}
               mandateHref={`/mandat/${dossierId}`}
             />
+            {/* Fourchette (hypothèse complément) : mention prudente, non chiffrée
+                en dur dans le compteur. Vérification du bail en back-office. TODO_COPY. */}
+            {range?.isRange ? (
+              <p className="mt-4 rounded-card bg-paper-2 px-4 py-3 text-sm text-ink/70">
+                Estimation prudente. Après vérification de votre bail (notamment un
+                éventuel complément de loyer), le montant récupérable pourrait atteindre{" "}
+                <strong className="font-mono tabular-nums text-refund">
+                  {formatEur(range.totalRecoverableHighCents)}
+                </strong>
+                .
+              </p>
+            ) : null}
             {/* Partage (Task 7) : un tiers n'ouvrira que le teaser anonymisé + OG. */}
             <ShareActions amountCents={verdict.totalRecoverableCents} />
             {/* Récit fondateur : une ligne, verdict POSITIF uniquement (phase 3). */}

@@ -4,6 +4,7 @@ import { brand, formatEUR } from "@troppaye/shared";
 import { getVerdictForSession } from "@/lib/diagnostic/verdict-read";
 import { getVerdictTeaser } from "@/lib/diagnostic/verdict-teaser";
 import { getReferentials } from "@/lib/referentials";
+import { evaluateSnapshotRange } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { trackEvent } from "@/lib/track";
 import { CaptureView } from "./CaptureView";
@@ -84,12 +85,18 @@ export default async function VerdictPage({ params }: VerdictPageProps) {
     // Boosters (LOT 2) : snapshot + référentiels passés au module client pour
     // l'aperçu live ; le serveur reste autoritaire (booster-actions.ts).
     const referentials = data.snapshot ? await getReferentials() : null;
+    // Fourchette (hypothèse complément) calculée à la lecture depuis le snapshot.
+    const range =
+      data.snapshot && referentials
+        ? evaluateSnapshotRange(data.snapshot, referentials, data.verdict.asOf)
+        : null;
     return (
       <VerdictView
         verdict={data.verdict}
         addressLabel={data.addressLabel}
         dossierId={data.dossierId}
         dpeNumber={data.dpeNumber}
+        range={range}
         boosters={
           data.snapshot && referentials
             ? { verdictId, snapshot: data.snapshot, referentials }
