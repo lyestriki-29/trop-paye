@@ -42,6 +42,8 @@ export interface DiagnosticDraft {
   /** Complément de loyer au bail (retour Lyes 2026-06-11) : signal d'orientation. */
   rentSupplement?: "OUI" | "NON" | "NSP";
   rentSupplementCents?: number;
+  /** Caractéristiques exceptionnelles déclarées (justifient le complément). */
+  rentSupplementExceptional?: "OUI" | "NON" | "NSP";
   /** Critères 3DS cochés (LOT 1.2) ; ids de COMPLEMENT_3DS_CRITERIA. */
   complementCriteria?: string[];
   revisionClause?: boolean;
@@ -129,6 +131,8 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
     depositPaidCents: draft.depositPaidCents,
     rentSupplement: draft.rentSupplement,
     rentSupplementCents: draft.rentSupplement === "OUI" ? draft.rentSupplementCents : undefined,
+    rentSupplementExceptional:
+      draft.rentSupplement === "OUI" ? draft.rentSupplementExceptional : undefined,
     complementCriteria: draft.rentSupplement === "OUI" ? draft.complementCriteria : undefined,
     revisionClause: draft.revisionClause,
     revisionQuarter: draft.revisionQuarter,

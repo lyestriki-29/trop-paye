@@ -44,6 +44,22 @@ describe("toSnapshot — colocation (LOT 1.3)", () => {
     expect(s.complementCriteria).toEqual(["humidite_murs"]);
   });
 
+  it("caractéristique exceptionnelle : OUI → true ; NON → false ; sans complément → undefined", () => {
+    expect(
+      snapshot({ rentSupplement: "OUI", rentSupplementExceptional: "OUI" })
+        .rentSupplementExceptional,
+    ).toBe(true);
+    expect(
+      snapshot({ rentSupplement: "OUI", rentSupplementExceptional: "NON" })
+        .rentSupplementExceptional,
+    ).toBe(false);
+    // Pas de complément déclaré → champ ignoré même si fourni.
+    expect(
+      snapshot({ rentSupplement: "NON", rentSupplementExceptional: "OUI" })
+        .rentSupplementExceptional,
+    ).toBeUndefined();
+  });
+
   it("« ma part » sans nombre de colocataires → refus zod", () => {
     expect(diagnosticSchema.safeParse({ ...base, rentBasis: "SHARE" }).success).toBe(false);
   });

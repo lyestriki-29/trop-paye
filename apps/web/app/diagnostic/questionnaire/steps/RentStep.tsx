@@ -137,6 +137,22 @@ export function RentStep({ draft, setField }: StepProps) {
             onChange={(c) => setField("rentSupplementCents", c)}
           />
 
+          {/* Caractéristiques exceptionnelles (recherche complément 2026-06-12) :
+              un complément n'est licite que si le logement a un atout RARE et
+              déterminant ; la preuve incombe au bailleur. Sans atout → probablement
+              injustifié. TODO_COPY — libellés brouillon, [AVOCAT]. */}
+          <ChoiceField
+            label="Votre logement a-t-il une caractéristique vraiment exceptionnelle ?"
+            hint="Par exemple : vue exceptionnelle (monument, panorama), terrasse ou très grand balcon, jardin privatif, hauteur sous plafond exceptionnelle, prestations haut de gamme rares, exposition ou luminosité exceptionnelle. Une rénovation récente ne compte pas."
+            choices={[
+              { value: "OUI", label: "Oui" },
+              { value: "NON", label: "Non" },
+              { value: "NSP", label: "Je ne sais pas" },
+            ]}
+            value={draft.rentSupplementExceptional}
+            onChange={(v) => setField("rentSupplementExceptional", v)}
+          />
+
           {/* Checklist 3DS (LOT 1.2) : ≥ 1 critère + bail depuis le 18/08/2022 →
               complément très probablement interdit. Référentiel TODO_VERIFIER. */}
           <fieldset className="space-y-2.5">

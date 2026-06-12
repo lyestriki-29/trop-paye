@@ -49,10 +49,15 @@ export const diagnosticSchema = z
     /** Dépôt de garantie versé (LOT 1, règle DEPOSIT_CAP) : optionnel ; absent =
         « je ne sais pas / pas de dépôt », la règle n'est pas évaluée. */
     depositPaidCents: z.number().int().positive().optional(),
-    /** Complément de loyer au bail (retour Lyes 2026-06-11) : OUI alimente un
-        signal d'orientation du moteur, jamais un chiffrage. */
+    /** Complément de loyer au bail (retour Lyes 2026-06-11) : OUI alimente la
+        règle RENT_SUPPLEMENT (chiffrée si interdit, sinon signal). */
     rentSupplement: z.enum(["OUI", "NON", "NSP"]).optional(),
     rentSupplementCents: z.number().int().positive().optional(),
+    /** Caractéristiques exceptionnelles déclarées (justifient le complément) :
+        OUI = complément possiblement justifié → signal ; NON/NSP + complément
+        hors interdiction = probablement injustifié. Sourcé : recherche complément
+        2026-06-12 (la preuve incombe au bailleur). */
+    rentSupplementExceptional: z.enum(["OUI", "NON", "NSP"]).optional(),
     /** Critères 3DS cochés (LOT 1.2) : ids de COMPLEMENT_3DS_CRITERIA. */
     complementCriteria: z.array(z.string().max(64)).max(20).optional(),
     revisionQuarter: z.string().optional(),
@@ -172,6 +177,8 @@ export function toSnapshot(input: DiagnosticInput, asOf: string): DossierSnapsho
     depositPaidCents: input.depositPaidCents,
     rentSupplementDeclared: input.rentSupplement === "OUI" ? true : undefined,
     rentSupplementCents: input.rentSupplement === "OUI" ? input.rentSupplementCents : undefined,
+    rentSupplementExceptional:
+      input.rentSupplement === "OUI" ? input.rentSupplementExceptional === "OUI" : undefined,
     // Filtrage anti-payload-forgé : seuls les ids connus du référentiel sont transmis.
     complementCriteria:
       input.rentSupplement === "OUI"
