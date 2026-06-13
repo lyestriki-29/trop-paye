@@ -76,15 +76,15 @@ function VerdictCardNb() {
   );
 }
 
-/** Strip de chiffres — rangée de cartes dures pleine largeur. */
+/** Strip de chiffres — pleine largeur de page (bord à bord), demande Lyes. */
 function StripNb() {
   return (
     <div className="border-t-3 border-nb-ink bg-nb-ink">
-      <dl className="mx-auto grid max-w-container grid-cols-2 gap-px bg-nb-ink sm:grid-cols-4">
+      <dl className="grid w-full grid-cols-2 gap-px bg-nb-ink sm:grid-cols-4">
         {STRIP.map(({ value, label }) => (
-          <div key={value} className="bg-cream px-5 py-5">
-            <dd className="tabular font-nb-display text-2xl">{value}</dd>
-            <dt className="mt-2 max-w-[26ch] nb-mono text-[11px] uppercase leading-relaxed tracking-wider text-nb-ink/60">
+          <div key={value} className="bg-cream px-6 py-6">
+            <dd className="tabular font-nb-display text-2xl sm:text-3xl">{value}</dd>
+            <dt className="mt-2 max-w-[28ch] nb-mono text-[11px] uppercase leading-relaxed tracking-wider text-nb-ink/60">
               {label}
             </dt>
           </div>
@@ -97,7 +97,6 @@ function StripNb() {
 export function HeroNb() {
   return (
     <section className="relative overflow-hidden border-b-3 border-nb-ink">
-      <div aria-hidden className="nb-dots pointer-events-none absolute inset-0 opacity-70" />
       <div className="relative mx-auto max-w-container px-6 py-14 sm:py-20">
         <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/65">
           Dossier TP-2026 · instruction en cours

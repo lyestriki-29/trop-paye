@@ -10,7 +10,7 @@ import { IconArrowRight } from "@/components/home/icons";
 
 export function RegimesNb() {
   return (
-    <section className="nb-stripes border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -86,7 +86,7 @@ export function RegimesNb() {
 
             {/* Régime 3 — décence : orientation judiciaire, JAMAIS chiffrée. */}
             <Reveal delay={0.24}>
-              <article className="flex h-full flex-col border-3 border-nb-ink bg-nb-ink p-7 text-cream shadow-nb">
+              <article className="nb-dark flex h-full flex-col border-3 border-nb-ink p-7 text-cream shadow-nb">
                 <p className="nb-mono text-[11px] uppercase tracking-widest text-cream/55">
                   Sans calcul automatique
                 </p>

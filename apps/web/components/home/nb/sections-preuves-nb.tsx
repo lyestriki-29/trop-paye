@@ -13,7 +13,7 @@ import type { PublicStats } from "@/lib/public-stats";
 
 export function ConfianceNb({ stats }: { stats: PublicStats | null }) {
   return (
-    <section className="border-b-3 border-nb-ink bg-nb-ink py-16 text-cream sm:py-20">
+    <section className="nb-dark border-b-3 border-nb-ink py-16 text-cream sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-cream/45">

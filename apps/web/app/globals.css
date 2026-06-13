@@ -241,8 +241,16 @@ body::after {
    ============================================================ */
 .nb {
   font-family: var(--font-nb-body), system-ui, sans-serif;
-  background-color: rgb(var(--color-cream));
   color: rgb(var(--color-nb-ink));
+  /* Fond travaillé UNIFIÉ (cohérence demandée Lyes 2026-06-13) : une seule
+     grille de points fine sur tout le scope. Les sections crème sont
+     transparentes → elles héritent toutes du même motif (fini le patchwork). */
+  background-color: rgb(var(--color-cream));
+  background-image: radial-gradient(
+    rgb(var(--color-nb-ink) / 0.05) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
 
   /* Variables de thème (déclinaison « Douce » par défaut). Les modificateurs
      `.nb--temperee` / `.nb--editoriale` ne surchargent que ces variables —
@@ -377,13 +385,34 @@ body::after {
   }
 }
 
-/* Bandeaux thématisés (lisent les vars de déclinaison). */
+/* Bandeaux thématisés (lisent les vars de déclinaison) — même grille de points
+   posée sur la couleur, pour rester « lié » au reste de la page. */
 .nb-band-final {
   background-color: rgb(var(--nb-band-bg));
   color: rgb(var(--nb-band-fg));
+  background-image: radial-gradient(
+    rgb(var(--color-nb-ink) / 0.07) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
 }
 .nb-band-caszero {
   background-color: rgb(var(--nb-caszero-bg));
+  background-image: radial-gradient(
+    rgb(var(--color-nb-ink) / 0.07) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
+}
+
+/* Bande sombre (confiance) : points clairs sur fond ink — même trame, négatif. */
+.nb-dark {
+  background-color: rgb(var(--color-nb-ink));
+  background-image: radial-gradient(
+    rgb(var(--color-cream) / 0.07) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
 }
 
 /* Titres : Archivo Black, capitales, interlignage serré (signature LP3). */
