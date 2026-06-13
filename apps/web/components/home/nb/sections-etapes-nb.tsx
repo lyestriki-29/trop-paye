@@ -93,7 +93,7 @@ export function EtapesNb() {
 
         <Reveal delay={0.32}>
           <p className="mt-8 nb-mono text-xs text-nb-ink/50">
-            Montants d&apos;illustration — données fictives (dossier témoin).
+            Montants d&apos;illustration.
           </p>
         </Reveal>
       </div>

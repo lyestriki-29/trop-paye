@@ -70,7 +70,7 @@ function VerdictCardNb() {
         Trop payé
       </span>
       <p className="mt-4 text-center nb-mono text-xs text-nb-ink/45">
-        Exemple de dossier — données d&apos;illustration
+        Exemple de dossier — montant d&apos;illustration
       </p>
     </aside>
   );
