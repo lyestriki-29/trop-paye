@@ -8,6 +8,7 @@ import { HeroNb, TickerNb } from "@/components/home/nb/sections-hero-nb";
 import { MoteurNb } from "@/components/home/nb/sections-moteur-nb";
 import { ConfianceNb, TemoignageNb } from "@/components/home/nb/sections-preuves-nb";
 import { RegimesNb } from "@/components/home/nb/sections-regimes-nb";
+import { VariantSwitcher } from "@/components/home/nb/VariantSwitcher";
 import { getPublicStats } from "@/lib/public-stats";
 
 export const metadata: Metadata = {
@@ -51,12 +52,12 @@ function PreviewHeader() {
 export default async function NeubrutalistPreview() {
   const stats = await getPublicStats();
   return (
-    <div className="nb min-h-screen">
+    <VariantSwitcher>
       <Link
         href="/design-lab"
         className="block bg-nb-ink px-6 py-2 text-center nb-mono text-xs uppercase tracking-widest text-cream"
       >
-        Design-lab · variante néubrutaliste (à arbitrer) — retour au lab
+        Design-lab · home néubrutaliste pastel (à arbitrer) — retour au lab
       </Link>
       <PreviewHeader />
       <main>
@@ -70,6 +71,6 @@ export default async function NeubrutalistPreview() {
         <ClosingNb />
       </main>
       <RevealInit />
-    </div>
+    </VariantSwitcher>
   );
 }

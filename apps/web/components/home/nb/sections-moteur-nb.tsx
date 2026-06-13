@@ -54,7 +54,7 @@ export function MoteurNb() {
             Pièce n°02 · L&apos;instruction
           </p>
           <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)]">
-            Votre dossier est <span className="nb-mark nb-mark--violet">instruit</span>, pas estimé.
+            Votre dossier est <span className="nb-mark">instruit</span>, pas estimé.
           </h2>
         </Reveal>
 

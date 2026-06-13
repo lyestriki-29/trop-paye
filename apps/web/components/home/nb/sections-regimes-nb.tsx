@@ -17,7 +17,7 @@ export function RegimesNb() {
             Pièce n°03 · Les règles
           </p>
           <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)]">
-            Trois règles. Trois façons de <span className="nb-mark nb-mark--pink">trop payer</span>.
+            Trois règles. Trois façons de <span className="nb-mark">trop payer</span>.
           </h2>
         </Reveal>
 

@@ -19,7 +19,7 @@ const CAS_ZERO: ReadonlyArray<{ value: string; label: string; tone: "refund" | "
 
 function CasZeroNb() {
   return (
-    <section className="border-b-3 border-nb-ink bg-acid py-16 sm:py-20">
+    <section className="nb-band-caszero border-b-3 border-nb-ink py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/60">
@@ -129,17 +129,18 @@ function FaqNb() {
 
 function VerdictFinalNb() {
   return (
-    <section className="bg-violet py-16 text-paper sm:py-24">
+    // Bandeau final thématisé : jaune accent (douce) ou ink sombre (tempérée/édito).
+    <section className="nb-band-final border-t-3 border-nb-ink py-16 sm:py-24">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <div className="flex flex-wrap items-start justify-between gap-8">
-            <h2 className="max-w-2xl text-[clamp(32px,5vw,60px)] text-paper">{brand.baseline}</h2>
-            <span className="nb-tag bg-acid text-nb-ink">0 € d&apos;avance</span>
+            <h2 className="max-w-2xl text-[clamp(32px,5vw,60px)]">{brand.baseline}</h2>
+            <span className="nb-tag bg-paper text-nb-ink">0 € d&apos;avance</span>
           </div>
           <div className="mt-10">
             <HeroAddress />
           </div>
-          <p className="mt-5 nb-mono text-xs uppercase tracking-wider text-paper/80">
+          <p className="mt-5 nb-mono text-xs uppercase tracking-wider opacity-70">
             {brand.hero.reassurance.join(" · ")}
           </p>
         </Reveal>

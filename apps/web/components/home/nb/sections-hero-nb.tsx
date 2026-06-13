@@ -25,7 +25,7 @@ function VerdictCardNb() {
   return (
     <aside aria-hidden="true" className="relative mx-auto w-full max-w-md lg:mx-0">
       <span className="nb-sticker -left-3 -top-5 z-10">0 € d&apos;avance</span>
-      <span className="nb-sticker nb-sticker--right -right-3 top-10 z-10 bg-pink text-paper">
+      <span className="nb-sticker nb-sticker--right -right-3 top-10 z-10 bg-pink text-nb-ink">
         25 % au succès
       </span>
       <div className="nb-card p-6 sm:p-7">
@@ -96,7 +96,7 @@ export function HeroNb() {
           <div>
             {/* brand.hero.title mot pour mot (composition 2 lignes). */}
             <h1 className="text-[clamp(46px,9vw,108px)]">
-              Marre de <span className="nb-mark nb-mark--acid">trop payer</span>&nbsp;?
+              Marre de <span className="nb-mark">trop payer</span>&nbsp;?
             </h1>
             <p className="mt-6 max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/80">
               {brand.hero.subtitle}

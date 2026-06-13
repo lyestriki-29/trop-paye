@@ -54,7 +54,7 @@ export function EtapesNb() {
             Pièce n°04 · La méthode
           </p>
           <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">
-            Comment <span className="nb-mark nb-mark--acid">ça marche</span>
+            Comment <span className="nb-mark">ça marche</span>
           </h2>
         </Reveal>
 

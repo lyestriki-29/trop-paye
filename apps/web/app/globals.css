@@ -14,13 +14,15 @@
   --color-line: 234 225 214; /* #EAE1D6 */
   --color-accent: 255 216 77; /* #FFD84D — le surligneur jaune */
 
-  /* Néubrutalisme — site PUBLIC uniquement (réf. LP3). Additif : ces canaux
-     ne sont consommés que sous le scope `.nb`, l'espace/admin n'y touchent pas. */
-  --color-cream: 242 239 230; /* #F2EFE6 — fond néubrutaliste */
-  --color-nb-ink: 18 18 18; /* #121212 — noir bords + texte */
-  --color-violet: 123 97 255; /* #7B61FF */
-  --color-pink: 255 92 138; /* #FF5C8A */
-  --color-acid: 232 255 56; /* #E8FF38 */
+  /* Néubrutalisme — site PUBLIC uniquement. Additif : ces canaux ne sont
+     consommés que sous le scope `.nb`, l'espace/admin n'y touchent pas.
+     PASTEL aligné charte (choix Lyes 2026-06-13 : nos couleurs, pas LP3 ;
+     tout flashy → pâle). Bords/ombres = ink CHAUD de la charte, pas de noir pur. */
+  --color-cream: 250 244 236; /* = paper-2 : fond néubrutaliste chaud */
+  --color-nb-ink: 42 33 24; /* = ink charte : bords + texte chauds (ex-#121212) */
+  --color-violet: 203 191 239; /* lavande pâle (ex-flashy #7B61FF) */
+  --color-pink: 244 205 217; /* rose pâle (ex-flashy #FF5C8A) */
+  --color-acid: 255 216 77; /* = accent : jaune DOUX charte (ex-acide #E8FF38) */
 }
 
 html {
@@ -241,6 +243,60 @@ body::after {
   font-family: var(--font-nb-body), system-ui, sans-serif;
   background-color: rgb(var(--color-cream));
   color: rgb(var(--color-nb-ink));
+
+  /* Variables de thème (déclinaison « Douce » par défaut). Les modificateurs
+     `.nb--temperee` / `.nb--editoriale` ne surchargent que ces variables —
+     les sections lisent ces vars, donc on bascule la DA sans toucher au JSX. */
+  --nb-mark-bg: var(--color-accent); /* surligneur emphatique */
+  --nb-mark-fg: var(--color-nb-ink);
+  --nb-badge-bg: var(--color-violet); /* badge d'étape */
+  --nb-badge-fg: var(--color-nb-ink);
+  --nb-band-bg: var(--color-accent); /* bandeau CTA final */
+  --nb-band-fg: var(--color-nb-ink);
+  --nb-caszero-bg: var(--color-violet); /* bloc cas zéro */
+}
+
+/* Déclinaison « Tempérée » : un seul accent (jaune), fonds neutres, bandeau
+   sombre — moins de couleur, même grammaire dure. */
+.nb--temperee {
+  --nb-badge-bg: var(--color-accent);
+  --nb-band-bg: var(--color-nb-ink);
+  --nb-band-fg: var(--color-cream);
+  --nb-caszero-bg: var(--color-paper-2);
+}
+.nb--temperee .nb-dots,
+.nb--temperee .nb-stripes {
+  background-image: none;
+}
+
+/* Déclinaison « Éditoriale » : la plus calme — titres en casse normale,
+   accent jaune seul, déco minimale. */
+.nb--editoriale {
+  --nb-badge-bg: var(--color-accent);
+  --nb-band-bg: var(--color-nb-ink);
+  --nb-band-fg: var(--color-cream);
+  --nb-caszero-bg: var(--color-paper-2);
+}
+.nb--editoriale .nb-dots,
+.nb--editoriale .nb-stripes {
+  background-image: none;
+}
+.nb--editoriale h1,
+.nb--editoriale h2,
+.nb--editoriale h3,
+.nb--editoriale .nb-title {
+  text-transform: none;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* Bandeaux thématisés (lisent les vars de déclinaison). */
+.nb-band-final {
+  background-color: rgb(var(--nb-band-bg));
+  color: rgb(var(--nb-band-fg));
+}
+.nb-band-caszero {
+  background-color: rgb(var(--nb-caszero-bg));
 }
 
 /* Titres : Archivo Black, capitales, interlignage serré (signature LP3). */
@@ -280,22 +336,24 @@ body::after {
   }
 }
 
-/* Surligneur pivoté pour mots-clés dans les titres. */
+/* Surligneur pivoté pour mots-clés dans les titres (couleur = var de thème). */
 .nb-mark {
   display: inline-block;
   padding: 0 0.18em;
-  background-color: rgb(var(--color-accent));
+  background-color: rgb(var(--nb-mark-bg));
+  color: rgb(var(--nb-mark-fg));
   border: 2px solid rgb(var(--color-nb-ink));
   box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
   transform: rotate(-1.5deg);
 }
+/* Pastels clairs → texte ink (lisible). Seul le vert refund garde un texte clair. */
 .nb-mark--violet {
   background-color: rgb(var(--color-violet));
-  color: rgb(var(--color-paper));
+  color: rgb(var(--color-nb-ink));
 }
 .nb-mark--pink {
   background-color: rgb(var(--color-pink));
-  color: rgb(var(--color-paper));
+  color: rgb(var(--color-nb-ink));
 }
 .nb-mark--acid {
   background-color: rgb(var(--color-acid));
@@ -340,8 +398,8 @@ body::after {
   flex-shrink: 0;
   font-family: var(--font-nb-display), system-ui, sans-serif;
   font-size: 1.5rem;
-  color: rgb(var(--color-paper));
-  background-color: rgb(var(--color-violet));
+  color: rgb(var(--nb-badge-fg));
+  background-color: rgb(var(--nb-badge-bg));
   border: 3px solid rgb(var(--color-nb-ink));
   border-radius: 999px;
   box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
