@@ -114,6 +114,36 @@
   automatiquement. · Rebond : Vous quittez bientôt votre logement ?
   Vérifiez aussi votre dépôt de garantie.
 
+## 2bis. Mini-tunnel dépôt (brouillon LOT 3)
+
+### ⚠️ BROUILLON — à valider par Lyes / [AVOCAT] avant mise en ligne
+
+- Titre module : Dépôt de garantie
+- Introduction module : Mini-vérification facultative — brouillon, à valider.
+- Question date : Date de remise des clés
+- Question état des lieux : L'état des lieux de sortie est-il conforme ?
+  · Choix : Oui / Non
+- Question montant : Montant du dépôt de garantie versé
+- Question restitution : Le dépôt a-t-il été remboursé ?
+  · Choix : Non / Partiellement / Totalement
+- Champs restitution : Montant remboursé · Date du remboursement
+- Champ retenue : Montant retenu avec justificatif (facultatif)
+- Aperçu : À ajouter à votre dossier : +{montant}
+- État incomplet : Complétez les 4 questions pour recalculer votre dossier.
+- CTA : Mettre à jour mon dossier
+- CTA état chargement : Mise à jour…
+- Erreurs : TODO_COPY — saisie invalide · TODO_COPY — session expirée ·
+  TODO_COPY — dossier introuvable ou session expirée · TODO_COPY — trop de
+  tentatives, réessayez plus tard · TODO_COPY — enregistrement impossible,
+  réessayez · TODO_COPY — complétez les champs du dépôt
+
+**TODO_COPY**
+- Valider le titre et l'introduction du module.
+- Valider les libellés date / état des lieux / montant / restitution.
+- Valider la formulation « montant retenu avec justificatif » [AVOCAT].
+- Valider les messages d'erreur et l'état incomplet.
+- Valider le libellé CTA et son état de chargement.
+
 ## 3. Tunnel mandat (microcopy)
 
 - Barème — titre : Notre rémunération, en toute transparence · slider :
@@ -183,57 +213,69 @@ réseaux ; ici, on est précis, calme, et de votre côté.
 
 ## 7. Page « Notre histoire » + injections du récit fondateur
 
-### ⚠️ SQUELETTE À REMPLIR PAR LYES — chaque `TODO_COPY` bloque le build de prod
-### (scripts/check-copy.mjs). Une fois remplie, aligner mot pour mot
-### apps/web/lib/content/notre-histoire.ts. Garde-fous : Nicolas = « expert de
-### la location » UNIQUEMENT (jamais juriste/expert juridique) ; aucune mention
-### « validé par avocat » hors flag legalReviewDone.
+### ✅ REMPLI — copy validée par Lyes le 2026-06-13. Source de vérité ; le module
+### apps/web/lib/content/notre-histoire.ts est aligné mot pour mot. Garde-fous :
+### Nicolas = « expert de la location » UNIQUEMENT ; aucune mention « validé par
+### avocat » affichée hors flag legalReviewDone. Les items 🔴 (titres, bases
+### légales, phrases sans promesse) restent à confirmer en revue juriste — voir
+### docs/copy-deck-notre-histoire-BRIEF-JURISTE.md.
 
 **SEO**
-- seo.title : TODO_COPY
-- seo.description : TODO_COPY
+- seo.title : TropPayé : votre loyer est peut-être trop élevé
+- seo.description : Découvrez si votre loyer dépasse ce que la loi autorise. Diagnostic gratuit, trop-perçu récupérable à l'amiable. Rémunération au succès uniquement.
 
-**§1 Hero « cas zéro »** (chiffres réels actés 2026-06-11 : loyer 900,00 € HC,
-complément de loyer 120,00 €/mois, logement classé F — éditables ici)
-- hero.kicker : TODO_COPY
-- hero.title : TODO_COPY
-- hero.intro : TODO_COPY
-- casZero.meta (ligne mono sous l'en-tête de la quittance, non-PII) : TODO_COPY
+**§1 Hero « cas zéro »** (chiffres réels : loyer 900,00 € HC, complément de loyer
+120,00 €/mois, logement classé F)
+- hero.kicker : Notre histoire
+- hero.title : Tout a commencé par notre propre quittance.
+- hero.intro : TropPayé n'est pas né d'une étude de marché. Il est né d'un loyer que l'un de nous payait, et qui dépassait ce que la loi autorise. Nous avons construit l'outil que nous aurions voulu avoir.
+- casZero.meta : Quittance reconstituée : logement classé F, complément de loyer contesté.
 
 **§2 Récit du duo** (deux voix en alternance)
-- duo.title : TODO_COPY
-- duo.founder.role (affiché sous « Lyes ») : TODO_COPY
-- duo.founder.photoAlt : TODO_COPY
-- duo.founder.p1 / p2 : TODO_COPY
-- duo.nicolas.photoAlt : TODO_COPY
-- duo.nicolas.p1 / p2 : TODO_COPY
+- duo.title : Deux regards sur le même problème
+- duo.founder.role (affiché sous « Lyes ») : Fondateur
+- duo.founder.photoAlt : Portrait de Lyes, fondateur de TropPayé
+- duo.founder.p1 : Je payais 1 020 € par mois pour un logement classé F. Sur le papier, tout semblait normal. En regardant de près, j'ai compris qu'un complément de loyer de 120 € s'ajoutait chaque mois sans base solide, et que la loi interdisait d'augmenter le loyer d'une passoire thermique.
+- duo.founder.p2 : J'ai voulu comprendre, puis récupérer ce qui pouvait l'être. Le calcul existait, la base légale aussi. Ce qui manquait, c'était un moyen simple de le faire valoir sans y passer des semaines. TropPayé est cette réponse.
+- duo.nicolas.photoAlt : Portrait de Nicolas, cofondateur de TropPayé
+- duo.nicolas.p1 : Cela fait des années que je connais le marché locatif de l'intérieur. Les loyers irréguliers, je les vois souvent, et je vois aussi combien il est rare qu'un locataire ose ou sache les contester.
+- duo.nicolas.p2 : Quand Lyes m'a montré son dossier, l'idée était évidente : si lui pouvait récupérer son trop-perçu, des milliers d'autres le pouvaient aussi. Mon rôle, c'est de rendre ce chemin clair et accessible.
   (le rôle affiché de Nicolas est figé : « Expert de la location »)
 
 **§3 La bascule**
-- bascule.title : TODO_COPY
-- bascule.p1 / p2 : TODO_COPY
+- bascule.title : Le déclic
+- bascule.p1 : Récupérer son propre trop-perçu, c'est satisfaisant. Comprendre que des centaines de milliers de locataires sont dans la même situation, sans le savoir, c'est ce qui change tout.
+- bascule.p2 : Nous avons décidé d'industrialiser ce que Lyes avait fait à la main : détecter l'irrégularité, estimer le montant récupérable, et engager le recouvrement amiable pour le compte du locataire.
 
 **§4 La méthode** (mentions type document officiel : 4 paires libellé → valeur)
-- methode.title / methode.intro : TODO_COPY
-- methode.m1..m4 (label + value) : TODO_COPY
+- methode.title : Notre méthode
+- methode.intro : Pas de promesse, pas de jargon. Une mécanique claire, adossée à des textes précis.
+- methode.m1 : Base légale → Gel des loyers des passoires thermiques (F et G) depuis le 24/08/2022.
+- methode.m2 : Plafonnement → Bouclier loyer, révisions encadrées (+3,5 % max) sur la période T3-2022 à T1-2024.
+- methode.m3 : Cadre d'activité → Recouvrement amiable de créances pour le compte d'autrui (art. R124-1 et s. CPCE).
+- methode.m4 : Rémunération → 25 % du trop-perçu effectivement récupéré. Aucun frais sans récupération.
 
 **§5 Preuve sociale**
-- preuve.title : TODO_COPY
+- preuve.title : Nos résultats
 - preuve.emptyState (imposé par la spec) : « Premier dossier en cours : le nôtre. »
 
 **§6 CTA**
-- cta.title : TODO_COPY (le bouton réutilise le CTA du deck §1)
+- cta.title : Découvrez si votre loyer est récupérable. (le bouton réutilise le CTA du deck §1)
 
-**Phrase avocat** (rendue uniquement si legalReviewDone=true)
-- legalReviewLine : TODO_COPY
+**Phrase avocat** (rendue uniquement si legalReviewDone=true ; brouillon gardé masqué)
+- legalReviewLine : Parcours validé par un avocat. *(à confirmer/reformuler par l'avocat AVANT de lever le flag)*
 
 **JSON-LD**
-- jsonLd.founderJobTitle : TODO_COPY (ne pas inventer)
-- jsonLd.nicolasName (nom complet) : TODO_COPY
-- jsonLd.nicolasJobTitle : TODO_COPY (jamais « juriste »)
+- jsonLd.founderJobTitle : Fondateur
+- jsonLd.nicolasName (nom complet) : Nicolas *(nom complet à confirmer)*
+- jsonLd.nicolasJobTitle : Expert de la location
 
 **Injections**
-- storyTeaser.l1/l2/l3 (3 lignes, homepage) + storyTeaser.linkLabel : TODO_COPY
-- reviewer.phrase (tunnel mandat, étape signature) + reviewer.photoAlt : TODO_COPY
-- verdictStoryLine (une ligne, verdict positif uniquement) : TODO_COPY
-- footerSignature (signature courte du footer) : TODO_COPY
+- storyTeaser.l1 : Notre premier dossier, c'était le nôtre.
+- storyTeaser.l2 : Un loyer trop élevé, une base légale, un trop-perçu récupérable.
+- storyTeaser.l3 : Voilà comment TropPayé est né.
+- storyTeaser.linkLabel : Lire notre histoire
+- reviewer.phrase : Chaque dossier repose sur une base légale identifiée et un montant estimé récupérable.
+- reviewer.photoAlt : Portrait du référent qui suit votre dossier
+- verdictStoryLine : D'après vos informations, votre situation présente un trop-perçu potentiellement récupérable.
+- footerSignature : TropPayé : recouvrement amiable du trop-perçu locatif.

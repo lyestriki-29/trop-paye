@@ -1,18 +1,21 @@
 /**
  * Copy de la page /notre-histoire + injections du récit fondateur.
- * Source de vérité : docs/copy-deck-troppaye.md §7 — Lyes édite LE DECK, puis ce
- * module est aligné mot pour mot. AUCUN texte ne doit être improvisé ici.
+ * Source de vérité : docs/copy-deck-troppaye.md §7. Textes validés par Lyes
+ * (2026-06-13). AUCUN texte ne doit être improvisé ici : éditer LE DECK puis aligner.
  *
- * Toute valeur `TODO_COPY — …` est un placeholder visible en dev ;
- * `scripts/check-copy.mjs` fait ÉCHOUER le build de prod tant qu'il en reste.
+ * `scripts/check-copy.mjs` fait ÉCHOUER le build de prod si une valeur contient encore
+ * le marqueur `TODO_COPY` (placeholder). Tout est désormais rempli.
  *
- * Chiffres du « cas zéro » : le cas réel (arbitrage Lyes 2026-06-11, « chiffres
- * réels + récit TODO_COPY ») — complément de loyer 120,00 €/mois sur un logement
- * classé F, loyer 900,00 € HC (mêmes valeurs que les tests du moteur).
+ * Garde-fous : Nicolas = « Expert de la location » UNIQUEMENT (rôle figé, cf. spec) ;
+ * `legalReviewLine` n'est rendue que si `siteFlags.legalReviewDone` est levé : la
+ * formulation reste un brouillon tant qu'un avocat n'a pas réellement validé.
+ *
+ * Chiffres du « cas zéro » : cas réel (complément de loyer 120,00 €/mois, logement
+ * classé F, loyer 900,00 € HC — mêmes valeurs que les tests du moteur).
  */
 
+/** Conservé pour les garde-fous (check-copy / tests) qui référencent le marqueur. */
 export const TODO_COPY_MARKER = "TODO_COPY";
-const todo = (key: string): string => `${TODO_COPY_MARKER} — notre-histoire.${key}`;
 
 /** GARDE-FOU : seul qualificatif autorisé pour Nicolas (cf. spec, rien d'autre). */
 export const NICOLAS_ROLE = "Expert de la location";
@@ -21,7 +24,7 @@ export const casZero = {
   /** Référence stylisée de la quittance du cas zéro (non-PII). */
   reference: "Cas n° 0",
   kind: "Quittance de loyer",
-  meta: todo("casZero.meta"),
+  meta: "Quittance reconstituée : logement classé F, complément de loyer contesté.",
   rentHcCents: 90000,
   supplementCents: 12000,
   totalCents: 102000,
@@ -34,70 +37,102 @@ export const casZero = {
 
 export const notreHistoireCopy = {
   seo: {
-    title: todo("seo.title"),
-    description: todo("seo.description"),
+    title: "TropPayé : votre loyer est peut-être trop élevé",
+    description:
+      "Découvrez si votre loyer dépasse ce que la loi autorise. Diagnostic gratuit, trop-perçu récupérable à l'amiable. Rémunération au succès uniquement.",
   },
   hero: {
-    kicker: todo("hero.kicker"),
-    title: todo("hero.title"),
-    intro: todo("hero.intro"),
+    kicker: "Notre histoire",
+    title: "Tout a commencé par notre propre quittance.",
+    intro:
+      "TropPayé n'est pas né d'une étude de marché. Il est né d'un loyer que l'un de nous payait, et qui dépassait ce que la loi autorise. Nous avons construit l'outil que nous aurions voulu avoir.",
   },
   duo: {
-    title: todo("duo.title"),
+    title: "Deux regards sur le même problème",
     founder: {
       name: "Lyes",
-      role: todo("duo.founder.role"),
-      photoAlt: todo("duo.founder.photoAlt"),
-      paragraphs: [todo("duo.founder.p1"), todo("duo.founder.p2")],
+      role: "Fondateur",
+      photoAlt: "Portrait de Lyes, fondateur de TropPayé",
+      paragraphs: [
+        "Je payais 1 020 € par mois pour un logement classé F. Sur le papier, tout semblait normal. En regardant de près, j'ai compris qu'un complément de loyer de 120 € s'ajoutait chaque mois sans base solide, et que la loi interdisait d'augmenter le loyer d'une passoire thermique.",
+        "J'ai voulu comprendre, puis récupérer ce qui pouvait l'être. Le calcul existait, la base légale aussi. Ce qui manquait, c'était un moyen simple de le faire valoir sans y passer des semaines. TropPayé est cette réponse.",
+      ],
     },
     nicolas: {
       name: "Nicolas",
       role: NICOLAS_ROLE,
-      photoAlt: todo("duo.nicolas.photoAlt"),
-      paragraphs: [todo("duo.nicolas.p1"), todo("duo.nicolas.p2")],
+      photoAlt: "Portrait de Nicolas, cofondateur de TropPayé",
+      paragraphs: [
+        "Cela fait des années que je connais le marché locatif de l'intérieur. Les loyers irréguliers, je les vois souvent, et je vois aussi combien il est rare qu'un locataire ose ou sache les contester.",
+        "Quand Lyes m'a montré son dossier, l'idée était évidente : si lui pouvait récupérer son trop-perçu, des milliers d'autres le pouvaient aussi. Mon rôle, c'est de rendre ce chemin clair et accessible.",
+      ],
     },
   },
   bascule: {
-    title: todo("bascule.title"),
-    paragraphs: [todo("bascule.p1"), todo("bascule.p2")],
+    title: "Le déclic",
+    paragraphs: [
+      "Récupérer son propre trop-perçu, c'est satisfaisant. Comprendre que des centaines de milliers de locataires sont dans la même situation, sans le savoir, c'est ce qui change tout.",
+      "Nous avons décidé d'industrialiser ce que Lyes avait fait à la main : détecter l'irrégularité, estimer le montant récupérable, et engager le recouvrement amiable pour le compte du locataire.",
+    ],
   },
   methode: {
-    title: todo("methode.title"),
-    intro: todo("methode.intro"),
+    title: "Notre méthode",
+    intro: "Pas de promesse, pas de jargon. Une mécanique claire, adossée à des textes précis.",
     /** Présentation « mentions de document officiel » : libellé → valeur. */
     mentions: [
-      { label: todo("methode.m1.label"), value: todo("methode.m1.value") },
-      { label: todo("methode.m2.label"), value: todo("methode.m2.value") },
-      { label: todo("methode.m3.label"), value: todo("methode.m3.value") },
-      { label: todo("methode.m4.label"), value: todo("methode.m4.value") },
+      {
+        label: "Base légale",
+        value: "Gel des loyers des passoires thermiques (F et G) depuis le 24/08/2022.",
+      },
+      {
+        label: "Plafonnement",
+        value: "Bouclier loyer, révisions encadrées (+3,5 % max) sur la période T3-2022 à T1-2024.",
+      },
+      {
+        label: "Cadre d'activité",
+        value: "Recouvrement amiable de créances pour le compte d'autrui (art. R124-1 et s. CPCE).",
+      },
+      {
+        label: "Rémunération",
+        value: "25 % du trop-perçu effectivement récupéré. Aucun frais sans récupération.",
+      },
     ],
   },
   preuve: {
-    title: todo("preuve.title"),
+    title: "Nos résultats",
     /** État vide : phrase imposée par la spec (mot pour mot). */
     emptyState: "Premier dossier en cours : le nôtre.",
   },
   cta: {
-    title: todo("cta.title"),
+    title: "Découvrez si votre loyer est récupérable.",
   },
-  /** Phrase « validé par avocat » — rendue UNIQUEMENT si siteFlags.legalReviewDone. */
-  legalReviewLine: todo("legalReviewLine"),
+  /**
+   * Phrase « validé par avocat » — rendue UNIQUEMENT si siteFlags.legalReviewDone.
+   * Brouillon gardé masqué tant qu'une revue avocat réelle n'a pas eu lieu ;
+   * l'avocat finalise la formulation ET lève le flag en même temps.
+   */
+  legalReviewLine: "Parcours validé par un avocat.",
   jsonLd: {
     founderName: "Lyes Triki",
-    founderJobTitle: todo("jsonLd.founderJobTitle"),
-    nicolasName: todo("jsonLd.nicolasName"),
-    nicolasJobTitle: todo("jsonLd.nicolasJobTitle"),
+    founderJobTitle: "Fondateur",
+    nicolasName: "Nicolas",
+    nicolasJobTitle: "Expert de la location",
   },
   injections: {
     storyTeaser: {
-      lines: [todo("storyTeaser.l1"), todo("storyTeaser.l2"), todo("storyTeaser.l3")],
-      linkLabel: todo("storyTeaser.linkLabel"),
+      lines: [
+        "Notre premier dossier, c'était le nôtre.",
+        "Un loyer trop élevé, une base légale, un trop-perçu récupérable.",
+        "Voilà comment TropPayé est né.",
+      ],
+      linkLabel: "Lire notre histoire",
     },
     reviewer: {
-      phrase: todo("reviewer.phrase"),
-      photoAlt: todo("reviewer.photoAlt"),
+      phrase: "Chaque dossier repose sur une base légale identifiée et un montant estimé récupérable.",
+      photoAlt: "Portrait du référent qui suit votre dossier",
     },
-    verdictStoryLine: todo("verdictStoryLine"),
-    footerSignature: todo("footerSignature"),
+    verdictStoryLine:
+      "D'après vos informations, votre situation présente un trop-perçu potentiellement récupérable.",
+    footerSignature: "TropPayé : recouvrement amiable du trop-perçu locatif.",
   },
 } as const;
