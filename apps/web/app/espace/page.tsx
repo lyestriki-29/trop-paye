@@ -1,55 +1,50 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { listDossiersForUser } from "@/lib/dossier/read";
 import { Amount } from "@/components/Amount";
+import { Button } from "@/components/ui/Button";
 
-const STATUS_LABEL: Record<string, string> = {
-  DRAFT: "Brouillon",
-  DIAGNOSED: "Diagnostic réalisé",
-  MANDATE_PENDING: "Pièces à fournir",
-  IN_REVIEW: "En cours d'étude",
-  RECOVERY: "Démarche engagée",
-  ESCALATED: "Escalade",
-  WON: "Récupéré",
-  LOST: "Clôturé sans suite",
-  CLOSED: "Clôturé",
-};
+export const dynamic = "force-dynamic";
 
-export default async function EspacePage() {
+export default async function EspaceHome() {
   const items = await listDossiersForUser();
 
   if (items.length === 0) {
     return (
-      <div>
-        <h1 className="font-display text-2xl font-extrabold tracking-display">Votre espace</h1>
-        <p className="mt-3 text-ink/70">Vous n'avez pas encore de dossier.</p>
-        <Link
-          href="/diagnostic"
-          className="mt-6 inline-block rounded-field bg-ink px-6 py-3 font-medium text-paper hover:bg-ink/90"
-        >
-          Lancer un diagnostic
-        </Link>
+      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
+        <h1 className="font-display text-2xl font-extrabold tracking-display">Aucun dossier pour l&apos;instant</h1>
+        <p className="mt-3 text-ink/60">Lancez un diagnostic gratuit pour savoir si votre loyer est trop élevé.</p>
+        <div className="mt-6"><Button href="/diagnostic">Faire mon diagnostic</Button></div>
       </div>
     );
   }
 
+  const only = items[0];
+  if (items.length === 1 && only) {
+    redirect(`/espace/${only.dossier.id}`);
+  }
+
+  const totalRecoverable = items.reduce((s, i) => s + (i.verdict?.totalRecoverableCents ?? 0), 0);
+
   return (
-    <div>
-      <h1 className="font-display text-2xl font-extrabold tracking-display">Vos dossiers</h1>
-      <ul className="mt-6 space-y-3">
+    <div className="mx-auto max-w-container space-y-8 px-4 py-8">
+      <div>
+        <h1 className="font-display text-2xl font-extrabold tracking-display">Mes dossiers</h1>
+        <p className="mt-2 text-ink/60">
+          Trop-perçu visé au total : <Amount cents={totalRecoverable} favorable className="font-medium" />
+        </p>
+      </div>
+      <ul className="grid gap-3 sm:grid-cols-2">
         {items.map(({ dossier, verdict }) => (
           <li key={dossier.id}>
             <Link
               href={`/espace/${dossier.id}`}
-              className="flex items-center justify-between gap-4 rounded-card border border-line bg-paper p-5 hover:border-ink/40"
+              className="block rounded-card border border-line bg-paper p-5 hover:border-ink/40"
             >
-              <div>
-                <p className="font-medium">{dossier.address_label ?? "Dossier"}</p>
-                <p className="mt-1 text-sm text-ink/55">
-                  {STATUS_LABEL[dossier.status] ?? dossier.status}
-                </p>
-              </div>
+              <p className="font-medium">{dossier.address_label ?? "Dossier"}</p>
+              <p className="mt-1 text-sm text-ink/55">{dossier.status}</p>
               {verdict && verdict.totalRecoverableCents > 0 ? (
-                <Amount cents={verdict.totalRecoverableCents} favorable className="font-medium" />
+                <Amount cents={verdict.totalRecoverableCents} favorable className="mt-2 block text-lg font-medium" />
               ) : null}
             </Link>
           </li>
