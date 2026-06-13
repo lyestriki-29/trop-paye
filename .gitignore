@@ -43,3 +43,6 @@ Thumbs.db
 
 # Maquettes brainstorming (compagnon visuel, local)
 .superpowers/
+
+# Playwright MCP console logs
+.playwright-mcp/
