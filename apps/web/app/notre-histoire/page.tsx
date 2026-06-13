@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { brand } from "@troppaye/shared";
-import { RevealInit } from "@/components/home/RevealInit";
 import {
   BasculeSection,
   CtaSection,
@@ -9,8 +8,7 @@ import {
   MethodeSection,
   PreuveSection,
 } from "@/components/story/sections-histoire";
-import { SiteFooter } from "@/components/ui/SiteFooter";
-import { SiteHeader } from "@/components/ui/SiteHeader";
+import { PublicShell } from "@/components/ui/PublicShell";
 import { notreHistoireCopy as copy } from "@/lib/content/notre-histoire";
 
 /** Statique : aucune donnée dynamique (CaseProofList lit un JSON versionné). */
@@ -53,23 +51,21 @@ const jsonLd = {
  */
 export default function NotreHistoirePage() {
   return (
-    <>
-      <SiteHeader />
-      <main>
-        <HeroCasZero />
-        <DuoSection />
-        <BasculeSection />
-        <MethodeSection />
-        <PreuveSection />
-        <CtaSection ctaLabel={brand.hero.cta} />
-      </main>
-      <RevealInit />
-      <SiteFooter />
+    <PublicShell>
+      {/* Chrome néubrutaliste. NOTE : les 6 sections récit conservent pour
+          l'instant leurs visuels « dossier/quittance » (charte) ; un restyle nb
+          dédié de sections-histoire.tsx reste à faire (page narrative riche). */}
+      <HeroCasZero />
+      <DuoSection />
+      <BasculeSection />
+      <MethodeSection />
+      <PreuveSection />
+      <CtaSection ctaLabel={brand.hero.cta} />
       <script
         type="application/ld+json"
         // Constantes du repo ; échappe `<` contre tout breakout </script>.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-    </>
+    </PublicShell>
   );
 }

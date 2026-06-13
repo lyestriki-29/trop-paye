@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { brand, formatEUR } from "@troppaye/shared";
-import { HeroAddress } from "@/components/home/HeroAddress";
+import { formatEUR } from "@troppaye/shared";
 import { Reveal } from "@/components/home/Reveal";
+import { CtaFinalNb } from "@/components/home/nb/CtaFinalNb";
 
 /**
  * Cas n°0 (le fondateur) + FAQ (copy deck §1 mot pour mot, mêmes 2 extraits
@@ -127,34 +127,12 @@ function FaqNb() {
   );
 }
 
-function VerdictFinalNb() {
-  return (
-    // Bandeau final thématisé : jaune accent (douce) ou ink sombre (tempérée/édito).
-    <section className="nb-band-final border-t-3 border-nb-ink py-16 sm:py-24">
-      <div className="mx-auto max-w-container px-6">
-        <Reveal>
-          <div className="flex flex-wrap items-start justify-between gap-8">
-            <h2 className="max-w-2xl text-[clamp(32px,5vw,60px)]">{brand.baseline}</h2>
-            <span className="nb-tag bg-paper text-nb-ink">0 € d&apos;avance</span>
-          </div>
-          <div className="mt-10">
-            <HeroAddress />
-          </div>
-          <p className="mt-5 nb-mono text-xs uppercase tracking-wider opacity-70">
-            {brand.hero.reassurance.join(" · ")}
-          </p>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 export function ClosingNb() {
   return (
     <>
       <CasZeroNb />
       <FaqNb />
-      <VerdictFinalNb />
+      <CtaFinalNb />
     </>
   );
 }

@@ -432,6 +432,37 @@ body::after {
   font-family: var(--font-nb-mono), ui-monospace, monospace;
 }
 
+/* Prose d'article (guides) : titres lisibles, PAS en capitales Archivo. */
+.nb-prose h1,
+.nb-prose h2,
+.nb-prose h3,
+.nb-prose h4 {
+  font-family: var(--font-nb-body), system-ui, sans-serif;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.nb-prose h2 {
+  font-size: 1.6rem;
+  margin-top: 2rem;
+}
+.nb-prose h3 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+}
+.nb-prose p,
+.nb-prose li {
+  margin-top: 0.85rem;
+  line-height: 1.7;
+  color: rgb(var(--color-nb-ink) / 0.82);
+}
+.nb-prose a {
+  color: rgb(var(--color-refund));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* Carte dure : bord plein 3px + ombre dure portée. */
 .nb-card {
   background-color: rgb(var(--color-paper));
