@@ -1,7 +1,9 @@
 import { loadOwnedDossier } from "@/lib/espace/dossier-context";
 import { requireAuthPage } from "@/lib/auth/guards";
 import { buildStudyChecklist } from "@/lib/espace/study-checklist";
+import { buildActivityFeed } from "@/lib/espace/activity";
 import { EspaceHeader } from "@/components/espace/EspaceHeader";
+import { NotificationsPanel } from "@/components/espace/NotificationsPanel";
 import { WorkspaceTabs, type TabDef } from "@/components/espace/WorkspaceTabs";
 
 export const dynamic = "force-dynamic";
@@ -21,17 +23,22 @@ export default async function DossierLayout({
   const needsPieces = detail.dossier.status === "MANDATE_PENDING" && !checklist.launchable;
   const needsMandate = detail.dossier.status === "DIAGNOSED";
 
+  const feed = buildActivityFeed({
+    actions: detail.actions.map((a) => ({ type: a.type, scheduled_at: a.scheduled_at, executed_at: a.executed_at })),
+    messages: detail.messages.map((m) => ({ id: m.id, sender: m.sender, body: m.body, created_at: m.created_at })),
+  });
+
   const tabs: TabDef[] = [
     { key: "apercu", label: "Aperçu", segment: "" },
     { key: "pieces", label: "Pièces", segment: "pieces", flag: needsPieces },
     { key: "mandat", label: "Mandat", segment: "mandat", flag: needsMandate },
-    { key: "messages", label: "Messages", segment: "messages" },
+    { key: "messages", label: "Messages", segment: "messages", flag: detail.messages.some((m) => m.sender !== "client") },
     { key: "versement", label: "Versement", segment: "versement" },
   ];
 
   return (
     <div className="min-h-screen bg-paper">
-      <EspaceHeader email={user.email ?? null} activityCount={0} />
+      <EspaceHeader email={user.email ?? null} activityCount={feed.length} notifications={<NotificationsPanel events={feed} />} />
       <div className="mx-auto max-w-container px-4">
         <WorkspaceTabs dossierId={dossierId} tabs={tabs} />
         <main className="py-8">{children}</main>
