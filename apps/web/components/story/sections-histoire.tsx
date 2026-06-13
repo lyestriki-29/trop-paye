@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Reveal } from "@/components/home/Reveal";
 import { CaseProofList } from "@/components/story/CaseProofList";
 import { QuittanceStamped } from "@/components/story/QuittanceStamped";
@@ -21,41 +20,35 @@ export function HeroCasZero() {
   );
 }
 
+/** Voix du récit, sans photo (parti pris : monogramme nb au lieu d'un portrait). */
 function Voice({
   name,
   role,
-  photo,
-  photoAlt,
   paragraphs,
-  flip,
 }: {
   name: string;
   role: string;
-  photo: string;
-  photoAlt: string;
   paragraphs: readonly string[];
-  flip?: boolean;
 }) {
   return (
-    <div className={`flex flex-col gap-6 sm:items-start ${flip ? "sm:flex-row-reverse" : "sm:flex-row"}`}>
-      <Image
-        src={photo}
-        alt={photoAlt}
-        width={160}
-        height={160}
-        className="h-32 w-32 shrink-0 border-3 border-nb-ink object-cover shadow-nb-sm sm:h-40 sm:w-40"
-      />
-      <div>
+    <article className="nb-card p-7 sm:p-8">
+      <div className="flex items-center gap-4">
+        <span
+          aria-hidden
+          className="grid h-14 w-14 shrink-0 place-items-center border-3 border-nb-ink bg-accent font-nb-display text-2xl"
+        >
+          {name.charAt(0)}
+        </span>
         <p className="font-nb-body text-lg font-bold">
           {name} <span className="font-normal text-nb-ink/55">· {role}</span>
         </p>
-        {paragraphs.map((p, i) => (
-          <p key={i} className="mt-3 max-w-prose leading-relaxed text-ink/75">
-            {p}
-          </p>
-        ))}
       </div>
-    </div>
+      {paragraphs.map((p, i) => (
+        <p key={i} className="mt-4 font-nb-body leading-relaxed text-nb-ink/75">
+          {p}
+        </p>
+      ))}
+    </article>
   );
 }
 
@@ -68,21 +61,16 @@ export function DuoSection() {
         <h2 className="text-[clamp(24px,3.5vw,40px)]">
           {duo.title}
         </h2>
-        <div className="mt-8 space-y-10">
+        <div className="mt-8 space-y-6">
           <Voice
             name={duo.founder.name}
             role={duo.founder.role}
-            photo="/story/founder.jpg"
-            photoAlt={duo.founder.photoAlt}
             paragraphs={duo.founder.paragraphs}
           />
           <Voice
             name={duo.nicolas.name}
             role={duo.nicolas.role}
-            photo="/story/nicolas.jpg"
-            photoAlt={duo.nicolas.photoAlt}
             paragraphs={duo.nicolas.paragraphs}
-            flip
           />
         </div>
       </Reveal>

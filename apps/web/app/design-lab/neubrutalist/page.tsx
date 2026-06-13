@@ -29,7 +29,6 @@ function PreviewHeader() {
         </Link>
         <nav className="hidden items-center gap-6 nb-mono text-xs font-semibold uppercase tracking-wider lg:flex">
           <Link href="/comment-ca-marche" className="hover:text-violet">Comment ça marche</Link>
-          <Link href="/guides" className="hover:text-violet">Guides</Link>
           <Link href="/#resultats" className="hover:text-violet">Résultats</Link>
           <Link href="/notre-histoire" className="hover:text-violet">Notre histoire</Link>
         </nav>

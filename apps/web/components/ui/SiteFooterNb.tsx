@@ -13,14 +13,12 @@ const COLS = [
     links: [
       { label: "Comment ça marche", href: "/comment-ca-marche" },
       { label: "Résultats", href: "/#resultats" },
-      { label: "Guides", href: "/guides" },
     ],
   },
   {
     title: "Société",
     links: [
       { label: "Notre histoire", href: "/notre-histoire" },
-      { label: "Méthode & sources", href: "/methode" },
       { label: "Partenaires", href: "/partenaires" },
       { label: "Presse", href: "/presse" },
     ],
