@@ -15,31 +15,34 @@ const STRIP: ReadonlyArray<{ value: string; label: string }> = [
   { value: "25 %", label: "de commission, au succès. Rien récupéré ? Rien payé." },
 ];
 
-/** Carte verdict spécimen — chiffres témoin P0 (fictifs), aria-hidden. */
+/** Carte verdict spécimen — agrandie ; chiffres témoin P0 (fictifs), aria-hidden. */
 function VerdictCardNb() {
   const rows: ReadonlyArray<{ label: string; cents: number; accent?: boolean }> = [
-    { label: "Loyer hors charges", cents: 102_185 },
+    { label: "Loyer hors charges appelé", cents: 102_185 },
     { label: "Plafond légal (gel DPE F/G)", cents: 95_000 },
-    { label: "Différence mensuelle", cents: 7_185, accent: true },
+    { label: "Hausse illégale / mois", cents: 7_185, accent: true },
   ];
   return (
-    <aside aria-hidden="true" className="relative mx-auto w-full max-w-md lg:mx-0">
-      <span className="nb-sticker -left-3 -top-5 z-10">0 € d&apos;avance</span>
-      <span className="nb-sticker nb-sticker--right -right-3 top-10 z-10 bg-pink text-nb-ink">
+    <aside aria-hidden="true" className="relative mx-auto w-full max-w-xl lg:mx-0">
+      <span className="nb-sticker -left-4 -top-6 z-10 text-sm">0 € d&apos;avance</span>
+      <span className="nb-sticker nb-sticker--right -right-4 top-12 z-10 bg-pink text-nb-ink text-sm">
         25 % au succès
       </span>
-      <div className="nb-card p-6 sm:p-7">
-        <div className="flex items-center justify-between nb-mono text-[11px] uppercase tracking-widest text-nb-ink/55">
+      <div className="nb-tilt nb-card p-7 sm:p-9">
+        <div className="flex items-center justify-between nb-mono text-xs uppercase tracking-widest text-nb-ink/55">
           <span>Réf. TP-2026-0117</span>
           <span>Quittance de loyer</span>
         </div>
-        <p className="mt-3 nb-mono text-sm text-nb-ink/70">12 rue des Lilas, 75011 Paris</p>
-        <dl className="mt-5 space-y-2.5">
+        <p className="mt-3 nb-mono text-base text-nb-ink/70">12 rue des Lilas, 75011 Paris</p>
+        <dl className="mt-7 space-y-4">
           {rows.map(({ label, cents, accent }) => (
-            <div key={label} className="flex items-baseline justify-between gap-4">
-              <dt className="font-nb-body text-sm text-nb-ink/75">{label}</dt>
+            <div
+              key={label}
+              className="flex items-baseline justify-between gap-4 border-b border-nb-ink/15 pb-3"
+            >
+              <dt className="font-nb-body text-base text-nb-ink/75">{label}</dt>
               <dd
-                className={`tabular nb-mono text-sm font-medium ${
+                className={`tabular nb-mono text-lg font-medium ${
                   accent ? "text-refund" : "text-nb-ink"
                 }`}
               >
@@ -48,19 +51,19 @@ function VerdictCardNb() {
             </div>
           ))}
         </dl>
-        <div className="mt-5 flex items-end justify-between border-t-3 border-nb-ink pt-4">
-          <span className="font-nb-display text-sm uppercase leading-none">
+        <div className="mt-6 flex items-end justify-between border-t-3 border-nb-ink pt-5">
+          <span className="font-nb-display text-base uppercase leading-none">
             Trop-perçu
             <br />
-            sur la période
+            récupéré
           </span>
-          <span className="tabular nb-mono text-2xl font-semibold text-refund">
+          <span className="tabular nb-mono text-4xl font-semibold text-refund">
             {formatEUR(143_700, { decimals: true })}
           </span>
         </div>
       </div>
       <p className="mt-4 text-center nb-mono text-xs text-nb-ink/45">
-        Quittance spécimen — données fictives
+        Exemple de dossier — données d&apos;illustration
       </p>
     </aside>
   );
@@ -92,10 +95,10 @@ export function HeroNb() {
         <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/65">
           Dossier TP-2026 · instruction en cours
         </p>
-        <div className="mt-7 grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+        <div className="mt-7 grid items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
           <div>
             {/* brand.hero.title mot pour mot (composition 2 lignes). */}
-            <h1 className="text-[clamp(46px,9vw,108px)]">
+            <h1 className="text-[clamp(44px,8vw,96px)]">
               Marre de <span className="nb-mark">trop payer</span>&nbsp;?
             </h1>
             <p className="mt-6 max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/80">
@@ -107,6 +110,17 @@ export function HeroNb() {
               <span className="nb-mark nb-mark--refund">baisse pour de bon</span> : hausse
               illégale supprimée, complément de loyer contesté.
             </p>
+            {/* Métrique phare (réel, Lyes 2026-06-13) : baisse de loyer moyenne. */}
+            <div className="mt-7 inline-flex items-center gap-4 border-3 border-nb-ink bg-paper px-5 py-3 shadow-nb-sm">
+              <span className="tabular font-nb-display text-3xl leading-none text-refund">
+                −194 €
+              </span>
+              <span className="nb-mono text-[11px] uppercase leading-snug tracking-wider text-nb-ink/65">
+                de loyer / mois
+                <br />
+                en moyenne
+              </span>
+            </div>
             <div className="mt-8">
               <HeroAddress />
             </div>

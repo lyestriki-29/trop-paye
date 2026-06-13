@@ -334,6 +334,16 @@ body::after {
     transform: translate(3px, 3px);
     box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
   }
+  /* Carte « vivante » : léger relèvement + ombre creusée au survol. */
+  .nb-tilt {
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+  .nb-tilt:hover {
+    transform: translate(-2px, -3px) rotate(-0.6deg);
+    box-shadow: 10px 10px 0 rgb(var(--color-nb-ink));
+  }
 }
 
 /* Surligneur pivoté pour mots-clés dans les titres (couleur = var de thème). */
@@ -442,7 +452,11 @@ body::after {
   .nb-step-badge {
     transform: none;
   }
-  .nb-card-hover {
+  .nb-card-hover,
+  .nb-tilt {
     transition: none;
+  }
+  .nb-tilt:hover {
+    transform: none;
   }
 }

@@ -8,8 +8,8 @@ import { HeroNb, TickerNb } from "@/components/home/nb/sections-hero-nb";
 import { MoteurNb } from "@/components/home/nb/sections-moteur-nb";
 import { ConfianceNb, TemoignageNb } from "@/components/home/nb/sections-preuves-nb";
 import { RegimesNb } from "@/components/home/nb/sections-regimes-nb";
+import { ResultatsNb } from "@/components/home/nb/sections-resultats-nb";
 import { VariantSwitcher } from "@/components/home/nb/VariantSwitcher";
-import { getPublicStats } from "@/lib/public-stats";
 
 export const metadata: Metadata = {
   title: "Design-lab — Home néubrutaliste",
@@ -49,8 +49,7 @@ function PreviewHeader() {
  * arbitrer le look AVANT de propager au site public (convention design-lab :
  * « je tranche, j'archive »). N'altère rien hors de son sous-arbre.
  */
-export default async function NeubrutalistPreview() {
-  const stats = await getPublicStats();
+export default function NeubrutalistPreview() {
   return (
     <VariantSwitcher>
       <Link
@@ -60,13 +59,16 @@ export default async function NeubrutalistPreview() {
         Design-lab · home néubrutaliste pastel (à arbitrer) — retour au lab
       </Link>
       <PreviewHeader />
+      {/* Ordre revu (Lyes 2026-06-13) : preuve chiffrée tôt (résultats juste
+          après le hero), puis méthode → règles → moteur → preuve → récit → CTA. */}
       <main>
         <TickerNb />
         <HeroNb />
-        <MoteurNb />
-        <RegimesNb />
+        <ResultatsNb />
         <EtapesNb />
-        <ConfianceNb stats={stats} />
+        <RegimesNb />
+        <MoteurNb />
+        <ConfianceNb stats={null} />
         <TemoignageNb />
         <ClosingNb />
       </main>
