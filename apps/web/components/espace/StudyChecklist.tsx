@@ -62,7 +62,7 @@ export function StudyChecklist({ data, piecesHref }: StudyChecklistProps) {
       <div className="mt-5 border-t border-line pt-4">
         {data.launchable ? (
           <p className="text-sm font-medium text-refund-text">
-            ✓ Étude lançable — toutes les pièces sont présentes.
+            ✓ Étude lançable : toutes les pièces sont présentes.
           </p>
         ) : (
           <Button href={piecesHref} variant="ghost" size="md">

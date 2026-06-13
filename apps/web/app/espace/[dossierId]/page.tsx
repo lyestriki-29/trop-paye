@@ -7,7 +7,7 @@ import { KpiStrip } from "@/components/espace/KpiStrip";
 import { DossierTimeline } from "@/components/espace/DossierTimeline";
 import { NextStepRail } from "@/components/espace/NextStepRail";
 import { StudyChecklist } from "@/components/espace/StudyChecklist";
-import type { PieceStatus } from "@/lib/espace/study-checklist";
+import { narrowPieceStatus } from "@/lib/espace/study-checklist";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,7 @@ export default async function ApercuPage({
   const { dossierId } = await params;
   const { dossier, verdict, actions, pieces } = await loadOwnedDossier(dossierId);
   const checklist = buildStudyChecklist(
-    pieces.map((p) => ({ kind: p.kind, status: p.status as PieceStatus })),
+    pieces.map((p) => ({ kind: p.kind, status: narrowPieceStatus(p.status) })),
   );
   const step = nextStep(dossier.status, dossierId);
 

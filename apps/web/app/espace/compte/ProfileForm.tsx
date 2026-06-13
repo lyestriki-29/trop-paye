@@ -110,10 +110,10 @@ export function ProfileForm({ initial }: ProfileFormProps) {
       </div>
 
       {success && (
-        <p className="text-sm font-medium text-green-700">Préférences enregistrées.</p>
+        <p className="text-sm font-medium text-refund-text">Préférences enregistrées.</p>
       )}
       {error && (
-        <p className="text-sm font-medium text-red-600">{error}</p>
+        <p className="text-sm font-medium text-stamp">{error}</p>
       )}
 
       <Button type="submit" disabled={isPending}>

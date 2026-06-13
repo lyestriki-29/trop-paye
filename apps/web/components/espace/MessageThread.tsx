@@ -38,7 +38,7 @@ export function MessageThread({ dossierId, messages }: MessageThreadProps) {
   return (
     <div className="flex flex-col gap-4">
       <p className="rounded-field bg-paper-2 px-4 py-2 text-xs text-ink/55">
-        Échanges suivis par nos opérateurs. Information générale — ceci n'est pas un conseil
+        Échanges suivis par nos opérateurs. Information générale : ceci n'est pas un conseil
         juridique.
       </p>
 

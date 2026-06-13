@@ -188,6 +188,7 @@ export async function uploadPiece(formData: FormData): Promise<ActionResult> {
 
   await maybeAdvanceToReview(dossierId, dossier.status as DossierStatus, user.email ?? null);
   revalidatePath(`/mandat/${dossierId}`);
+  revalidatePath(`/espace/${dossierId}`, "layout");
   return { ok: true };
 }
 
@@ -226,6 +227,7 @@ export const savePayoutDetails = withAuth(payoutSchema, async (input, { user }):
   if (error) return { error: "Impossible d'enregistrer les coordonnées." };
 
   revalidatePath(`/mandat/${input.dossierId}`);
+  revalidatePath(`/espace/${input.dossierId}`, "layout");
   return { ok: true };
 });
 

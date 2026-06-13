@@ -1,4 +1,9 @@
 export type PieceStatus = "RECEIVED" | "ILLEGIBLE" | "VALIDATED";
+
+const VALID_PIECE_STATUSES = new Set<string>(["RECEIVED", "ILLEGIBLE", "VALIDATED"]);
+export function narrowPieceStatus(s: string): PieceStatus {
+  return VALID_PIECE_STATUSES.has(s) ? (s as PieceStatus) : "RECEIVED";
+}
 export type ChecklistKind = "bail" | "quittance";
 export type ChecklistState = "missing" | "received" | "validated";
 

@@ -21,7 +21,7 @@ export function nextStep(status: DossierStatus, id: string): NextStep {
     case "MANDATE_PENDING":
       return {
         text: "Ajoutez vos pièces (bail + quittance) pour lancer l'étude.",
-        href: `/mandat/${id}`,
+        href: `/espace/${id}/pieces`,
         cta: "Ajouter mes pièces",
       };
     case "IN_REVIEW":

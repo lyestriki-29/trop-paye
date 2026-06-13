@@ -1,5 +1,5 @@
 import { loadOwnedDossier } from "@/lib/espace/dossier-context";
-import { buildStudyChecklist, type PieceStatus } from "@/lib/espace/study-checklist";
+import { buildStudyChecklist, narrowPieceStatus } from "@/lib/espace/study-checklist";
 import { PiecesDropzone } from "@/components/espace/PiecesDropzone";
 import { PieceRow } from "@/components/espace/PieceRow";
 import { StudyChecklist } from "@/components/espace/StudyChecklist";
@@ -10,7 +10,7 @@ export default async function PiecesPage({ params }: { params: Promise<{ dossier
   const { dossierId } = await params;
   const { pieces } = await loadOwnedDossier(dossierId);
   const checklist = buildStudyChecklist(
-    pieces.map((p) => ({ kind: p.kind, status: p.status as PieceStatus })),
+    pieces.map((p) => ({ kind: p.kind, status: narrowPieceStatus(p.status) })),
   );
 
   return (
