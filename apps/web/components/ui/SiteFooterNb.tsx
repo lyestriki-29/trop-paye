@@ -12,7 +12,7 @@ const COLS = [
     title: "Produit",
     links: [
       { label: "Comment ça marche", href: "/comment-ca-marche" },
-      { label: "Résultats", href: "/resultats" },
+      { label: "Résultats", href: "/#resultats" },
       { label: "Guides", href: "/guides" },
     ],
   },

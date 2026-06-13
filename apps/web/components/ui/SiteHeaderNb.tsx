@@ -13,7 +13,7 @@ import { brand } from "@troppaye/shared";
 const NAV = [
   { label: "Comment ça marche", href: "/comment-ca-marche" },
   { label: "Guides", href: "/guides" },
-  { label: "Résultats", href: "/resultats" },
+  { label: "Résultats", href: "/#resultats" },
   { label: "Notre histoire", href: "/notre-histoire" },
   { label: "Méthode", href: "/methode" },
 ] as const;
