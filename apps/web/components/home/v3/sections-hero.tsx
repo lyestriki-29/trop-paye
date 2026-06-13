@@ -64,8 +64,10 @@ const STRIP: ReadonlyArray<{ value: string; label: string }> = [
 
 export function HeroV3() {
   return (
-    <section className="v3-ruled relative border-b border-line">
-      <div className="mx-auto max-w-container px-6 pb-16 pt-10 sm:pt-14">
+    // Hero « une page » : la section occupe une hauteur d'écran (header ~65px
+    // déduit) en colonne flex — contenu centré, strip de chiffres collé en bas.
+    <section className="v3-ruled relative flex min-h-[calc(100svh-65px)] flex-col border-b border-line">
+      <div className="mx-auto flex w-full max-w-container flex-1 flex-col justify-center px-6 py-8">
         {/* Cartouche dossier — TODO_COPY (vocabulaire document, hors copy deck). */}
         <div className="reveal-1 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-widest text-ink/55">
           <span>Dossier TP-2026 · instruction en cours</span>
@@ -73,30 +75,31 @@ export function HeroV3() {
           <span aria-hidden className="hidden sm:inline">Europe/Paris</span>
         </div>
 
-        <div className="mt-10 grid items-end gap-14 lg:grid-cols-[7fr_5fr]">
+        <div className="mt-6 grid items-center gap-10 lg:grid-cols-[7fr_5fr] lg:gap-14">
           <div>
-            {/* brand.hero.title mot pour mot — composition éditoriale 2 lignes. */}
+            {/* brand.hero.title mot pour mot — composition éditoriale 2 lignes.
+                Titre réduit (vs text-giga) pour que toute la hero tienne en 1 écran. */}
             <h1 className="reveal-1 font-display font-extrabold tracking-display">
               <span className="block text-xl text-ink/85 sm:text-2xl">Marre de</span>
-              <span className="mt-1 block text-giga leading-[0.95]">
+              <span className="mt-1 block text-[clamp(56px,9vw,116px)] leading-[0.95]">
                 <Marker>trop payer</Marker>&nbsp;?
               </span>
             </h1>
             <div className="reveal-2">
-              <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink/70">
+              <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink/70">
                 {brand.hero.subtitle}
               </p>
               {/* Double bénéfice (demande Lyes 2026-06-12) : récupérer le passé
                   ET faire baisser le loyer pour la suite. TODO_COPY — brouillon
                   hors deck, ton sans promesse de résultat (règles §6 du deck). */}
-              <p className="mt-3 max-w-xl text-base leading-relaxed text-ink/70">
+              <p className="mt-2 max-w-xl text-base leading-relaxed text-ink/70">
                 Et souvent, votre loyer <Marker>baisse pour de bon</Marker> :
                 hausse illégale supprimée, complément de loyer contesté.
               </p>
-              <div className="mt-9">
+              <div className="mt-7">
                 <HeroAddress />
               </div>
-              <p className="mt-4 text-sm font-medium text-ink/55">
+              <p className="mt-3 text-sm font-medium text-ink/55">
                 {brand.hero.reassurance.join(" · ")}
               </p>
             </div>
@@ -107,11 +110,11 @@ export function HeroV3() {
         </div>
       </div>
 
-      {/* Strip de chiffres — la densité remplace le blanc sous le hero. */}
+      {/* Strip de chiffres — pleine largeur edge-to-edge (hors max-w-container). */}
       <div className="border-t border-line bg-paper">
-        <dl className="mx-auto grid max-w-container grid-cols-2 gap-px bg-line px-0 lg:grid-cols-4">
+        <dl className="grid w-full grid-cols-2 gap-px bg-line sm:grid-cols-4">
           {STRIP.map(({ value, label }) => (
-            <div key={value} className="bg-paper px-6 py-6">
+            <div key={value} className="bg-paper px-6 py-5">
               <dd className="tabular font-display text-2xl font-extrabold tracking-display">
                 {value}
               </dd>

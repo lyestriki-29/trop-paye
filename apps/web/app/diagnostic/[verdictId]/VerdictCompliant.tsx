@@ -32,9 +32,13 @@ export function VerdictCompliant({ addressLabel }: { addressLabel: string }) {
         </div>
         <div className="reveal-3 rounded-card bg-paper-2 p-5">
           <IconHandCoins aria-hidden className="h-5 w-5 text-ink/60" />
-          <p className="mt-3 text-sm leading-relaxed text-ink/80">
+          <Button
+            href="#depot-garantie"
+            variant="ghost"
+            className="mt-4 w-full justify-start text-left"
+          >
             Vous quittez bientôt votre logement ? Vérifiez aussi votre dépôt de garantie.
-          </p>
+          </Button>
         </div>
       </div>
 
