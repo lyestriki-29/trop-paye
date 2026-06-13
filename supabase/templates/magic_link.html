@@ -1,25 +1,28 @@
 <!doctype html>
 <html lang="fr">
   <body style="font-family: system-ui, sans-serif; color: #2a2118; line-height: 1.6">
-    <!-- Template magic link custom (revue 2026-06-11) : lien en token_hash, vérifié
-         côté serveur SANS dépendre du navigateur d'origine (webview TikTok → Safari).
+    <!-- Template OTP par CODE (2026-06-13) : code à 6 chiffres ({{ .Token }}),
+         vérifié côté serveur via verifyOtp(type:email). Plus de lien cliquable
+         → supprime les soucis de redirection (localhost) et d'expiration quand
+         le lien s'ouvre dans un autre navigateur (webview TikTok → Safari).
          À répliquer dans le dashboard Supabase cloud (Auth > Email Templates).
          TODO_COPY [AVOCAT] : textes brouillon, hors copy deck. -->
-    <h2 style="font-weight: 800">Votre lien de connexion TropPayé</h2>
-    <p>Cliquez pour accéder à votre dossier. Ce lien est valable une heure et ne sert qu'une fois.</p>
-    <p>
-      <a
-        href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email"
-        style="display: inline-block; background: #2a2118; color: #fffefb; padding: 12px 24px; border-radius: 999px; text-decoration: none; font-weight: 700"
-        >Accéder à mon dossier</a
-      >
-    </p>
-    <p style="font-size: 13px; color: #6b6258">
-      Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br />
-      {{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email
+    <h2 style="font-weight: 800">Votre code de connexion TropPayé</h2>
+    <p>Saisissez ce code dans la page de connexion. Il est valable une heure et ne sert qu'une fois.</p>
+    <p
+      style="
+        margin: 24px 0;
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: 10px;
+        font-family: 'Courier New', monospace;
+        color: #2a2118;
+      "
+    >
+      {{ .Token }}
     </p>
     <p style="font-size: 12px; color: #6b6258">
-      Vous n'avez rien demandé ? Ignorez cet email, personne ne peut accéder à votre dossier sans lui.
+      Vous n'avez rien demandé ? Ignorez cet email, personne ne peut accéder à votre dossier sans ce code.
     </p>
   </body>
 </html>

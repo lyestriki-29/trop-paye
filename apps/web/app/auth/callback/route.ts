@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { claimDossiersByEmail } from "@/lib/dossier/claim";
+
+/** Types d'OTP email acceptés au callback (signInWithOtp = "email" ; admin.generateLink = "magiclink"). */
+const EMAIL_OTP_TYPES: ReadonlyArray<EmailOtpType> = ["email", "magiclink", "signup", "recovery", "invite"];
+function parseOtpType(raw: string | null): EmailOtpType {
+  return EMAIL_OTP_TYPES.includes(raw as EmailOtpType) ? (raw as EmailOtpType) : "email";
+}
 
 /**
  * Échange le magic link contre une session, puis redirige.
@@ -20,7 +27,7 @@ export async function GET(request: Request) {
   if (tokenHash) {
     const supabase = await getSupabaseServer();
     const { data, error } = await supabase.auth.verifyOtp({
-      type: "email",
+      type: parseOtpType(searchParams.get("type")),
       token_hash: tokenHash,
     });
     if (!error) {
