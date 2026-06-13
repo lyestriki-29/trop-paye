@@ -4,6 +4,7 @@ import { buildStudyChecklist } from "@/lib/espace/study-checklist";
 import { buildActivityFeed } from "@/lib/espace/activity";
 import { EspaceHeader } from "@/components/espace/EspaceHeader";
 import { NotificationsPanel } from "@/components/espace/NotificationsPanel";
+import { ContactDialog } from "@/components/espace/ContactDialog";
 import { WorkspaceTabs, type TabDef } from "@/components/espace/WorkspaceTabs";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +39,7 @@ export default async function DossierLayout({
 
   return (
     <div className="min-h-screen bg-paper">
-      <EspaceHeader email={user.email ?? null} activityCount={feed.length} notifications={<NotificationsPanel events={feed} />} />
+      <EspaceHeader email={user.email ?? null} activityCount={feed.length} notifications={<NotificationsPanel events={feed} />} contact={<ContactDialog />} />
       <div className="mx-auto max-w-container px-4">
         <WorkspaceTabs dossierId={dossierId} tabs={tabs} />
         <main className="py-8">{children}</main>

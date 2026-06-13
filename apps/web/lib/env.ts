@@ -13,6 +13,10 @@ export const env = {
   NEXT_PUBLIC_PLAUSIBLE_DOMAIN: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "",
   NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL:
     process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_URL ?? "https://plausible.io/js/script.js",
+  /** Contact WhatsApp — numéro international sans +, ex. 33612345678. Vide = bouton masqué. */
+  NEXT_PUBLIC_WHATSAPP: process.env.NEXT_PUBLIC_WHATSAPP ?? "",
+  /** URL Cal.com ou Calendly pour prendre RDV. Vide = bouton masqué. */
+  NEXT_PUBLIC_CAL_URL: process.env.NEXT_PUBLIC_CAL_URL ?? "",
   get SUPABASE_SERVICE_ROLE_KEY(): string {
     return req("SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY);
   },
