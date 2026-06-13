@@ -25,6 +25,8 @@ supabase/.temp/
 coverage/
 playwright-report/
 test-results/
+apps/web/e2e/.auth/
+.last-run.json
 
 # Logs & OS
 *.log
@@ -35,3 +37,9 @@ Thumbs.db
 .tokenade/
 .planning/
 *.log
+
+# tokenade — legacy per-project embedding model cache (now global)
+.fastembed_cache/
+
+# Maquettes brainstorming (compagnon visuel, local)
+.superpowers/
