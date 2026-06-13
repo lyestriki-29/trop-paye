@@ -62,6 +62,13 @@ function VerdictCardNb() {
           </span>
         </div>
       </div>
+      {/* Tampon imprimé — visible seulement en variante Maximal. */}
+      <span
+        aria-hidden="true"
+        className="nb-stamp absolute right-6 top-1/2 z-20 -translate-y-1/2 text-xl"
+      >
+        Trop payé
+      </span>
       <p className="mt-4 text-center nb-mono text-xs text-nb-ink/45">
         Exemple de dossier — données d&apos;illustration
       </p>

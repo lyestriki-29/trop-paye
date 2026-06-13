@@ -24,7 +24,7 @@ export function RegimesNb() {
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {/* Régime 1 — gel F/G : texte prod (copy deck §1). */}
           <Reveal delay={0.08} className="lg:col-span-2">
-            <article className="nb-card relative flex h-full flex-col p-8 sm:p-10">
+            <article className="nb-tilt nb-card relative flex h-full flex-col p-8 sm:p-10">
               <span className="nb-sticker nb-sticker--right -right-3 -top-4 bg-acid">
                 Gelé depuis 2022
               </span>
@@ -71,7 +71,7 @@ export function RegimesNb() {
           <div className="grid gap-6">
             {/* Régime 2 — bouclier 3,5 % : TODO_COPY / TODO_VERIFIER avant prod. */}
             <Reveal delay={0.16}>
-              <article className="nb-card flex h-full flex-col p-7">
+              <article className="nb-tilt nb-card flex h-full flex-col p-7">
                 <p className="tabular font-nb-display text-3xl">+3,5 % max</p>
                 <h3 className="mt-3 text-lg">Hausse au-dessus du bouclier ?</h3>
                 <p className="mt-3 font-nb-body text-sm leading-relaxed text-nb-ink/75">

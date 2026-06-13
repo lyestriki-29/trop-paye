@@ -256,38 +256,125 @@ body::after {
   --nb-caszero-bg: var(--color-violet); /* bloc cas zéro */
 }
 
-/* Déclinaison « Tempérée » : un seul accent (jaune), fonds neutres, bandeau
-   sombre — moins de couleur, même grammaire dure. */
-.nb--temperee {
-  --nb-badge-bg: var(--color-accent);
-  --nb-band-bg: var(--color-nb-ink);
-  --nb-band-fg: var(--color-cream);
-  --nb-caszero-bg: var(--color-paper-2);
+/* ----------------------------------------------------------------
+   3 NIVEAUX D'ANIMATION (palette Douce validée pour les trois).
+   Vivante = base `.nb`. Kinetic / Maximal AJOUTENT des effets, tous
+   progressifs (@supports animation-timeline) et coupés en reduced-motion.
+   ---------------------------------------------------------------- */
+
+/* — Vivante (base) — stickers qui « tombent » en place au montage. */
+.nb-sticker {
+  animation: nb-drop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-.nb--temperee .nb-dots,
-.nb--temperee .nb-stripes {
-  background-image: none;
+@keyframes nb-drop {
+  from {
+    opacity: 0;
+    translate: 0 -14px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
 }
 
-/* Déclinaison « Éditoriale » : la plus calme — titres en casse normale,
-   accent jaune seul, déco minimale. */
-.nb--editoriale {
-  --nb-badge-bg: var(--color-accent);
-  --nb-band-bg: var(--color-nb-ink);
-  --nb-band-fg: var(--color-cream);
-  --nb-caszero-bg: var(--color-paper-2);
+/* Tampon « Trop payé » — masqué par défaut, imprimé en Maximal. */
+.nb-stamp {
+  display: none;
 }
-.nb--editoriale .nb-dots,
-.nb--editoriale .nb-stripes {
-  background-image: none;
+
+/* Barre de progression de lecture — masquée hors Kinetic / Maximal. */
+.nb-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 5px;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background-color: rgb(var(--color-refund));
+  border-bottom: 2px solid rgb(var(--color-nb-ink));
+  z-index: 90;
+  display: none;
 }
-.nb--editoriale h1,
-.nb--editoriale h2,
-.nb--editoriale h3,
-.nb--editoriale .nb-title {
-  text-transform: none;
-  letter-spacing: -0.02em;
-  line-height: 1;
+
+/* — Kinetic — marquee rapide + parallax stickers + barre de progression. */
+.nb--kinetic .v3-marquee-track {
+  animation-duration: 18s;
+}
+@supports (animation-timeline: scroll()) {
+  .nb--kinetic .nb-progress,
+  .nb--maximal .nb-progress {
+    display: block;
+    animation: nb-progress-grow linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+@keyframes nb-progress-grow {
+  to {
+    transform: scaleX(1);
+  }
+}
+@supports (animation-timeline: view()) {
+  .nb--kinetic .nb-sticker,
+  .nb--maximal .nb-sticker {
+    animation: nb-parallax linear both;
+    animation-timeline: view();
+    animation-range: cover;
+  }
+  .nb--maximal .nb-tilt {
+    animation: nb-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+}
+@keyframes nb-parallax {
+  from {
+    translate: 0 22px;
+  }
+  to {
+    translate: 0 -22px;
+  }
+}
+@keyframes nb-rise {
+  from {
+    scale: 0.95;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+/* — Maximal — typo XXL + tampon imprimé au scroll. */
+.nb--maximal h1 {
+  font-size: clamp(56px, 11vw, 132px);
+}
+.nb--maximal .nb-stamp {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-nb-display), system-ui, sans-serif;
+  color: rgb(var(--color-stamp));
+  border: 4px solid rgb(var(--color-stamp));
+  border-radius: 6px;
+  padding: 0.2rem 0.7rem;
+  rotate: -9deg;
+  opacity: 0.9;
+}
+@supports (animation-timeline: view()) {
+  .nb--maximal .nb-stamp {
+    animation: nb-stamp-in linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 70%;
+  }
+}
+@keyframes nb-stamp-in {
+  from {
+    opacity: 0;
+    scale: 1.8;
+    rotate: -24deg;
+  }
+  to {
+    opacity: 0.9;
+    scale: 1;
+    rotate: -9deg;
+  }
 }
 
 /* Bandeaux thématisés (lisent les vars de déclinaison). */
@@ -458,5 +545,14 @@ body::after {
   }
   .nb-tilt:hover {
     transform: none;
+  }
+  /* Animations néubrutalistes (drop, parallax, pop, stamp, progress) coupées. */
+  .nb-sticker,
+  .nb-stamp,
+  .nb-tilt {
+    animation: none;
+  }
+  .nb-progress {
+    display: none;
   }
 }

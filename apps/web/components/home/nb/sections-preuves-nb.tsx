@@ -82,7 +82,7 @@ export function TemoignageNb() {
           </Reveal>
 
           <Reveal delay={0.18}>
-            <div className="nb-card relative p-6 sm:p-7">
+            <div className="nb-tilt nb-card relative p-6 sm:p-7">
               <span className="nb-sticker -left-3 -top-4 z-10">Reçu</span>
               <div className="nb-mono text-[11px] uppercase tracking-widest text-nb-ink/55">
                 Reçu de reversement — {t.prenom}

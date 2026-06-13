@@ -61,7 +61,7 @@ export function MoteurNb() {
         <ol className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {PIPELINE.map(({ num, title, source, text, meta }, i) => (
             <Reveal key={num} delay={0.08 + i * 0.08} className="h-full">
-              <li className="nb-card flex h-full flex-col p-6">
+              <li className="nb-tilt nb-card flex h-full flex-col p-6">
                 <div className="flex items-center justify-between gap-4 border-b-3 border-nb-ink pb-4">
                   <span className="flex h-11 w-11 items-center justify-center border-3 border-nb-ink bg-acid font-nb-display text-lg">
                     {num}

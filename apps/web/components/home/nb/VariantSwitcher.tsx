@@ -10,21 +10,25 @@ import { useState } from "react";
  */
 
 const VARIANTS = [
-  { id: "douce", label: "Douce", hint: "lavande + rose + jaune, titres capitales" },
-  { id: "temperee", label: "Tempérée", hint: "jaune seul, fonds neutres, bandeau sombre" },
-  { id: "editoriale", label: "Éditoriale", hint: "casse normale, déco minimale" },
+  { id: "vivante", label: "Vivante", hint: "sobre premium : reveals, cartes vivantes, compteurs" },
+  { id: "kinetic", label: "Kinetic", hint: "scroll-driven : parallax, marquee rapide, barre de lecture" },
+  { id: "maximal", label: "Maximal", hint: "waouh : typo XXL, tampon imprimé, effets max" },
 ] as const;
 
 type VariantId = (typeof VARIANTS)[number]["id"];
 
 export function VariantSwitcher({ children }: { children: React.ReactNode }) {
-  const [variant, setVariant] = useState<VariantId>("douce");
-  const scope = variant === "douce" ? "nb" : `nb nb--${variant}`;
+  // Palette Douce validée pour les 3 ; elles diffèrent par l'intensité animée.
+  const [variant, setVariant] = useState<VariantId>("vivante");
+  const scope = variant === "vivante" ? "nb" : `nb nb--${variant}`;
   const active = VARIANTS.find((v) => v.id === variant);
 
   return (
     <>
-      <div className={`${scope} min-h-screen`}>{children}</div>
+      <div className={`${scope} min-h-screen`}>
+        <div className="nb-progress" aria-hidden="true" />
+        {children}
+      </div>
 
       <div className="fixed inset-x-0 bottom-4 z-[100] flex justify-center px-4">
         <div className="flex max-w-full flex-col items-center gap-1 rounded-2xl border border-ink/15 bg-paper/95 px-3 py-2 shadow-deep backdrop-blur">

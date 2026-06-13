@@ -61,7 +61,7 @@ export function EtapesNb() {
         <ol className="mt-10 grid gap-6 md:grid-cols-3">
           {ETAPES.map(({ Icon, title, text, artefact }, i) => (
             <Reveal key={title} delay={0.08 + i * 0.08} className="h-full">
-              <li className="nb-card flex h-full flex-col p-7">
+              <li className="nb-tilt nb-card flex h-full flex-col p-7">
                 <div className="flex items-center gap-4">
                   <span className="nb-step-badge">{i + 1}</span>
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center border-3 border-nb-ink bg-accent text-nb-ink">
