@@ -1,0 +1,157 @@
+import { PRESCRIPTION_YEARS, brand, formatEUR } from "@troppaye/shared";
+import { HeroAddress } from "@/components/home/HeroAddress";
+
+/**
+ * Hero néubrutaliste (réf. LP3) — variante DA du site public, scopée `.nb`.
+ * Copy deck §1 mot pour mot (titre, sous-titre, réassurance) ; vocabulaire
+ * « dossier » et chiffres témoin (fictifs, déjà en prod) en TODO_COPY.
+ */
+
+/** Chiffres d'appui (factuels) — repris du hero v3 pour cohérence. */
+const STRIP: ReadonlyArray<{ value: string; label: string }> = [
+  { value: "1 sur 6", label: "logement loué a un loyer illégal (source : SDES)" },
+  { value: "24/08/2022", label: "loyers des passoires F/G gelés depuis cette date" },
+  { value: `${PRESCRIPTION_YEARS} ans`, label: "de trop-perçu récupérable (prescription)" },
+  { value: "25 %", label: "de commission, au succès. Rien récupéré ? Rien payé." },
+];
+
+/** Carte verdict spécimen — chiffres témoin P0 (fictifs), aria-hidden. */
+function VerdictCardNb() {
+  const rows: ReadonlyArray<{ label: string; cents: number; accent?: boolean }> = [
+    { label: "Loyer hors charges", cents: 102_185 },
+    { label: "Plafond légal (gel DPE F/G)", cents: 95_000 },
+    { label: "Différence mensuelle", cents: 7_185, accent: true },
+  ];
+  return (
+    <aside aria-hidden="true" className="relative mx-auto w-full max-w-md lg:mx-0">
+      <span className="nb-sticker -left-3 -top-5 z-10">0 € d&apos;avance</span>
+      <span className="nb-sticker nb-sticker--right -right-3 top-10 z-10 bg-pink text-paper">
+        25 % au succès
+      </span>
+      <div className="nb-card p-6 sm:p-7">
+        <div className="flex items-center justify-between nb-mono text-[11px] uppercase tracking-widest text-nb-ink/55">
+          <span>Réf. TP-2026-0117</span>
+          <span>Quittance de loyer</span>
+        </div>
+        <p className="mt-3 nb-mono text-sm text-nb-ink/70">12 rue des Lilas, 75011 Paris</p>
+        <dl className="mt-5 space-y-2.5">
+          {rows.map(({ label, cents, accent }) => (
+            <div key={label} className="flex items-baseline justify-between gap-4">
+              <dt className="font-nb-body text-sm text-nb-ink/75">{label}</dt>
+              <dd
+                className={`tabular nb-mono text-sm font-medium ${
+                  accent ? "text-refund" : "text-nb-ink"
+                }`}
+              >
+                {formatEUR(cents, { decimals: true })}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <div className="mt-5 flex items-end justify-between border-t-3 border-nb-ink pt-4">
+          <span className="font-nb-display text-sm uppercase leading-none">
+            Trop-perçu
+            <br />
+            sur la période
+          </span>
+          <span className="tabular nb-mono text-2xl font-semibold text-refund">
+            {formatEUR(143_700, { decimals: true })}
+          </span>
+        </div>
+      </div>
+      <p className="mt-4 text-center nb-mono text-xs text-nb-ink/45">
+        Quittance spécimen — données fictives
+      </p>
+    </aside>
+  );
+}
+
+/** Strip de chiffres — rangée de cartes dures pleine largeur. */
+function StripNb() {
+  return (
+    <div className="border-t-3 border-nb-ink bg-nb-ink">
+      <dl className="mx-auto grid max-w-container grid-cols-2 gap-px bg-nb-ink sm:grid-cols-4">
+        {STRIP.map(({ value, label }) => (
+          <div key={value} className="bg-cream px-5 py-5">
+            <dd className="tabular font-nb-display text-2xl">{value}</dd>
+            <dt className="mt-2 max-w-[26ch] nb-mono text-[11px] uppercase leading-relaxed tracking-wider text-nb-ink/60">
+              {label}
+            </dt>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+export function HeroNb() {
+  return (
+    <section className="relative overflow-hidden border-b-3 border-nb-ink">
+      <div aria-hidden className="nb-dots pointer-events-none absolute inset-0 opacity-70" />
+      <div className="relative mx-auto max-w-container px-6 py-14 sm:py-20">
+        <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/65">
+          Dossier TP-2026 · instruction en cours
+        </p>
+        <div className="mt-7 grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+          <div>
+            {/* brand.hero.title mot pour mot (composition 2 lignes). */}
+            <h1 className="text-[clamp(46px,9vw,108px)]">
+              Marre de <span className="nb-mark nb-mark--acid">trop payer</span>&nbsp;?
+            </h1>
+            <p className="mt-6 max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/80">
+              {brand.hero.subtitle}
+            </p>
+            {/* Double bénéfice (demande Lyes) — TODO_COPY, ton sans promesse. */}
+            <p className="mt-3 max-w-xl font-nb-body text-base leading-relaxed text-nb-ink/80">
+              Et souvent, votre loyer{" "}
+              <span className="nb-mark nb-mark--refund">baisse pour de bon</span> : hausse
+              illégale supprimée, complément de loyer contesté.
+            </p>
+            <div className="mt-8">
+              <HeroAddress />
+            </div>
+            <p className="mt-4 nb-mono text-xs uppercase tracking-wider text-nb-ink/60">
+              {brand.hero.reassurance.join(" · ")}
+            </p>
+          </div>
+          <div className="relative">
+            <VerdictCardNb />
+          </div>
+        </div>
+      </div>
+      <StripNb />
+    </section>
+  );
+}
+
+/** Items factuels (moteur + CLAUDE.md) — dupliqués ×2 pour la boucle. */
+const TICKER: ReadonlyArray<string> = [
+  "Gel des loyers F/G — loi Climat, art. 159",
+  "Bouclier d'indexation +3,5 % max — T3 2022 → T1 2024",
+  "IRL — série INSEE 001515333",
+  `Jusqu'à ${PRESCRIPTION_YEARS} ans de trop-perçu récupérable`,
+  "0 € d'avance — 25 % au succès",
+  "Données hébergées en France",
+];
+
+/** Bandeau défilant des bases légales — réutilise la mécanique `v3-marquee`. */
+export function TickerNb() {
+  return (
+    <div
+      aria-hidden="true"
+      className="v3-marquee border-b-3 border-nb-ink bg-nb-ink py-3 text-cream"
+    >
+      <div className="v3-marquee-track">
+        {[...TICKER, ...TICKER].map((item, i) => (
+          <span
+            key={`${item}-${i}`}
+            className="inline-flex items-center gap-3 pr-8 nb-mono text-[12px] font-medium uppercase tracking-widest text-cream/85"
+          >
+            <span className="text-acid">●</span>
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
