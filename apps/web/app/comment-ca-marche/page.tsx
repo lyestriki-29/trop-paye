@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Reveal } from "@/components/home/Reveal";
 import { CtaFinalNb } from "@/components/home/nb/CtaFinalNb";
-import { EtapesNb } from "@/components/home/nb/sections-etapes-nb";
 import { FAQ_COMPLETE } from "@/components/public/FaqComplete";
 import { PageHeroNb } from "@/components/public/PageHeroNb";
+import { ParcoursNb } from "@/components/public/ParcoursNb";
 import { PublicShell } from "@/components/ui/PublicShell";
 
 export const metadata: Metadata = {
@@ -108,7 +108,7 @@ export default function CommentCaMarchePage() {
         }
         lede="Vérifiez votre loyer en 2 minutes. Si on ne récupère rien, vous ne payez rien."
       />
-      <EtapesNb />
+      <ParcoursNb />
       <BaremeNb />
       <FaqNb />
       <CtaFinalNb />
