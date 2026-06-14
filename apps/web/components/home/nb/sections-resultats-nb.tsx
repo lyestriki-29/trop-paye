@@ -36,7 +36,7 @@ const GARANTIES = ["Chaque euro tracé sur un compte dédié", "Données en Fran
 
 export function ResultatsNb() {
   return (
-    <section id="resultats" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-12 sm:py-14">
+    <section id="resultats" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-14 sm:py-16">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
@@ -59,7 +59,7 @@ export function ResultatsNb() {
           {ITEMS.map((item, i) => (
             <Reveal key={item.suffix} delay={0.08 + i * 0.1}>
               <div
-                className={`nb-tilt nb-card flex h-full flex-col p-7 ${
+                className={`nb-tilt nb-card flex h-full flex-col justify-center p-7 ${
                   item.featured ? "bg-nb-ink" : ""
                 }`}
               >

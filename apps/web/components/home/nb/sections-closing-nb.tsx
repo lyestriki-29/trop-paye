@@ -41,7 +41,7 @@ export function CasZeroNb() {
         <div className="mt-7 grid gap-6 sm:grid-cols-3">
           {CAS_ZERO.map(({ value, label, tone }, i) => (
             <Reveal key={label} delay={0.1 + i * 0.08}>
-              <div className="nb-card h-full p-6">
+              <div className="nb-card flex h-full flex-col justify-center p-6">
                 <p
                   className={`tabular font-nb-display text-2xl sm:text-3xl ${
                     tone === "refund" ? "text-refund" : "text-nb-ink"
