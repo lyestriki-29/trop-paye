@@ -21,27 +21,14 @@ const DEPOSIT_CHOICES: { value: DepositChoice; label: string }[] = [
 ];
 
 /**
- * Base de saisie (coloc : total / ma part — réservé à `isShared`) + mode HC/CC.
- * Extrait de `RentStep`, mêmes `onChange` (dont le pré-remplissage des charges
- * au barème une seule fois en CC).
+ * Mode de saisie des loyers (HC / CC). Extrait de `RentStep`, même `onChange`
+ * (dont le pré-remplissage des charges au barème une seule fois en CC).
+ * La base de saisie coloc (total / ma part) est une question distincte
+ * (`RentBasisQ`), gatée sur `isShared` au niveau du graphe.
  */
 export function RentModeQ({ draft, setField }: StepProps) {
   return (
     <div className="space-y-6">
-      {/* Coloc : total du logement, ou part personnelle (reconstituée × n). TODO_COPY. */}
-      {draft.isShared ? (
-        <ChoiceField
-          label="Les montants que vous saisissez :"
-          hint="Vous ne connaissez que votre part ? On reconstitue le loyer total du logement."
-          choices={[
-            { value: "TOTAL", label: "Le loyer total du logement" },
-            { value: "SHARE", label: "Ma part" },
-          ]}
-          value={draft.rentBasis ?? "TOTAL"}
-          onChange={(v) => setField("rentBasis", v)}
-        />
-      ) : null}
-
       <ChoiceField
         label="Mes montants sont :"
         /* Phrase actée par Lyes (2026-06-11) : guider vers le CC si le HC est inconnu. */
