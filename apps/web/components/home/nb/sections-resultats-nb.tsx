@@ -36,7 +36,7 @@ const GARANTIES = ["Chaque euro tracé sur un compte dédié", "Données en Fran
 
 export function ResultatsNb() {
   return (
-    <section id="resultats" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-14 sm:py-16">
+    <section id="resultats" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-20 sm:py-24">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
@@ -55,7 +55,7 @@ export function ResultatsNb() {
           </div>
         </Reveal>
 
-        <dl className="mt-7 grid gap-6 sm:grid-cols-3">
+        <dl className="mt-10 grid gap-8 sm:grid-cols-3">
           {ITEMS.map((item, i) => (
             <Reveal key={item.suffix} delay={0.08 + i * 0.1}>
               <div

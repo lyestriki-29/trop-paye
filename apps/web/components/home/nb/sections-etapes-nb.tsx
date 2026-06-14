@@ -47,7 +47,7 @@ const ETAPES: ReadonlyArray<Etape> = [
 
 export function EtapesNb() {
   return (
-    <section className="border-b-3 border-nb-ink bg-ciel py-12 sm:py-14">
+    <section className="border-b-3 border-nb-ink bg-ciel py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -58,7 +58,7 @@ export function EtapesNb() {
           </h2>
         </Reveal>
 
-        <ol className="mt-7 grid gap-6 md:grid-cols-3">
+        <ol className="mt-10 grid gap-8 md:grid-cols-3">
           {ETAPES.map(({ Icon, title, text, artefact }, i) => (
             <Reveal key={title} delay={0.08 + i * 0.08} className="h-full">
               <li className="nb-tilt nb-card flex h-full flex-col p-7">

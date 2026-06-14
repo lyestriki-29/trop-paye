@@ -49,7 +49,7 @@ export function TemoignageNb() {
   if (!t) return null;
 
   return (
-    <section id="preuve" className="scroll-mt-24 border-b-3 border-nb-ink py-12 sm:py-14">
+    <section id="preuve" className="scroll-mt-24 border-b-3 border-nb-ink py-16 sm:py-24">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -60,7 +60,7 @@ export function TemoignageNb() {
           </h2>
         </Reveal>
 
-        <div className="mt-8 grid items-stretch gap-10 lg:grid-cols-[1fr_1fr] lg:gap-14">
+        <div className="mt-12 grid items-stretch gap-10 lg:grid-cols-[1fr_1fr] lg:gap-14">
           <Reveal delay={0.08} className="flex flex-col justify-center">
             <figure className="relative">
               <span
