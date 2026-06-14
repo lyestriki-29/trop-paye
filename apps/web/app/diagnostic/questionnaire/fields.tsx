@@ -43,7 +43,7 @@ export function TextField({
       inputMode={inputMode}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      inputClassName={mono ? "font-mono tabular" : undefined}
+      inputClassName={mono ? "nb-field font-mono tabular" : "nb-field"}
     />
   );
 }
@@ -77,7 +77,7 @@ export function MoneyField({
         onChange(Number.isFinite(euros) ? Math.round(euros * 100) : undefined);
       }}
       suffix="€"
-      inputClassName="font-mono tabular"
+      inputClassName="nb-field font-mono tabular"
     />
   );
 }
@@ -106,7 +106,7 @@ export function DateField({
       value={value}
       max={max}
       onChange={(e) => onChange(e.target.value)}
-      inputClassName="font-mono tabular"
+      inputClassName="nb-field font-mono tabular"
     />
   );
 }
@@ -126,8 +126,7 @@ const MONTHS = [
   "Décembre",
 ] as const;
 
-const SELECT_CLS =
-  "h-12 rounded-field border border-line bg-paper px-3 text-sm text-ink transition hover:border-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink";
+const SELECT_CLS = "nb-field";
 
 /**
  * Mois + année (décision Lyes 2026-06-11 : pas de date exacte, le date picker
@@ -195,7 +194,7 @@ export function MonthYearField({
             const m = y === currentYear && month > currentMonth ? 0 : month;
             emit(m, y);
           }}
-          className={`${SELECT_CLS} tabular font-mono`}
+          className={`${SELECT_CLS} font-mono tabular`}
         >
           <option value="" disabled>
             Année
@@ -243,11 +242,7 @@ export function ChoiceField<T extends string>({
               type="button"
               onClick={() => onChange(c.value)}
               aria-pressed={active}
-              className={`rounded-badge border px-5 py-2.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 ${
-                active
-                  ? "border-ink bg-ink text-paper shadow-sm"
-                  : "border-line bg-paper text-ink/80 hover:border-ink/40 hover:shadow-sm"
-              }`}
+              className={`nb-pill focus-visible:outline-none${/je ne sais/i.test(c.label) ? " nb-pill--dashed" : ""}`}
             >
               {c.label}
             </button>
