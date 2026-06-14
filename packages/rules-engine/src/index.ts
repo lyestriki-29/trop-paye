@@ -30,3 +30,4 @@ export {
   ccToHcCents,
   estimateMonthlyChargesCents,
 } from "./internal/charges";
+export { constructionPeriodFromYear } from "./construction";
