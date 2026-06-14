@@ -48,7 +48,7 @@ export function ResultatsNb() {
                 Déjà <span className="nb-mark">récupéré</span>, déjà reversé.
               </h2>
             </div>
-            <p className="max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/75 lg:pb-2">
+            <p className="max-w-xl font-nb-body text-xl font-medium leading-relaxed text-nb-ink/90 lg:pb-1">
               Pas de promesse en l&apos;air : voici ce que nous avons déjà obtenu pour de vrais
               locataires. Que des chiffres réels, jamais d&apos;exemple inventé.
             </p>
@@ -71,18 +71,18 @@ export function ResultatsNb() {
                       <CountUp cents={item.cents} />
                       {item.perMonth ? (
                         <span
-                          className={`text-[0.45em] ${item.featured ? "text-cream/60" : "text-nb-ink/60"}`}
+                          className={`whitespace-nowrap text-[0.3em] font-nb-body font-medium ${item.featured ? "text-cream/70" : "text-nb-ink/55"}`}
                         >
                           {" "}
-                          / mois
+                          /mois
                         </span>
                       ) : null}
                     </>
                   )}
                 </dd>
                 <dt
-                  className={`mt-4 font-nb-body text-sm leading-relaxed ${
-                    item.featured ? "text-cream/75" : "text-nb-ink/75"
+                  className={`mt-4 font-nb-body text-base font-medium leading-relaxed ${
+                    item.featured ? "text-cream/85" : "text-nb-ink/80"
                   }`}
                 >
                   {item.suffix}

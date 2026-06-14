@@ -153,10 +153,10 @@ function FaqNb() {
           </p>
           <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">Questions fréquentes</h2>
         </Reveal>
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="mt-10 grid items-start gap-6 md:grid-cols-2">
           {FAQ.map(({ q, a }, i) => (
-            <Reveal key={q} delay={0.1 + i * 0.08} className="h-full">
-              <details className="nb-card group h-full p-0">
+            <Reveal key={q} delay={0.1 + i * 0.08}>
+              <details className="nb-card group p-0">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-6 font-nb-display text-lg uppercase [&::-webkit-details-marker]:hidden">
                   {q}
                   <span
