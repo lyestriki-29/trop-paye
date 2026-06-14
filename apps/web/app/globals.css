@@ -563,6 +563,35 @@ body::after {
   transform: rotate(-4deg);
 }
 
+/* ── Tunnel diagnostic : champs nb (Phase A) ───────────────────────────── */
+.nb-field {
+  width: 100%;
+  border: 2px solid rgb(var(--color-nb-ink));
+  background: rgb(var(--color-paper));
+  box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
+  padding: 11px 14px;
+  font-size: 15px;
+  color: rgb(var(--color-nb-ink));
+}
+.nb-field:focus-visible { outline: 3px solid rgb(var(--color-accent)); outline-offset: 1px; }
+.nb-pill {
+  border: 2px solid rgb(var(--color-nb-ink));
+  background: rgb(var(--color-paper));
+  box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
+  padding: 9px 18px; font-weight: 700; font-size: 14px;
+  transition: transform .08s ease;
+}
+.nb-pill[aria-pressed="true"] { background: rgb(var(--color-accent)); }
+.nb-pill--dashed { border-style: dashed; box-shadow: none; font-weight: 600; }
+.nb-confirmed {
+  border: 2px solid rgb(var(--color-nb-ink));
+  background: rgb(var(--color-paper));
+  box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
+}
+.nb-confirmed--prefill { background: #eafaf2; }
+.nb-ghost { border: 2px dashed rgb(var(--color-nb-ink) / 0.4); }
+@media (prefers-reduced-motion: reduce) { .nb-pill { transition: none; } }
+
 /* Bande pleine largeur (full-bleed) : casse le conteneur pour un aplat. */
 .nb-band {
   margin-inline: calc(50% - 50vw);
