@@ -47,7 +47,7 @@ const PIPELINE: ReadonlyArray<Etape> = [
 
 export function MoteurNb() {
   return (
-    <section className="nb-dark border-b-3 border-nb-ink py-12 text-cream sm:py-14">
+    <section className="nb-dark border-b-3 border-nb-ink py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-cream/45">

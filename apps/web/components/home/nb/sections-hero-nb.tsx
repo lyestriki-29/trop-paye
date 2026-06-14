@@ -12,10 +12,9 @@ import { HeroAddress } from "@/components/home/HeroAddress";
 /** −194 € : baisse de loyer moyenne (réel, Lyes 2026-06-13). Montant en centimes. */
 const AVG_MONTHLY_SAVING_CENTS = 19_400;
 
-/** Style du compteur géant : stroke + ombre dure nb (pas une classe utilitaire). */
+/** Style du compteur géant : ombre dure nb crisp (sans text-stroke = plus net). */
 const METER_STYLE = {
-  WebkitTextStroke: "2px rgb(var(--color-nb-ink))",
-  textShadow: "6px 6px 0 rgb(var(--color-nb-ink))",
+  textShadow: "4px 4px 0 rgb(var(--color-nb-ink))",
 } as const;
 
 /** Quittance spécimen nettoyée — chiffres témoin P0 (fictifs), aria-hidden. */
