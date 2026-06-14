@@ -111,21 +111,21 @@ function StripNb() {
 export function HeroNb() {
   return (
     <section className="relative overflow-hidden border-b-3 border-nb-ink bg-violet">
-      <div className="relative mx-auto max-w-container px-6 py-14 sm:py-20">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16">
+      <div className="relative mx-auto max-w-container px-6 py-8 sm:py-10">
+        <div className="grid items-center gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
           <div>
             <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/65">
               Loyer encadré · gel F/G · bouclier 3,5 %
             </p>
             {/* Compteur géant : −194 €/mois, count-up en vue (reduced-motion = valeur finale). */}
-            <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-7">
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
               <span
                 style={METER_STYLE}
-                className="tabular nb-mono text-[clamp(64px,11vw,128px)] font-semibold leading-[0.8] text-refund"
+                className="shrink-0 tabular nb-mono text-[clamp(56px,8vw,104px)] font-semibold leading-[0.8] text-refund"
               >
                 −<CountUp cents={AVG_MONTHLY_SAVING_CENTS} durationMs={1400} />
               </span>
-              <span className="border-l-3 border-nb-ink pl-4 nb-mono text-[13px] uppercase leading-relaxed tracking-wide text-nb-ink/80 sm:max-w-[22ch]">
+              <span className="max-w-[26ch] border-l-3 border-nb-ink pl-4 nb-mono text-[12px] uppercase leading-snug tracking-wide text-nb-ink/80">
                 <span className="block font-nb-display text-sm normal-case tracking-normal">
                   par mois en moyenne
                 </span>
@@ -133,16 +133,16 @@ export function HeroNb() {
               </span>
             </div>
             {/* brand.hero.title verbatim (composition 2 lignes). */}
-            <h1 className="mt-7 text-[clamp(40px,6vw,72px)]">
+            <h1 className="mt-5 text-[clamp(34px,4.6vw,58px)]">
               Marre de <span className="nb-mark">trop payer</span>&nbsp;?
             </h1>
-            <p className="mt-5 max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/80">
+            <p className="mt-4 max-w-xl font-nb-body text-base leading-relaxed text-nb-ink/80">
               {brand.hero.subtitle}
             </p>
-            <div className="mt-7">
+            <div className="mt-5">
               <HeroAddress />
             </div>
-            <div className="mt-5 flex flex-wrap items-center gap-4">
+            <div className="mt-4 flex flex-wrap items-center gap-4">
               <span className="inline-flex items-center gap-2.5 border-2 border-nb-ink bg-paper px-3.5 py-2 nb-mono text-[12px] font-medium text-nb-ink shadow-nb-sm">
                 <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-refund" />
                 37 diagnostics lancés cette semaine

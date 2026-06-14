@@ -47,7 +47,7 @@ export function RegimesNb() {
               <div className="mt-auto pt-7">
                 <a
                   href="/diagnostic"
-                  className="nb-card-hover group inline-flex items-center gap-2 border-3 border-nb-ink bg-accent px-6 py-3 font-nb-display text-base uppercase shadow-nb focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nb-ink focus-visible:ring-offset-2"
+                  className="nb-card-hover group inline-flex items-center gap-2 border-3 border-nb-ink bg-nb-ink px-6 py-3 font-nb-display text-base uppercase text-cream shadow-nb focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nb-ink focus-visible:ring-offset-2"
                 >
                   Vérifier mon DPE
                   <IconArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

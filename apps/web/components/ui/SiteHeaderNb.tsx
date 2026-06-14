@@ -78,7 +78,7 @@ export function SiteHeaderNb() {
           </Link>
           <Link
             href="/diagnostic"
-            className="nb-card-hover border-3 border-nb-ink bg-accent px-4 py-2 font-nb-display text-sm uppercase shadow-nb-sm"
+            className="nb-card-hover border-3 border-nb-ink bg-nb-ink px-4 py-2 font-nb-display text-sm uppercase text-cream shadow-nb-sm"
           >
             {brand.hero.cta}
           </Link>
@@ -124,7 +124,7 @@ export function SiteHeaderNb() {
             <Link
               href="/diagnostic"
               onClick={() => setOpen(false)}
-              className="block border-3 border-nb-ink bg-accent px-4 py-3 text-center font-nb-display text-base uppercase shadow-nb-sm"
+              className="block border-3 border-nb-ink bg-nb-ink px-4 py-3 text-center font-nb-display text-base uppercase text-cream shadow-nb-sm"
             >
               {brand.hero.cta}
             </Link>
