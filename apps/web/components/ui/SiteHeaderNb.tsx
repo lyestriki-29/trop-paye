@@ -46,7 +46,7 @@ function IconBurger({ open }: { open: boolean }) {
 export function SiteHeaderNb() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 border-b-3 border-nb-ink bg-paper/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b-3 border-nb-ink bg-cream/95 backdrop-blur">
       <div className="mx-auto flex max-w-container items-center justify-between gap-6 px-6 py-3.5">
         <Link
           href="/"
@@ -63,7 +63,7 @@ export function SiteHeaderNb() {
             <Link
               key={href}
               href={href}
-              className="nb-mono text-xs font-semibold uppercase tracking-wider text-nb-ink/70 transition hover:text-nb-ink"
+              className="font-nb-body text-sm font-semibold uppercase tracking-wide text-nb-ink/70 transition hover:text-nb-ink"
             >
               {label}
             </Link>
@@ -72,7 +72,7 @@ export function SiteHeaderNb() {
         <div className="hidden items-center gap-4 lg:flex">
           <Link
             href="/login"
-            className="nb-mono text-xs font-semibold uppercase tracking-wider text-nb-ink/70 transition hover:text-nb-ink"
+            className="font-nb-body text-sm font-semibold uppercase tracking-wide text-nb-ink/70 transition hover:text-nb-ink"
           >
             Se connecter
           </Link>
@@ -88,7 +88,7 @@ export function SiteHeaderNb() {
           aria-expanded={open}
           aria-controls="menu-mobile-nb"
           onClick={() => setOpen((o) => !o)}
-          className="border-3 border-nb-ink bg-paper p-1.5 text-nb-ink shadow-nb-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nb-ink lg:hidden"
+          className="border-3 border-nb-ink bg-cream p-1.5 text-nb-ink shadow-nb-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nb-ink lg:hidden"
         >
           <IconBurger open={open} />
           <span className="sr-only">{open ? "Fermer le menu" : "Ouvrir le menu"}</span>
@@ -97,7 +97,7 @@ export function SiteHeaderNb() {
       <nav
         id="menu-mobile-nb"
         aria-label="Navigation principale"
-        className={open ? "border-t-3 border-nb-ink bg-paper px-6 py-5 lg:hidden" : "hidden"}
+        className={open ? "border-t-3 border-nb-ink bg-cream px-6 py-5 lg:hidden" : "hidden"}
       >
         <ul className="flex flex-col gap-4">
           {NAV.map(({ label, href }) => (
@@ -115,7 +115,7 @@ export function SiteHeaderNb() {
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="nb-mono text-sm font-semibold uppercase tracking-wider text-nb-ink/70"
+              className="font-nb-body text-sm font-semibold uppercase tracking-wide text-nb-ink/70"
             >
               Se connecter
             </Link>

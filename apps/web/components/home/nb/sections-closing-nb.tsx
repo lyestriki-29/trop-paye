@@ -60,7 +60,7 @@ export function CasZeroNb() {
         <Reveal delay={0.3}>
           <Link
             href="/notre-histoire"
-            className="nb-card-hover mt-10 inline-flex items-center gap-2 border-3 border-nb-ink bg-paper px-6 py-3 font-nb-display text-base uppercase shadow-nb"
+            className="nb-card-hover mt-10 inline-flex items-center gap-2 border-3 border-nb-ink bg-cream px-6 py-3 font-nb-display text-base uppercase shadow-nb"
           >
             Lire notre histoire
           </Link>

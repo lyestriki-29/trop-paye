@@ -72,7 +72,7 @@ function VerdictCardNb() {
           Élément autonome : `.nb-stamp` global est masqué hors variante Maximal. */}
       <span
         aria-hidden="true"
-        className="absolute -bottom-3 right-5 z-20 -rotate-[8deg] border-3 border-pink bg-paper/60 px-3 py-1.5 font-nb-display text-base uppercase tracking-wide text-pink"
+        className="absolute -bottom-3 right-5 z-20 -rotate-[8deg] border-3 border-pink bg-cream/60 px-3 py-1.5 font-nb-display text-base uppercase tracking-wide text-pink"
       >
         Trop payé
       </span>
@@ -94,7 +94,7 @@ function StripNb() {
     <div className="border-t-3 border-nb-ink bg-nb-ink">
       <dl className="grid w-full grid-cols-2 gap-px bg-nb-ink sm:grid-cols-4">
         {STRIP.map(({ value, label }) => (
-          <div key={value} className="bg-paper px-6 py-6">
+          <div key={value} className="bg-cream px-6 py-6">
             <dd className="tabular font-nb-display text-2xl sm:text-3xl">{value}</dd>
             <dt className="mt-2 max-w-[28ch] nb-mono text-[11px] uppercase leading-relaxed tracking-wider text-nb-ink/60">
               {label}
@@ -141,7 +141,7 @@ export function HeroNb() {
               <HeroAddress />
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-4">
-              <span className="inline-flex items-center gap-2.5 border-2 border-nb-ink bg-paper px-3.5 py-2 nb-mono text-[12px] font-medium text-nb-ink shadow-nb-sm">
+              <span className="inline-flex items-center gap-2.5 border-2 border-nb-ink bg-cream px-3.5 py-2 nb-mono text-[12px] font-medium text-nb-ink shadow-nb-sm">
                 <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-refund" />
                 Déjà {DOSSIERS_AIDES} locataires aidés
               </span>

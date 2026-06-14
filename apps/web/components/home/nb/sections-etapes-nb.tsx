@@ -73,7 +73,7 @@ export function EtapesNb() {
                 {/* Artefact comptable — TODO_COPY (vocabulaire document). */}
                 <div
                   aria-hidden="true"
-                  className="mt-auto border-3 border-nb-ink bg-paper px-5 py-4"
+                  className="mt-auto border-3 border-nb-ink bg-cream px-5 py-4"
                 >
                   <p className="nb-mono text-[10px] uppercase tracking-widest text-nb-ink/55">
                     {artefact.label}
