@@ -82,10 +82,11 @@ Le moteur de dévoilement dérive l'état (questions répondues / active / à ve
 Dérivée des champs `DiagnosticDraft` et des steps actuels. Aucun champ retiré.
 
 - **Adresse** : `address` (AddressAutocomplete IGN — auto-advance à la sélection).
-- **Logement** : `surfaceM2` · `furnished` · `roomCount`/`roomCountUnknown` ·
-  `constructionPeriod`/`…Unknown` · `isShared` → si oui : `tenantCount`, `rentBasis` ·
-  **DPE** (sous-séquence : auto-fetch ADEME depuis l'adresse → sélection d'un résultat
-  ou « je ne sais pas » → `dpe`/`dpeUnknown`).
+- **Logement** : **DPE auto-fetch dès l'adresse** pré-remplit `dpe.class`/`dpe.date` +
+  **`surfaceM2`** + **`constructionPeriod`** (blocs confirmés éditables, cf. §7bis) ·
+  `furnished` (pilule) · `roomCount`/`roomCountUnknown` (pilule) · `isShared` → si oui :
+  `tenantCount` (pas-à-pas), `rentBasis` · repli DPE manuel/« je ne sais pas »
+  (`dpeUnknown`) si l'ADEME ne renvoie rien.
 - **Loyer** (chapitre le plus dense, ex-`RentStep`) : si coloc → `rentBasis`
   (total / ma part) · `rentInputMode` (HC/CC) · `initialRentCents` (loyer de départ) ·
   `currentRentCents` (loyer actuel) → si CC : `chargesCents` (pré-rempli barème,
@@ -154,6 +155,46 @@ Réutilise le système `.nb` existant (`apps/web/app/globals.css`), **aucune cou
   jauge « plus que ~N infos ». Jamais de montant.
 - **Micro-guidage** : aides courtes par question + chemins « je ne sais pas » partout
   (existants), raccourcis (pilules), restylés nb.
+
+## 7bis. Réduction de la saisie clavier (validé 2026-06-14)
+
+Objectif : **ne taper que ce que nous ne pouvons pas deviner**. De ~9 champs tapés
+aujourd'hui → **2 incontournables** (loyer actuel + recherche d'adresse), parfois 3.
+
+**Levier 1 — Cascade DPE (auto-remplir dès l'adresse).** La recherche DPE est
+déclenchée **juste après l'adresse** ; l'API ADEME renvoie `surfaceM2` et
+`anneeConstruction`. On pré-remplit, en blocs « confirmés » éditables :
+- `dpe.class` + `dpe.date` (déjà) ;
+- **`surfaceM2`** ← `dpe.surfaceM2` ;
+- **`constructionPeriod`** ← mapping de `dpe.anneeConstruction` (fonction pure
+  `constructionPeriodFromYear(year)` : <1946 / 1946-1970 / 1971-1990 / >1990).
+- Reste à saisir dans « Logement » : **0 frappe** (meublé, pièces, coloc = pilules).
+- Si plusieurs résultats DPE → une sélection (tap) ; un seul → auto-sélection ;
+  échec/aucun → on retombe sur les pilules + saisie manuelle existantes.
+
+**Levier 2 — Frappe → tap.**
+- `tenantCount` : `TextField` numérique → **pas-à-pas / pilules** 2·3·4·5·6+.
+- `revisionQuarter` : **pré-sélectionné** depuis le mois de signature
+  (`quarterFromMonthISO(leaseSignedAt)`), `revisionQuarterUnknown` par défaut ;
+  l'utilisateur ne touche que s'il diffère.
+- Hausses annuelles : chip **« augmentation légale (IRL ≈ X €) »** en un tap, à côté
+  de « Pas de hausse » et « Autre montant ». Le montant indexé vient d'un helper
+  `irlIndexedRentCents(baseCents, fromQuarter, toQuarter, irlSeries)` ; il faut donc
+  exposer les valeurs IRL au client (server action `getIrlSuggestion` ou valeurs
+  passées au montage). **Dépendance à plomber** ; si trop lourd, le chip est
+  dégradable en « Pas de hausse / Autre montant » sans bloquer la phase.
+
+**Levier 3 — Raccourcis.**
+- `initialRentCents` : pilule **« Identique — jamais augmenté »** qui recopie
+  `currentRentCents`. Sinon saisie.
+- `chargesCents` : déjà pré-rempli au barème (`estimateMonthlyChargesCents`).
+- Numéro DPE : la recherche à l'adresse en fait un repli rare.
+
+**Incompressible (on garde la saisie) :** `currentRentCents` (cœur), recherche
+d'adresse (quelques lettres + tap), `initialRentCents` (souvent évité par le raccourci).
+
+> Tous les pré-remplis restent **`TODO_VERIFIER`** : on **affiche** ce que renvoie le
+> DPE / le barème / l'IRL, l'utilisateur **valide**. Jamais une valeur imposée silencieusement.
 
 ## 8. Page verdict (Phase B)
 
