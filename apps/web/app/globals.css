@@ -432,6 +432,7 @@ body::after {
   text-transform: uppercase;
   letter-spacing: -0.01em;
   line-height: 0.95;
+  text-wrap: balance; /* coupe les titres proprement (fini les orphelins). */
 }
 
 /* Mono : libellés techniques, montants, kickers. */
