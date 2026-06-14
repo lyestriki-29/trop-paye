@@ -46,7 +46,7 @@ function IconBurger({ open }: { open: boolean }) {
 export function SiteHeaderNb() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 border-b-3 border-nb-ink bg-cream/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b-3 border-nb-ink bg-paper/95 backdrop-blur">
       <div className="mx-auto flex max-w-container items-center justify-between gap-6 px-6 py-3.5">
         <Link
           href="/"
@@ -97,7 +97,7 @@ export function SiteHeaderNb() {
       <nav
         id="menu-mobile-nb"
         aria-label="Navigation principale"
-        className={open ? "border-t-3 border-nb-ink bg-cream px-6 py-5 lg:hidden" : "hidden"}
+        className={open ? "border-t-3 border-nb-ink bg-paper px-6 py-5 lg:hidden" : "hidden"}
       >
         <ul className="flex flex-col gap-4">
           {NAV.map(({ label, href }) => (

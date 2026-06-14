@@ -12,7 +12,7 @@
   --color-refund-text: 10 115 81; /* #0A7351 */
   --color-stamp: 214 69 69; /* #D64545 */
   --color-line: 234 225 214; /* #EAE1D6 */
-  --color-accent: 255 216 77; /* #FFD84D — le surligneur jaune */
+  --color-accent: 255 206 46; /* #FFCE2E — jaune nb (aligné maquettes, = acid) */
 
   /* Néubrutalisme — site PUBLIC uniquement. Additif : ces canaux ne sont
      consommés que sous le scope `.nb`, l'espace/admin n'y touchent pas.

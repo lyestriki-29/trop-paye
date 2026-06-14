@@ -1,21 +1,24 @@
 import { PRESCRIPTION_YEARS, brand, formatEUR } from "@troppaye/shared";
+import { CountUp } from "@/components/ui/CountUp";
 import { HeroAddress } from "@/components/home/HeroAddress";
 
 /**
- * Hero néubrutaliste (réf. LP3) — variante DA du site public, scopée `.nb`.
- * Copy deck §1 mot pour mot (titre, sous-titre, réassurance) ; vocabulaire
- * « dossier » et chiffres témoin (fictifs, déjà en prod) en TODO_COPY.
+ * Hero néubrutaliste — variante « Mix 2 v2 » validée 2026-06-14 (compagnon visuel,
+ * spec docs/superpowers/specs/2026-06-14-hero-da-design.md). Objectif unique :
+ * pousser au diagnostic. Compteur géant (choc) à gauche + quittance-preuve à droite,
+ * bande lavande. Copy deck §1 verbatim ; « 37 diagnostics » = TODO_COPY/TODO_VERIFIER.
  */
 
-/** Chiffres d'appui (factuels) — repris du hero v3 pour cohérence. */
-const STRIP: ReadonlyArray<{ value: string; label: string }> = [
-  { value: "1 sur 6", label: "logement loué a un loyer illégal (source : SDES)" },
-  { value: "24/08/2022", label: "loyers des passoires F/G gelés depuis cette date" },
-  { value: `${PRESCRIPTION_YEARS} ans`, label: "de trop-perçu récupérable (prescription)" },
-  { value: "25 %", label: "de commission, au succès. Rien récupéré ? Rien payé." },
-];
+/** −194 € : baisse de loyer moyenne (réel, Lyes 2026-06-13). Montant en centimes. */
+const AVG_MONTHLY_SAVING_CENTS = 19_400;
 
-/** Carte verdict spécimen — agrandie ; chiffres témoin P0 (fictifs), aria-hidden. */
+/** Style du compteur géant : stroke + ombre dure nb (pas une classe utilitaire). */
+const METER_STYLE = {
+  WebkitTextStroke: "2px rgb(var(--color-nb-ink))",
+  textShadow: "6px 6px 0 rgb(var(--color-nb-ink))",
+} as const;
+
+/** Quittance spécimen nettoyée — chiffres témoin P0 (fictifs), aria-hidden. */
 function VerdictCardNb() {
   const rows: ReadonlyArray<{ label: string; cents: number; accent?: boolean }> = [
     { label: "Loyer hors charges appelé", cents: 102_185 },
@@ -23,66 +26,76 @@ function VerdictCardNb() {
     { label: "Hausse illégale / mois", cents: 7_185, accent: true },
   ];
   return (
-    <aside aria-hidden="true" className="relative mx-auto w-full max-w-xl lg:mx-0">
-      <span className="nb-sticker -left-4 -top-6 z-10 text-sm">0 € d&apos;avance</span>
-      <span className="nb-sticker nb-sticker--right -right-4 top-12 z-10 bg-pink text-nb-ink text-sm">
+    <aside aria-hidden="true" className="relative mx-auto w-full max-w-md px-2 pb-6 lg:mx-0">
+      <span className="nb-sticker -left-2 -top-4 z-20 text-sm">0 € d&apos;avance</span>
+      <span className="nb-sticker nb-sticker--right -right-2 -top-3 z-20 bg-pink text-nb-ink text-sm">
         25 % au succès
       </span>
-      <div className="nb-tilt nb-card p-7 sm:p-9">
-        <div className="flex items-center justify-between nb-mono text-xs uppercase tracking-widest text-nb-ink/55">
+      <div className="nb-tilt nb-card p-7 sm:p-8">
+        <div className="flex items-center justify-between nb-mono text-[11px] uppercase tracking-widest text-nb-ink/55">
           <span>Réf. TP-2026-0117</span>
           <span>Quittance de loyer</span>
         </div>
-        <p className="mt-3 nb-mono text-base text-nb-ink/70">12 rue des Lilas, 75011 Paris</p>
-        <dl className="mt-7 space-y-4">
+        <p className="mt-2 nb-mono text-sm text-nb-ink/70">12 rue des Lilas, 75011 Paris</p>
+        <dl className="mt-6 space-y-3.5">
           {rows.map(({ label, cents, accent }) => (
             <div
               key={label}
-              className="flex items-baseline justify-between gap-4 border-b border-nb-ink/15 pb-3"
+              className={
+                accent
+                  ? "-mx-3 flex items-baseline justify-between gap-4 border-3 border-nb-ink bg-acid px-3 py-2.5 shadow-nb-sm"
+                  : "flex items-baseline justify-between gap-4 border-b border-nb-ink/15 pb-3"
+              }
             >
-              <dt className="font-nb-body text-base text-nb-ink/75">{label}</dt>
+              <dt className="font-nb-body text-[15px] text-nb-ink/80">{label}</dt>
               <dd
-                className={`tabular nb-mono text-lg font-medium ${
+                className={`tabular nb-mono text-base font-medium ${
                   accent ? "text-refund" : "text-nb-ink"
                 }`}
               >
+                {accent ? "+" : ""}
                 {formatEUR(cents, { decimals: true })}
               </dd>
             </div>
           ))}
         </dl>
-        <div className="mt-6 flex items-end justify-between border-t-3 border-nb-ink pt-5">
-          <span className="font-nb-display text-base uppercase leading-none">
+        <div className="mt-5 flex items-end justify-between border-t-3 border-nb-ink pt-4">
+          <span className="font-nb-display text-sm uppercase leading-none">
             Trop-perçu
             <br />
             récupéré
           </span>
-          <span className="tabular nb-mono text-4xl font-semibold text-refund">
+          <span className="tabular nb-mono text-3xl font-semibold text-refund">
             {formatEUR(143_700, { decimals: true })}
           </span>
         </div>
       </div>
-      {/* Tampon imprimé — visible seulement en variante Maximal. */}
+      {/* Tampon imprimé — descendu à droite, sous le total (demande Lyes). */}
       <span
         aria-hidden="true"
-        className="nb-stamp absolute right-6 top-1/2 z-20 -translate-y-1/2 text-xl"
+        className="nb-stamp absolute -bottom-3 right-6 z-20 text-lg"
       >
         Trop payé
       </span>
-      <p className="mt-4 text-center nb-mono text-xs text-nb-ink/45">
-        Exemple de dossier — montant d&apos;illustration
-      </p>
     </aside>
   );
 }
 
-/** Strip de chiffres — pleine largeur de page (bord à bord), demande Lyes. */
+/** Chiffres d'appui (factuels) — strip pleine largeur de page. */
+const STRIP: ReadonlyArray<{ value: string; label: string }> = [
+  { value: "1 sur 6", label: "logement loué a un loyer illégal (source : SDES)" },
+  { value: "24/08/2022", label: "loyers des passoires F/G gelés depuis cette date" },
+  { value: `${PRESCRIPTION_YEARS} ans`, label: "de trop-perçu récupérable (prescription)" },
+  { value: "25 %", label: "de commission, au succès. Rien récupéré ? Rien payé." },
+];
+
+/** Strip de chiffres — pleine largeur de page (bord à bord). */
 function StripNb() {
   return (
     <div className="border-t-3 border-nb-ink bg-nb-ink">
       <dl className="grid w-full grid-cols-2 gap-px bg-nb-ink sm:grid-cols-4">
         {STRIP.map(({ value, label }) => (
-          <div key={value} className="bg-cream px-6 py-6">
+          <div key={value} className="bg-paper px-6 py-6">
             <dd className="tabular font-nb-display text-2xl sm:text-3xl">{value}</dd>
             <dt className="mt-2 max-w-[28ch] nb-mono text-[11px] uppercase leading-relaxed tracking-wider text-nb-ink/60">
               {label}
@@ -96,43 +109,47 @@ function StripNb() {
 
 export function HeroNb() {
   return (
-    <section className="relative overflow-hidden border-b-3 border-nb-ink">
+    <section className="relative overflow-hidden border-b-3 border-nb-ink bg-violet">
       <div className="relative mx-auto max-w-container px-6 py-14 sm:py-20">
-        <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/65">
-          Dossier TP-2026 · instruction en cours
-        </p>
-        <div className="mt-7 grid items-center gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16">
           <div>
-            {/* brand.hero.title mot pour mot (composition 2 lignes). */}
-            <h1 className="text-[clamp(44px,8vw,96px)]">
+            <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/65">
+              Loyer encadré · gel F/G · bouclier 3,5 %
+            </p>
+            {/* Compteur géant : −194 €/mois, count-up en vue (reduced-motion = valeur finale). */}
+            <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-7">
+              <span
+                style={METER_STYLE}
+                className="tabular nb-mono text-[clamp(64px,11vw,128px)] font-semibold leading-[0.8] text-refund"
+              >
+                −<CountUp cents={AVG_MONTHLY_SAVING_CENTS} durationMs={1400} />
+              </span>
+              <span className="border-l-3 border-nb-ink pl-4 nb-mono text-[13px] uppercase leading-relaxed tracking-wide text-nb-ink/80 sm:max-w-[22ch]">
+                <span className="block font-nb-display text-sm normal-case tracking-normal">
+                  par mois en moyenne
+                </span>
+                de loyer économisé une fois la hausse illégale supprimée
+              </span>
+            </div>
+            {/* brand.hero.title verbatim (composition 2 lignes). */}
+            <h1 className="mt-7 text-[clamp(40px,6vw,72px)]">
               Marre de <span className="nb-mark">trop payer</span>&nbsp;?
             </h1>
-            <p className="mt-6 max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/80">
+            <p className="mt-5 max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/80">
               {brand.hero.subtitle}
             </p>
-            {/* Double bénéfice (demande Lyes) — TODO_COPY, ton sans promesse. */}
-            <p className="mt-3 max-w-xl font-nb-body text-base leading-relaxed text-nb-ink/80">
-              Et souvent, votre loyer{" "}
-              <span className="nb-mark nb-mark--refund">baisse pour de bon</span> : hausse
-              illégale supprimée, complément de loyer contesté.
-            </p>
-            {/* Métrique phare (réel, Lyes 2026-06-13) : baisse de loyer moyenne. */}
-            <div className="mt-7 inline-flex items-center gap-4 border-3 border-nb-ink bg-paper px-5 py-3 shadow-nb-sm">
-              <span className="tabular font-nb-display text-3xl leading-none text-refund">
-                −194 €
-              </span>
-              <span className="nb-mono text-[11px] uppercase leading-snug tracking-wider text-nb-ink/65">
-                de loyer / mois
-                <br />
-                en moyenne
-              </span>
-            </div>
-            <div className="mt-8">
+            <div className="mt-7">
               <HeroAddress />
             </div>
-            <p className="mt-4 nb-mono text-xs uppercase tracking-wider text-nb-ink/60">
-              {brand.hero.reassurance.join(" · ")}
-            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-4">
+              <span className="inline-flex items-center gap-2.5 border-2 border-nb-ink bg-paper px-3.5 py-2 nb-mono text-[12px] font-medium text-nb-ink shadow-nb-sm">
+                <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-refund" />
+                37 diagnostics lancés cette semaine
+              </span>
+              <span className="nb-mono text-xs uppercase tracking-wider text-nb-ink/60">
+                {brand.hero.reassurance.join(" · ")}
+              </span>
+            </div>
           </div>
           <div className="relative">
             <VerdictCardNb />
