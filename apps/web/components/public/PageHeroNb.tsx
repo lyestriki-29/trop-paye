@@ -8,13 +8,16 @@ export function PageHeroNb({
   kicker,
   title,
   lede,
+  band,
 }: {
   kicker: string;
   title: ReactNode;
   lede: string;
+  /** Classe de fond optionnelle (bande de couleur), ex. "bg-violet". Défaut : crème. */
+  band?: string;
 }) {
   return (
-    <section className="border-b-3 border-nb-ink py-14 sm:py-20">
+    <section className={`border-b-3 border-nb-ink py-14 sm:py-20 ${band ?? ""}`}>
       <div className="mx-auto max-w-container px-6">
         <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
           {kicker}

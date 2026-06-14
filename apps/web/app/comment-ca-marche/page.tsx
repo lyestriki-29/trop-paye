@@ -26,7 +26,7 @@ const faqJsonLd = {
 /** Barème néubrutaliste (#bareme) — copy deck §1 : 0 € d'avance, 25 % au succès. */
 function BaremeNb() {
   return (
-    <section id="bareme" className="scroll-mt-24 border-b-3 border-nb-ink py-16 sm:py-20">
+    <section id="bareme" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -100,6 +100,7 @@ export default function CommentCaMarchePage() {
   return (
     <PublicShell>
       <PageHeroNb
+        band="bg-violet"
         kicker="TropPayé · Le parcours"
         title={
           <>

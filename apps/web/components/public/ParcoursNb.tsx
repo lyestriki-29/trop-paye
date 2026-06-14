@@ -56,7 +56,7 @@ const ETAPES: ReadonlyArray<Etape> = [
 
 export function ParcoursNb() {
   return (
-    <section className="border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink bg-ciel py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
