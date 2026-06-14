@@ -32,16 +32,20 @@ export function ResultatsNb() {
     <section id="resultats" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
-          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
-            Pièce n°00 · Nos résultats
-          </p>
-          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)]">
-            Déjà <span className="nb-mark">récupéré</span>, déjà reversé.
-          </h2>
-          <p className="mt-5 max-w-2xl font-nb-body text-lg leading-relaxed text-nb-ink/75">
-            Pas de promesse en l&apos;air : voici ce que nous avons déjà obtenu pour de vrais
-            locataires. Que des chiffres réels, jamais d&apos;exemple inventé.
-          </p>
+          <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+            <div>
+              <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
+                Pièce n°00 · Nos résultats
+              </p>
+              <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">
+                Déjà <span className="nb-mark">récupéré</span>, déjà reversé.
+              </h2>
+            </div>
+            <p className="max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/75 lg:pb-2">
+              Pas de promesse en l&apos;air : voici ce que nous avons déjà obtenu pour de vrais
+              locataires. Que des chiffres réels, jamais d&apos;exemple inventé.
+            </p>
+          </div>
         </Reveal>
 
         <dl className="mt-7 grid gap-6 sm:grid-cols-3">
