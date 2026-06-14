@@ -1,6 +1,7 @@
 import { PRESCRIPTION_YEARS, brand, formatEUR } from "@troppaye/shared";
 import { CountUp } from "@/components/ui/CountUp";
 import { HeroAddress } from "@/components/home/HeroAddress";
+import { LogoNb } from "@/components/ui/LogoNb";
 import { BAISSE_MOY_CENTS, DOSSIERS_AIDES } from "@/lib/content/resultats-publics";
 
 /**
@@ -46,11 +47,7 @@ function VerdictCardNb() {
               }
             >
               <dt className="font-nb-body text-base text-nb-ink/80">{label}</dt>
-              <dd
-                className={`tabular nb-mono text-lg font-medium ${
-                  accent ? "text-refund" : "text-nb-ink"
-                }`}
-              >
+              <dd className="tabular nb-mono text-lg font-medium text-nb-ink">
                 {accent ? "+" : ""}
                 {formatEUR(cents, { decimals: true })}
               </dd>
@@ -68,14 +65,10 @@ function VerdictCardNb() {
           </span>
         </div>
       </div>
-      {/* Tampon imprimé — descendu à droite, sous le total (demande Lyes).
-          Élément autonome : `.nb-stamp` global est masqué hors variante Maximal. */}
-      <span
-        aria-hidden="true"
-        className="absolute -bottom-3 right-5 z-20 -rotate-[8deg] border-3 border-accent bg-cream/60 px-3 py-1.5 font-nb-display text-base uppercase tracking-wide text-accent"
-      >
-        Trop payé
-      </span>
+      {/* Logo tampon « stampé » sur la quittance (remplace l'ancien tampon texte). */}
+      <div aria-hidden="true" className="absolute -bottom-4 right-5 z-20 -rotate-[6deg]">
+        <LogoNb />
+      </div>
     </aside>
   );
 }
@@ -94,9 +87,9 @@ function StripNb() {
     <div className="border-t-3 border-nb-ink bg-nb-ink">
       <dl className="grid w-full grid-cols-2 gap-px bg-nb-ink sm:grid-cols-4">
         {STRIP.map(({ value, label }) => (
-          <div key={value} className="bg-cream px-6 py-6">
+          <div key={value} className="bg-cream px-6 py-6 text-center">
             <dd className="tabular font-nb-display text-2xl sm:text-3xl">{value}</dd>
-            <dt className="mt-2 max-w-[28ch] nb-mono text-[11px] uppercase leading-relaxed tracking-wider text-nb-ink/60">
+            <dt className="mx-auto mt-2 max-w-[28ch] nb-mono text-[11px] uppercase leading-relaxed tracking-wider text-nb-ink/60">
               {label}
             </dt>
           </div>
