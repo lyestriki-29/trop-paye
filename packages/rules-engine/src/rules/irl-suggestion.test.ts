@@ -57,6 +57,17 @@ describe("irlSuggestionCents", () => {
     expect(result).toBe(16667);
   });
 
+  it("indice n-1 à zéro → null (pas de division par zéro)", () => {
+    // T2-2023 publié à 0 : la division produirait Infinity. On renvoie null.
+    const result = irlSuggestionCents(
+      100000,
+      "T2",
+      2024,
+      [irl("2023-T2", 0), irl("2024-T2", 140.0)],
+    );
+    expect(result).toBeNull();
+  });
+
   it("arrondi vers le bas quand la fraction < 0,5 (Math.round)", () => {
     // base = 95 000 ct, T2, anniversaire 2024
     // IRL_n = 2024-T2 = 134,0 ; IRL_prev = 2023-T2 = 130,0

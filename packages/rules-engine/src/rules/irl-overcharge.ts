@@ -56,7 +56,7 @@ export function irlSuggestionCents(
   const ref: Referentials = { irl, shieldRatePct: 3.5, agencyFees: { capsByZone: { TRES_TENDUE: { feePerM2Cents: 0, edlPerM2Cents: 0 }, TENDUE: { feePerM2Cents: 0, edlPerM2Cents: 0 }, RESTE: { feePerM2Cents: 0, edlPerM2Cents: 0 } }, zoneByInsee: {} } };
   const irlN = irlForYearOrBefore(ref, anniversaryYear, revisionQuarter);
   const irlPrev = irlN ? irlForYearOrBefore(ref, Number(irlN.quarter.split("-")[0]) - 1, revisionQuarter) : undefined;
-  if (!irlN || !irlPrev) return null;
+  if (!irlN || !irlPrev || irlPrev.value === 0) return null;
   return Math.round((baseCents * irlN.value) / irlPrev.value);
 }
 

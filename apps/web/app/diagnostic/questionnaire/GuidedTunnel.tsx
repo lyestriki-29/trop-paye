@@ -1,13 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { brand } from "@troppaye/shared";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
 import { useDiagnosticForm } from "./use-diagnostic-form";
 import { CHAPTERS, QUESTIONS, canSubmit } from "./question-graph";
-import { firstUnansweredId, nextQuestionId, revealOrder } from "./reveal-state";
+import {
+  applicableQuestions,
+  firstUnansweredId,
+  nextQuestionId,
+  resolveActiveId,
+  revealOrder,
+} from "./reveal-state";
 import { ConfirmedBlock } from "./ui/ConfirmedBlock";
 import { ActiveQuestion } from "./ui/ActiveQuestion";
 import { ChapterRail } from "./ui/ChapterRail";
@@ -41,6 +47,9 @@ export function GuidedTunnel() {
   const { draft, setField, hydrated, submit, submitting, error } = useDiagnosticForm();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  // Marque la question rouverte via « modifier » : on saute exactement le
+  // premier passage de l'effet de résolution pour ne pas la faire rebondir.
+  const editingRef = useRef<string | null>(null);
 
   // Restaure la question active après hydratation (ou première non répondue / recap).
   useEffect(() => {
@@ -51,7 +60,13 @@ export function GuidedTunnel() {
     } catch {
       /* private mode : on repart du calcul */
     }
-    const valid = saved && QUESTIONS.some((q) => q.id === saved) ? saved : null;
+    // L'id restauré doit être APPLICABLE au draft courant (pas seulement exister
+    // dans QUESTIONS) : sinon "recap" reste valide, sinon on recalcule.
+    const valid =
+      saved &&
+      (saved === "recap" || applicableQuestions(QUESTIONS, draft).some((q) => q.id === saved))
+        ? saved
+        : null;
     setActiveId(valid ?? firstUnansweredId(QUESTIONS, draft) ?? "recap");
     setReady(true);
   }, [hydrated, ready, draft]);
@@ -67,6 +82,7 @@ export function GuidedTunnel() {
   }, [activeId, ready]);
 
   // Avance : prochaine question applicable, ou recap si c'était la dernière.
+  // Utilisé par le bouton « Continuer » et les pilules (`goNext`).
   const advance = useCallback(() => {
     setActiveId((cur) => {
       const next = cur ? nextQuestionId(QUESTIONS, draft, cur) : null;
@@ -74,14 +90,19 @@ export function GuidedTunnel() {
     });
   }, [draft]);
 
-  // Auto-avance les questions à choix unique dès qu'elles sont répondues.
-  // Sûr : avancer change activeId ; la nouvelle active n'est pas (encore)
-  // répondue, donc l'effet ne re-déclenche pas en boucle.
+  // Effet unique de résolution de l'`activeId` : auto-avance des pilules ET
+  // garde anti-saut (id non applicable → première non répondue / recap).
+  // `resolveActiveId` est pur et renvoie l'id INCHANGÉ quand rien ne bouge ; on
+  // ne `setState` que sur changement effectif → aucune boucle. L'`editingRef`
+  // neutralise l'auto-avance pour le seul passage suivant un clic « modifier »
+  // (BUG 1), puis se vide : l'utilisateur peut re-choisir et l'avance reprend.
   useEffect(() => {
-    if (!ready || !activeId) return;
-    const q = QUESTIONS.find((x) => x.id === activeId);
-    if (q && q.autoAdvance && q.isAnswered(draft)) advance();
-  }, [draft, activeId, ready, advance]);
+    if (!ready || activeId === null) return;
+    const isEditing = editingRef.current === activeId;
+    editingRef.current = null;
+    const next = resolveActiveId(QUESTIONS, draft, activeId, isEditing);
+    if (next !== activeId) setActiveId(next);
+  }, [draft, activeId, ready]);
 
   if (!hydrated || !ready) {
     return (
@@ -121,7 +142,10 @@ export function GuidedTunnel() {
                   label={chapterLabel(q.chapter)}
                   value={q.summary(draft)}
                   prefilled={q.prefilled?.(draft)}
-                  onEdit={() => setActiveId(q.id)}
+                  onEdit={() => {
+                    editingRef.current = q.id;
+                    setActiveId(q.id);
+                  }}
                 />
               );
             }

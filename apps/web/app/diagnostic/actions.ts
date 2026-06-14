@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { z } from "zod";
 import { evaluateAll, irlSuggestionCents } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
@@ -121,18 +122,34 @@ export async function submitDiagnostic(raw: unknown): Promise<SubmitResult> {
   return { verdictId: v.id };
 }
 
+// Borne haute de loyer : 100 000 € en centimes. Au-delà = saisie aberrante/forgée.
+const IRL_SUGGESTION_MAX_CENTS = 100_000_00;
+
+const irlSuggestionSchema = z.object({
+  baseCents: z.number().int().positive().max(IRL_SUGGESTION_MAX_CENTS),
+  revisionQuarter: z.enum(["T1", "T2", "T3", "T4"]),
+  anniversaryYear: z.number().int().min(2000).max(2100),
+});
+
 /**
  * Renvoie le loyer indexé IRL suggéré pour un anniversaire donné (en centimes).
  * Utilisé par le chip "Augmentation légale" dans AnniversaryRows.
- * Retourne null si les indices IRL sont absents pour cette année/trimestre.
+ * Retourne null si l'entrée est invalide ou si les indices IRL sont absents
+ * pour cette année/trimestre.
+ *
+ * Volontairement NON authentifiée (pas de `withAuth`), comme ses voisines du
+ * flux anonyme (`searchAddressAction`, `lookupDpeAction`) : elle ne renvoie
+ * qu'un nombre calculé à partir de données de référence publiques (indices IRL
+ * INSEE), sans lire ni écrire de donnée propre à un utilisateur.
  */
 export async function getIrlSuggestionAction(params: {
   baseCents: number;
   revisionQuarter: string;
   anniversaryYear: number;
 }): Promise<{ cents: number } | null> {
-  const { baseCents, revisionQuarter, anniversaryYear } = params;
-  if (baseCents <= 0 || !revisionQuarter || anniversaryYear < 2000) return null;
+  const parsed = irlSuggestionSchema.safeParse(params);
+  if (!parsed.success) return null;
+  const { baseCents, revisionQuarter, anniversaryYear } = parsed.data;
 
   const ref = await getReferentials();
   const cents = irlSuggestionCents(baseCents, revisionQuarter, anniversaryYear, ref.irl);
