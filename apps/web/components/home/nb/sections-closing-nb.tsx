@@ -22,10 +22,10 @@ export function CasZeroNb() {
     <section className="nb-band-caszero border-b-3 border-nb-ink py-14 sm:py-16">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
-          <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+          <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
             <div>
-              <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/60">
-                Cas n°0 · le fondateur
+              <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
+                Pièce n°02 · Le fondateur
               </p>
               <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">
                 Tout a commencé par{" "}
@@ -34,7 +34,7 @@ export function CasZeroNb() {
                 </span>
               </h2>
             </div>
-            <p className="max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/80 lg:pb-2">
+            <p className="max-w-xl font-nb-body text-xl font-medium leading-relaxed text-nb-ink/90 lg:pb-1">
               Logement classé F, complément de loyer abusif. En faisant valoir mes droits, j&apos;ai
               récupéré le trop-perçu, fait baisser mon loyer et allégé mon préavis. TropPayé existe
               pour que ce soit simple pour vous aussi.
@@ -149,7 +149,7 @@ function FaqNb() {
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
-            Pièce n°05 · Questions fréquentes
+            Pièce n°06 · Questions fréquentes
           </p>
           <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">Questions fréquentes</h2>
         </Reveal>

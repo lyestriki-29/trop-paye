@@ -15,31 +15,25 @@ import {
  */
 
 const ITEMS = [
-  { kind: "int" as const, value: DOSSIERS_AIDES, suffix: "locataires aidés", featured: false },
-  {
-    kind: "eur" as const,
-    cents: RECUPERE_CENTS,
-    suffix: "récupérés pour nos locataires",
-    featured: true, // stat phare : carte sombre pour casser la monotonie + emphase.
-  },
+  { kind: "int" as const, value: DOSSIERS_AIDES, suffix: "locataires aidés" },
+  { kind: "eur" as const, cents: RECUPERE_CENTS, suffix: "récupérés pour nos locataires" },
   {
     kind: "eur" as const,
     cents: BAISSE_MOY_CENTS,
     perMonth: true,
     suffix: "de loyer en moins, en moyenne",
-    featured: false,
   },
 ];
 
 /* Réassurance : pourquoi ces chiffres sont fiables. */
-const GARANTIES = ["Chaque euro tracé sur un compte dédié", "Données en France", "Que des chiffres réels"];
+const GARANTIES = ["Chaque euro tracé sur un compte dédié", "Données en France"];
 
 export function ResultatsNb() {
   return (
     <section id="resultats" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-14 sm:py-16">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
-          <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+          <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
             <div>
               <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
                 Pièce n°01 · Nos résultats
@@ -58,11 +52,7 @@ export function ResultatsNb() {
         <dl className="mt-10 grid gap-8 sm:grid-cols-3">
           {ITEMS.map((item, i) => (
             <Reveal key={item.suffix} delay={0.08 + i * 0.1}>
-              <div
-                className={`nb-tilt nb-card flex h-full flex-col justify-center p-7 ${
-                  item.featured ? "bg-nb-ink" : ""
-                }`}
-              >
+              <div className="nb-tilt nb-card flex h-full flex-col justify-center p-7">
                 <dd className="tabular font-mono text-[clamp(40px,6vw,68px)] font-medium leading-none text-refund">
                   {item.kind === "int" ? (
                     <CountUpInt value={item.value} />
@@ -70,9 +60,7 @@ export function ResultatsNb() {
                     <>
                       <CountUp cents={item.cents} />
                       {item.perMonth ? (
-                        <span
-                          className={`whitespace-nowrap text-[0.3em] font-nb-body font-medium ${item.featured ? "text-cream/70" : "text-nb-ink/55"}`}
-                        >
+                        <span className="whitespace-nowrap text-[0.3em] font-nb-body font-medium text-nb-ink/55">
                           {" "}
                           /mois
                         </span>
@@ -80,11 +68,7 @@ export function ResultatsNb() {
                     </>
                   )}
                 </dd>
-                <dt
-                  className={`mt-4 font-nb-body text-base font-medium leading-relaxed ${
-                    item.featured ? "text-cream/85" : "text-nb-ink/80"
-                  }`}
-                >
+                <dt className="mt-4 font-nb-body text-base font-medium leading-relaxed text-nb-ink/80">
                   {item.suffix}
                 </dt>
               </div>

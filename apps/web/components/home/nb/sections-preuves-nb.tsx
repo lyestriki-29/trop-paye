@@ -53,7 +53,7 @@ export function TemoignageNb() {
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
-            Pièce n°03 · La preuve
+            Pièce n°04 · La preuve
           </p>
           <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">
             Ils ont <span className="nb-mark nb-mark--refund">récupéré</span>
