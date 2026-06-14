@@ -21,7 +21,7 @@ export const TEMOIGNAGES: ReadonlyArray<Temoignage> = [
     prenom: "Kilian",
     contexte: "3 ans locataire — Paris 9ᵉ",
     quote:
-      "Je pensais que 750 € pour Paris, c'était une affaire. Septième étage sans ascenseur, passoire thermique : j'ai récupéré 4 500 € et j'ai pu partir sans préavis.",
+      "Je pensais que 1 420 € à Paris, c'était le prix normal. Septième étage sans ascenseur, passoire thermique : j'ai récupéré 4 500 € et j'ai pu partir sans préavis.",
     loyerCents: 142_000,
     recupereCents: 450_000,
     lignes: [

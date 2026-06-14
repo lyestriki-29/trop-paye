@@ -10,7 +10,7 @@ import { IconArrowRight } from "@/components/home/icons";
 
 export function RegimesNb() {
   return (
-    <section className="border-b-3 border-nb-ink bg-pink py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink bg-pink py-14 sm:py-18">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">

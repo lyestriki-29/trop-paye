@@ -19,7 +19,7 @@ const CAS_ZERO: ReadonlyArray<{ value: string; label: string; tone: "refund" | "
 
 export function CasZeroNb() {
   return (
-    <section className="nb-band-caszero border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="nb-band-caszero border-b-3 border-nb-ink py-14 sm:py-16">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
@@ -28,7 +28,10 @@ export function CasZeroNb() {
                 Cas n°0 · le fondateur
               </p>
               <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">
-                Tout a commencé par <span className="nb-mark">mon propre loyer</span>.
+                Tout a commencé par{" "}
+                <span className="whitespace-nowrap">
+                  <span className="nb-mark">mon propre loyer</span>.
+                </span>
               </h2>
             </div>
             <p className="max-w-xl font-nb-body text-lg leading-relaxed text-nb-ink/80 lg:pb-2">
@@ -142,7 +145,7 @@ const FAQ: ReadonlyArray<{ q: string; a: ReactNode }> = [
 
 function FaqNb() {
   return (
-    <section className="border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink py-14 sm:py-16">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">

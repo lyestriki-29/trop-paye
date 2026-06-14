@@ -36,7 +36,7 @@ const GARANTIES = ["Chaque euro tracé sur un compte dédié", "Données en Fran
 
 export function ResultatsNb() {
   return (
-    <section id="resultats" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-20 sm:py-24">
+    <section id="resultats" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-14 sm:py-16">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
@@ -63,7 +63,7 @@ export function ResultatsNb() {
                   item.featured ? "bg-nb-ink" : ""
                 }`}
               >
-                <dd className="tabular font-nb-display text-[clamp(40px,6vw,68px)] leading-none text-refund">
+                <dd className="tabular font-mono text-[clamp(40px,6vw,68px)] font-medium leading-none text-refund">
                   {item.kind === "int" ? (
                     <CountUpInt value={item.value} />
                   ) : (
