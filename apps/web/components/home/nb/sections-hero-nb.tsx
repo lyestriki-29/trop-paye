@@ -66,7 +66,7 @@ function VerdictCardNb() {
         </div>
       </div>
       {/* Logo tampon « stampé » sur la quittance (remplace l'ancien tampon texte). */}
-      <LogoNb size={92} className="absolute -bottom-6 right-4 z-20" />
+      <LogoNb size={110} className="absolute -bottom-[14px] right-4 z-20" />
     </aside>
   );
 }
