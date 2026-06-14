@@ -1,16 +1,15 @@
 import { PRESCRIPTION_YEARS, brand, formatEUR } from "@troppaye/shared";
 import { CountUp } from "@/components/ui/CountUp";
 import { HeroAddress } from "@/components/home/HeroAddress";
+import { BAISSE_MOY_CENTS, DOSSIERS_AIDES } from "@/lib/content/resultats-publics";
 
 /**
  * Hero néubrutaliste — variante « Mix 2 v2 » validée 2026-06-14 (compagnon visuel,
  * spec docs/superpowers/specs/2026-06-14-hero-da-design.md). Objectif unique :
- * pousser au diagnostic. Compteur géant (choc) à gauche + quittance-preuve à droite,
- * bande lavande. Copy deck §1 verbatim ; « 37 diagnostics » = TODO_COPY/TODO_VERIFIER.
+ * pousser au diagnostic. Compteur géant (choc) à gauche + quittance-preuve à droite.
+ * Copy deck §1 verbatim. Compteur social = nb RÉEL de locataires aidés (source unique
+ * `resultats-publics`, partagée avec la section Résultats → s'incrémentent ensemble).
  */
-
-/** −194 € : baisse de loyer moyenne (réel, Lyes 2026-06-13). Montant en centimes. */
-const AVG_MONTHLY_SAVING_CENTS = 19_400;
 
 /** Style du compteur géant : ombre dure nb crisp (sans text-stroke = plus net). */
 const METER_STYLE = {
@@ -25,30 +24,30 @@ function VerdictCardNb() {
     { label: "Hausse illégale / mois", cents: 7_185, accent: true },
   ];
   return (
-    <aside aria-hidden="true" className="relative mx-auto w-full max-w-md px-2 pb-6 lg:mx-0">
+    <aside aria-hidden="true" className="relative mx-auto w-full max-w-lg px-2 pb-8 lg:mx-0 lg:h-full">
       <span className="nb-sticker -left-2 -top-4 z-20 text-sm">0 € d&apos;avance</span>
       <span className="nb-sticker nb-sticker--right -right-2 -top-3 z-20 bg-pink text-nb-ink text-sm">
         25 % au succès
       </span>
-      <div className="nb-tilt nb-card p-7 sm:p-8">
-        <div className="flex items-center justify-between nb-mono text-[11px] uppercase tracking-widest text-nb-ink/55">
+      <div className="nb-tilt nb-card flex h-full flex-col p-8 sm:p-10">
+        <div className="flex items-center justify-between nb-mono text-xs uppercase tracking-widest text-nb-ink/55">
           <span>Réf. TP-2026-0117</span>
           <span>Quittance de loyer</span>
         </div>
-        <p className="mt-2 nb-mono text-sm text-nb-ink/70">12 rue des Lilas, 75011 Paris</p>
-        <dl className="mt-6 space-y-3.5">
+        <p className="mt-3 nb-mono text-base text-nb-ink/70">12 rue des Lilas, 75011 Paris</p>
+        <dl className="mt-8 flex-1 space-y-5">
           {rows.map(({ label, cents, accent }) => (
             <div
               key={label}
               className={
                 accent
-                  ? "-mx-3 flex items-baseline justify-between gap-4 border-3 border-nb-ink bg-acid px-3 py-2.5 shadow-nb-sm"
-                  : "flex items-baseline justify-between gap-4 border-b border-nb-ink/15 pb-3"
+                  ? "-mx-4 flex items-baseline justify-between gap-4 border-3 border-nb-ink bg-acid px-4 py-3 shadow-nb-sm"
+                  : "flex items-baseline justify-between gap-4 border-b border-nb-ink/15 pb-3.5"
               }
             >
-              <dt className="font-nb-body text-[15px] text-nb-ink/80">{label}</dt>
+              <dt className="font-nb-body text-base text-nb-ink/80">{label}</dt>
               <dd
-                className={`tabular nb-mono text-base font-medium ${
+                className={`tabular nb-mono text-lg font-medium ${
                   accent ? "text-refund" : "text-nb-ink"
                 }`}
               >
@@ -58,13 +57,13 @@ function VerdictCardNb() {
             </div>
           ))}
         </dl>
-        <div className="mt-5 flex items-end justify-between border-t-3 border-nb-ink pt-4">
-          <span className="font-nb-display text-sm uppercase leading-none">
+        <div className="mt-7 flex items-end justify-between border-t-3 border-nb-ink pt-6">
+          <span className="font-nb-display text-base uppercase leading-none">
             Trop-perçu
             <br />
             récupéré
           </span>
-          <span className="tabular nb-mono text-3xl font-semibold text-refund">
+          <span className="tabular nb-mono text-4xl font-semibold text-refund sm:text-5xl">
             {formatEUR(143_700, { decimals: true })}
           </span>
         </div>
@@ -111,7 +110,7 @@ export function HeroNb() {
   return (
     <section className="relative overflow-hidden border-b-3 border-nb-ink bg-cream">
       <div className="relative mx-auto max-w-container px-6 py-8 sm:py-10">
-        <div className="grid items-center gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
+        <div className="grid items-center gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch lg:gap-12">
           <div>
             <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/65">
               Loyer encadré · gel F/G · bouclier 3,5 %
@@ -122,7 +121,7 @@ export function HeroNb() {
                 style={METER_STYLE}
                 className="shrink-0 tabular nb-mono text-[clamp(56px,8vw,104px)] font-semibold leading-[0.8] text-refund"
               >
-                −<CountUp cents={AVG_MONTHLY_SAVING_CENTS} durationMs={1400} />
+                −<CountUp cents={BAISSE_MOY_CENTS} durationMs={1400} />
               </span>
               <span className="max-w-[26ch] border-l-3 border-nb-ink pl-4 nb-mono text-[12px] uppercase leading-snug tracking-wide text-nb-ink/80">
                 <span className="block font-nb-display text-sm normal-case tracking-normal">
@@ -144,14 +143,14 @@ export function HeroNb() {
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <span className="inline-flex items-center gap-2.5 border-2 border-nb-ink bg-paper px-3.5 py-2 nb-mono text-[12px] font-medium text-nb-ink shadow-nb-sm">
                 <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-refund" />
-                37 diagnostics lancés cette semaine
+                Déjà {DOSSIERS_AIDES} locataires aidés
               </span>
               <span className="nb-mono text-xs uppercase tracking-wider text-nb-ink/60">
                 {brand.hero.reassurance.join(" · ")}
               </span>
             </div>
           </div>
-          <div className="relative">
+          <div className="relative lg:flex">
             <VerdictCardNb />
           </div>
         </div>

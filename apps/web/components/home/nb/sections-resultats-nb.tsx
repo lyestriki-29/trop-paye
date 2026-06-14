@@ -2,6 +2,11 @@ import Link from "next/link";
 import { CountUp } from "@/components/ui/CountUp";
 import { Reveal } from "@/components/home/Reveal";
 import { CountUpInt } from "@/components/home/nb/CountUpInt";
+import {
+  BAISSE_MOY_CENTS,
+  DOSSIERS_AIDES,
+  RECUPERE_CENTS,
+} from "@/lib/content/resultats-publics";
 
 /**
  * Section « Résultats » de la LP (ancre #resultats, ciblée par la nav) — ce
@@ -9,12 +14,8 @@ import { CountUpInt } from "@/components/home/nb/CountUpInt";
  * réels fournis par Lyes (2026-06-13) ; à brancher sur les stats publiques.
  */
 
-const DOSSIERS = 22;
-const RECUPERE_CENTS = 3_743_800; // 37 438 €
-const BAISSE_MOY_CENTS = 19_400; // 194 € / mois
-
 const ITEMS = [
-  { kind: "int" as const, value: DOSSIERS, suffix: "dossiers résolus", featured: false },
+  { kind: "int" as const, value: DOSSIERS_AIDES, suffix: "locataires aidés", featured: false },
   {
     kind: "eur" as const,
     cents: RECUPERE_CENTS,
