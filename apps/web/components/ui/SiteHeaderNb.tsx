@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
+import { LogoNb } from "@/components/ui/LogoNb";
 
 /**
  * En-tête public néubrutaliste — sticky, bord dur 3px, vraies pages en nav,
@@ -48,12 +49,8 @@ export function SiteHeaderNb() {
   return (
     <header className="sticky top-0 z-50 border-b-3 border-nb-ink bg-cream/95 backdrop-blur">
       <div className="mx-auto flex max-w-container items-center justify-between gap-6 px-6 py-3.5">
-        <Link
-          href="/"
-          aria-label={`${brand.name} — accueil`}
-          className="font-nb-display text-xl uppercase tracking-tight"
-        >
-          {brand.name}
+        <Link href="/" aria-label={`${brand.name} — accueil`}>
+          <LogoNb />
         </Link>
         <nav
           aria-label="Navigation principale"

@@ -12,7 +12,7 @@
   --color-refund-text: 10 115 81; /* #0A7351 */
   --color-stamp: 214 69 69; /* #D64545 */
   --color-line: 234 225 214; /* #EAE1D6 */
-  --color-accent: 255 206 46; /* #FFCE2E — jaune nb (aligné maquettes, = acid) */
+  --color-accent: 255 122 26; /* #FF7A1A — ORANGE, couleur principale nb (= acid) */
 
   /* Néubrutalisme — site PUBLIC uniquement. Additif : ces canaux ne sont
      consommés que sous le scope `.nb`, l'espace/admin n'y touchent pas.
@@ -23,7 +23,7 @@
   /* Palette « + de couleur » (itération 2026-06-14 §4). Scopée `.nb`, additive. */
   --color-violet: 183 164 242; /* #B7A4F2 lavande */
   --color-pink: 255 138 160; /* #FF8AA0 corail */
-  --color-acid: 255 206 46; /* #FFCE2E jaune */
+  --color-acid: 255 122 26; /* #FF7A1A — orange (= accent, couleur principale) */
   --color-menthe: 127 227 180; /* #7FE3B4 */
   --color-ciel: 134 210 245; /* #86D2F5 */
   --color-orange: 255 154 61; /* #FF9A3D */

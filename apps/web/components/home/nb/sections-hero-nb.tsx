@@ -72,7 +72,7 @@ function VerdictCardNb() {
           Élément autonome : `.nb-stamp` global est masqué hors variante Maximal. */}
       <span
         aria-hidden="true"
-        className="absolute -bottom-3 right-5 z-20 -rotate-[8deg] border-3 border-pink bg-cream/60 px-3 py-1.5 font-nb-display text-base uppercase tracking-wide text-pink"
+        className="absolute -bottom-3 right-5 z-20 -rotate-[8deg] border-3 border-accent bg-cream/60 px-3 py-1.5 font-nb-display text-base uppercase tracking-wide text-accent"
       >
         Trop payé
       </span>
