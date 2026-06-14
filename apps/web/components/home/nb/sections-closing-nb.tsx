@@ -94,6 +94,50 @@ const FAQ: ReadonlyArray<{ q: string; a: ReactNode }> = [
       </>
     ),
   },
+  // Questions ci-dessous : brouillons TODO_COPY (formulation juridique à valider [AVOCAT]).
+  {
+    q: "Comment vérifiez-vous mon loyer ?",
+    a: (
+      <>
+        Nous n&apos;estimons rien : votre dossier est <strong>instruit</strong> à partir de données
+        officielles. L&apos;adresse via le géocodage de l&apos;État (Géoplateforme IGN), le DPE
+        réellement enregistré à l&apos;ADEME, et l&apos;indice de référence des loyers de
+        l&apos;INSEE. À l&apos;arrivée, chaque verdict cite sa règle, sa base légale et son calcul,
+        ligne à ligne.
+      </>
+    ),
+  },
+  {
+    q: "Sur quelle loi vous appuyez-vous ?",
+    a: (
+      <>
+        Uniquement sur des droits déjà inscrits dans la loi, jamais sur une interprétation maison.
+        Trois régimes distincts : le gel des loyers des passoires F/G, le bouclier
+        d&apos;indexation +3,5 % (T3 2022 → T1 2024) et l&apos;encadrement par l&apos;indice de
+        référence des loyers. Chaque calcul renvoie au texte applicable à la date de votre bail.
+      </>
+    ),
+  },
+  {
+    q: "Mes données sont-elles protégées ?",
+    a: (
+      <>
+        Oui. Tout est hébergé en France, les pièces sensibles sont chiffrées, et chaque euro
+        récupéré transite par un <strong>compte dédié</strong> et tracé. Vous pouvez demander la
+        suppression de vos données à tout moment.
+      </>
+    ),
+  },
+  {
+    q: "Et si mes informations sont incertaines ?",
+    a: (
+      <>
+        Chaque verdict porte un <strong>score de confiance</strong> (élevé, moyen ou faible).
+        S&apos;il manque une donnée, nous vous le signalons et consolidons le dossier avant toute
+        démarche. Rien n&apos;est affirmé qui ne soit traçable.
+      </>
+    ),
+  },
 ];
 
 function FaqNb() {
