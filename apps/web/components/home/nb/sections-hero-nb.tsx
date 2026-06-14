@@ -109,7 +109,7 @@ function StripNb() {
 
 export function HeroNb() {
   return (
-    <section className="relative overflow-hidden border-b-3 border-nb-ink bg-violet">
+    <section className="relative overflow-hidden border-b-3 border-nb-ink bg-cream">
       <div className="relative mx-auto max-w-container px-6 py-8 sm:py-10">
         <div className="grid items-center gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
           <div>
