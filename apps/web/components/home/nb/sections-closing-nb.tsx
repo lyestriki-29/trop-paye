@@ -17,7 +17,7 @@ const CAS_ZERO: ReadonlyArray<{ value: string; label: string; tone: "refund" | "
   { value: "Préavis allégé", label: "le logement étant non décent", tone: "ink" },
 ];
 
-function CasZeroNb() {
+export function CasZeroNb() {
   return (
     <section className="nb-band-caszero border-b-3 border-nb-ink py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
@@ -130,7 +130,6 @@ function FaqNb() {
 export function ClosingNb() {
   return (
     <>
-      <CasZeroNb />
       <FaqNb />
       <CtaFinalNb />
     </>
