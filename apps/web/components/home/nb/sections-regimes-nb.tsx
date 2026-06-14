@@ -13,12 +13,20 @@ export function RegimesNb() {
     <section className="border-b-3 border-nb-ink bg-pink py-14 sm:py-18">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
-          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
-            Pièce n°05 · Les règles
-          </p>
-          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)]">
-            Trois règles. Trois façons de <span className="nb-mark">trop payer</span>.
-          </h2>
+          <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+            <div>
+              <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
+                Pièce n°05 · Les règles
+              </p>
+              <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">
+                Trois règles. Trois façons de <span className="nb-mark">trop payer</span>.
+              </h2>
+            </div>
+            <p className="max-w-xl font-nb-body text-xl font-medium leading-relaxed text-nb-ink/90">
+              Votre dossier relève d&apos;au moins un de ces trois régimes. Chacun a sa base
+              légale et sa façon de récupérer le trop-perçu, ou de vous orienter.
+            </p>
+          </div>
         </Reveal>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-3">
