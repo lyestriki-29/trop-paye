@@ -70,10 +70,11 @@ function VerdictCardNb() {
           </span>
         </div>
       </div>
-      {/* Tampon imprimé — descendu à droite, sous le total (demande Lyes). */}
+      {/* Tampon imprimé — descendu à droite, sous le total (demande Lyes).
+          Élément autonome : `.nb-stamp` global est masqué hors variante Maximal. */}
       <span
         aria-hidden="true"
-        className="nb-stamp absolute -bottom-3 right-6 z-20 text-lg"
+        className="absolute -bottom-3 right-5 z-20 -rotate-[8deg] border-3 border-pink bg-paper/60 px-3 py-1.5 font-nb-display text-base uppercase tracking-wide text-pink"
       >
         Trop payé
       </span>
