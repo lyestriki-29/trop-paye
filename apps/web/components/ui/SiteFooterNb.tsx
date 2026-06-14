@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
+import { LEGAL_ENTITY } from "@/lib/content/legal-entity";
 
 /**
  * Pied de page public néubrutaliste — bande sombre `nb-dark`, colonnes de liens,
@@ -73,14 +74,23 @@ export function SiteFooterNb() {
           </div>
         </div>
 
-        {/* [AVOCAT] — squelette R124 du copy deck §5, mot pour mot ; ne pas reformuler. */}
-        <p className="mt-12 border-t border-cream/15 pt-6 nb-mono text-[11px] leading-relaxed text-cream/50">
-          TropPayé est une marque de {"{RAISON SOCIALE}"}, société par actions simplifiée,
-          activité de recouvrement amiable de créances pour le compte d&apos;autrui déclarée
-          auprès du procureur de la République de {"{ville}"} (art. R124-1 et s. CPCE),
-          assurance RC professionnelle {"{assureur}"}, médiateur de la consommation :{" "}
-          {"{organisme}"}.
-        </p>
+        {/* [AVOCAT] — squelette R124 du copy deck §5, mot pour mot ; ne pas reformuler.
+            Affiché SEULEMENT quand l'entité légale existe (LEGAL_ENTITY.ready). En phase
+            de test (société non immatriculée) : encart neutre, aucune donnée inventée. */}
+        {LEGAL_ENTITY.ready ? (
+          <p className="mt-12 border-t border-cream/15 pt-6 nb-mono text-[11px] leading-relaxed text-cream/50">
+            TropPayé est une marque de {LEGAL_ENTITY.raisonSociale}, société par actions
+            simplifiée, activité de recouvrement amiable de créances pour le compte
+            d&apos;autrui déclarée auprès du procureur de la République de{" "}
+            {LEGAL_ENTITY.villeTribunal} (art. R124-1 et s. CPCE), assurance RC professionnelle{" "}
+            {LEGAL_ENTITY.assureurRC}, médiateur de la consommation : {LEGAL_ENTITY.mediateur}.
+          </p>
+        ) : (
+          <p className="mt-12 border-t border-cream/15 pt-6 nb-mono text-[11px] leading-relaxed text-cream/40">
+            Version de démonstration. Mentions légales en cours de constitution (société non
+            encore immatriculée) — aucun service de recouvrement n&apos;est encore opéré.
+          </p>
+        )}
 
         {/* Signature centrée, tout en bas (demande Lyes). */}
         <p className="mt-10 text-center font-nb-body text-sm text-cream/60">
