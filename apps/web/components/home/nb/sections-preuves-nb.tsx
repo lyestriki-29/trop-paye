@@ -13,16 +13,16 @@ import type { PublicStats } from "@/lib/public-stats";
 
 export function ConfianceNb({ stats }: { stats: PublicStats | null }) {
   return (
-    <section className="nb-dark border-b-3 border-nb-ink py-16 text-cream sm:py-20">
+    <section className="border-b-3 border-nb-ink bg-acid py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
-          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-cream/45">
+          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
             Pièce n°05 · La confiance
           </p>
-          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)] text-cream">
+          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)] text-nb-ink">
             Nous faisons appliquer la loi. Rien de plus.
           </h2>
-          <p className="mt-6 max-w-3xl font-nb-body leading-relaxed text-cream/80">
+          <p className="mt-6 max-w-3xl font-nb-body leading-relaxed text-nb-ink/80">
             Le gel des loyers des passoires thermiques, l&apos;indice de référence des loyers, les
             délais de restitution du dépôt de garantie : ce sont vos droits, écrits dans la loi.
             TropPayé les fait simplement respecter. Chaque calcul cite sa source. Chaque euro est
@@ -31,7 +31,7 @@ export function ConfianceNb({ stats }: { stats: PublicStats | null }) {
         </Reveal>
         {stats ? (
           <Reveal delay={0.16}>
-            <div className="mt-10 border-t border-cream/20 pt-8">
+            <div className="mt-10 border-t border-nb-ink/20 pt-8">
               <CompteurPublic
                 recoveredCents={stats.recoveredCents}
                 inProgressCount={stats.inProgressCount}

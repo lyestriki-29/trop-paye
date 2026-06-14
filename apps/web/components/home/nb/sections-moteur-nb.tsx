@@ -47,13 +47,13 @@ const PIPELINE: ReadonlyArray<Etape> = [
 
 export function MoteurNb() {
   return (
-    <section className="border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="nb-dark border-b-3 border-nb-ink py-16 text-cream sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
-          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
+          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-cream/45">
             Pièce n°02 · L&apos;instruction
           </p>
-          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)]">
+          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)] text-cream">
             Votre dossier est <span className="nb-mark">instruit</span>, pas estimé.
           </h2>
         </Reveal>

@@ -47,7 +47,7 @@ const ETAPES: ReadonlyArray<Etape> = [
 
 export function EtapesNb() {
   return (
-    <section className="border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink bg-ciel py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
