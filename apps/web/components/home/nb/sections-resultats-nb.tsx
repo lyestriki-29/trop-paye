@@ -14,13 +14,19 @@ const RECUPERE_CENTS = 3_743_800; // 37 438 €
 const BAISSE_MOY_CENTS = 19_400; // 194 € / mois
 
 const ITEMS = [
-  { kind: "int" as const, value: DOSSIERS, suffix: "dossiers résolus" },
-  { kind: "eur" as const, cents: RECUPERE_CENTS, suffix: "récupérés pour nos locataires" },
+  { kind: "int" as const, value: DOSSIERS, suffix: "dossiers résolus", featured: false },
+  {
+    kind: "eur" as const,
+    cents: RECUPERE_CENTS,
+    suffix: "récupérés pour nos locataires",
+    featured: true, // stat phare : carte sombre pour casser la monotonie + emphase.
+  },
   {
     kind: "eur" as const,
     cents: BAISSE_MOY_CENTS,
     perMonth: true,
     suffix: "de loyer en moins, en moyenne",
+    featured: false,
   },
 ];
 
@@ -35,7 +41,7 @@ export function ResultatsNb() {
           <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
             <div>
               <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
-                Pièce n°00 · Nos résultats
+                Pièce n°01 · Nos résultats
               </p>
               <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">
                 Déjà <span className="nb-mark">récupéré</span>, déjà reversé.
@@ -51,7 +57,11 @@ export function ResultatsNb() {
         <dl className="mt-7 grid gap-6 sm:grid-cols-3">
           {ITEMS.map((item, i) => (
             <Reveal key={item.suffix} delay={0.08 + i * 0.1}>
-              <div className="nb-tilt nb-card h-full p-7">
+              <div
+                className={`nb-tilt nb-card flex h-full flex-col p-7 ${
+                  item.featured ? "bg-nb-ink" : ""
+                }`}
+              >
                 <dd className="tabular font-nb-display text-[clamp(40px,6vw,68px)] leading-none text-refund">
                   {item.kind === "int" ? (
                     <CountUpInt value={item.value} />
@@ -59,12 +69,21 @@ export function ResultatsNb() {
                     <>
                       <CountUp cents={item.cents} />
                       {item.perMonth ? (
-                        <span className="text-[0.45em] text-nb-ink/60"> / mois</span>
+                        <span
+                          className={`text-[0.45em] ${item.featured ? "text-cream/60" : "text-nb-ink/60"}`}
+                        >
+                          {" "}
+                          / mois
+                        </span>
                       ) : null}
                     </>
                   )}
                 </dd>
-                <dt className="mt-4 font-nb-body text-sm leading-relaxed text-nb-ink/75">
+                <dt
+                  className={`mt-4 font-nb-body text-sm leading-relaxed ${
+                    item.featured ? "text-cream/75" : "text-nb-ink/75"
+                  }`}
+                >
                   {item.suffix}
                 </dt>
               </div>

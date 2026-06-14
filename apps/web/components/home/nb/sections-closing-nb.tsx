@@ -146,7 +146,7 @@ function FaqNb() {
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
-            Pièce n°07 · Questions fréquentes
+            Pièce n°05 · Questions fréquentes
           </p>
           <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">Questions fréquentes</h2>
         </Reveal>
