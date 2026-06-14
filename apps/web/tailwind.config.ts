@@ -24,6 +24,10 @@ const config: Config = {
         violet: "rgb(var(--color-violet) / <alpha-value>)",
         pink: "rgb(var(--color-pink) / <alpha-value>)",
         acid: "rgb(var(--color-acid) / <alpha-value>)",
+        menthe: "rgb(var(--color-menthe) / <alpha-value>)",
+        ciel: "rgb(var(--color-ciel) / <alpha-value>)",
+        orange: "rgb(var(--color-orange) / <alpha-value>)",
+        vert: "rgb(var(--color-vert) / <alpha-value>)",
       },
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],

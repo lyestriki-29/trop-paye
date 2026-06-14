@@ -19,10 +19,15 @@
      PASTEL aligné charte (choix Lyes 2026-06-13 : nos couleurs, pas LP3 ;
      tout flashy → pâle). Bords/ombres = ink CHAUD de la charte, pas de noir pur. */
   --color-cream: 250 244 236; /* = paper-2 : fond néubrutaliste chaud */
-  --color-nb-ink: 42 33 24; /* = ink charte : bords + texte chauds (ex-#121212) */
-  --color-violet: 203 191 239; /* lavande pâle (ex-flashy #7B61FF) */
-  --color-pink: 244 205 217; /* rose pâle (ex-flashy #FF5C8A) */
-  --color-acid: 255 216 77; /* = accent : jaune DOUX charte (ex-acide #E8FF38) */
+  --color-nb-ink: 36 29 21; /* #241D15 — encre nb plus dense (palette + de couleur) */
+  /* Palette « + de couleur » (itération 2026-06-14 §4). Scopée `.nb`, additive. */
+  --color-violet: 183 164 242; /* #B7A4F2 lavande */
+  --color-pink: 255 138 160; /* #FF8AA0 corail */
+  --color-acid: 255 206 46; /* #FFCE2E jaune */
+  --color-menthe: 127 227 180; /* #7FE3B4 */
+  --color-ciel: 134 210 245; /* #86D2F5 */
+  --color-orange: 255 154 61; /* #FF9A3D */
+  --color-vert: 15 169 104; /* #0FA968 vert d'accent (≠ refund #0C8F63, montants) */
 }
 
 html {
