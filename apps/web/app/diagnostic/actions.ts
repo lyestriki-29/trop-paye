@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { evaluateAll } from "@troppaye/rules-engine";
+import { evaluateAll, irlSuggestionCents } from "@troppaye/rules-engine";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
 import { completeAddress, type AddressSearchResult } from "@/lib/providers/geo";
@@ -119,4 +119,23 @@ export async function submitDiagnostic(raw: unknown): Promise<SubmitResult> {
   if (vErr || !v) return { error: vErr?.message ?? "Impossible d'enregistrer le verdict." };
 
   return { verdictId: v.id };
+}
+
+/**
+ * Renvoie le loyer indexé IRL suggéré pour un anniversaire donné (en centimes).
+ * Utilisé par le chip "Augmentation légale" dans AnniversaryRows.
+ * Retourne null si les indices IRL sont absents pour cette année/trimestre.
+ */
+export async function getIrlSuggestionAction(params: {
+  baseCents: number;
+  revisionQuarter: string;
+  anniversaryYear: number;
+}): Promise<{ cents: number } | null> {
+  const { baseCents, revisionQuarter, anniversaryYear } = params;
+  if (baseCents <= 0 || !revisionQuarter || anniversaryYear < 2000) return null;
+
+  const ref = await getReferentials();
+  const cents = irlSuggestionCents(baseCents, revisionQuarter, anniversaryYear, ref.irl);
+  if (cents === null) return null;
+  return { cents };
 }

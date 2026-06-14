@@ -1,9 +1,11 @@
 "use client";
 
-import { anniversariesBetween } from "@troppaye/rules-engine";
+import { useEffect, useState } from "react";
+import { anniversariesBetween, formatEur } from "@troppaye/rules-engine";
 import { frenchDate } from "@/lib/format-date";
 import type { DiagnosticDraft, SetField } from "../use-diagnostic-form";
 import { MoneyField } from "../fields";
+import { getIrlSuggestionAction } from "@/app/diagnostic/actions";
 
 /**
  * Historique des hausses par année anniversaire (spec questionnaire §4) :
@@ -25,6 +27,31 @@ export function AnniversaryRows({
   const dates = anniversariesBetween(leaseSignedAt, today);
   const rents = draft.anniversaryRents ?? {};
   const noIncrease = new Set(draft.noIncreaseDates ?? []);
+
+  // Suggestions IRL par date d'anniversaire (null = indisponible, undefined = en cours)
+  const [irlSuggestions, setIrlSuggestions] = useState<Record<string, number | null>>({});
+
+  useEffect(() => {
+    const base = draft.initialRentCents;
+    const q = draft.revisionQuarter;
+    if (!base || !q || dates.length === 0) return;
+
+    let cancelled = false;
+    void (async () => {
+      const results: Record<string, number | null> = {};
+      await Promise.all(
+        dates.map(async (date) => {
+          const year = Number(date.slice(0, 4));
+          const res = await getIrlSuggestionAction({ baseCents: base, revisionQuarter: q, anniversaryYear: year });
+          results[date] = res?.cents ?? null;
+        }),
+      );
+      if (!cancelled) setIrlSuggestions(results);
+    })();
+
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft.initialRentCents, draft.revisionQuarter, leaseSignedAt]);
 
   function setAmount(date: string, cents: number | undefined) {
     const next: Record<string, number> = { ...rents };
@@ -87,6 +114,20 @@ export function AnniversaryRows({
               >
                 Pas de hausse cette année
               </button>
+              {/* Chip IRL (dégradable) : absent si indices manquants ou paramètres incomplets. */}
+              {(() => {
+                const suggestion = irlSuggestions[date];
+                if (suggestion == null) return null;
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setAmount(date, suggestion)}
+                    className="nb-pill mt-1 rounded-badge border border-accent bg-accent/10 px-4 py-2.5 text-sm font-medium text-accent transition hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                  >
+                    Augmentation légale (≈&nbsp;{formatEur(suggestion)})
+                  </button>
+                );
+              })()}
             </div>
           </div>
         );

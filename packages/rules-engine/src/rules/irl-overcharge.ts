@@ -35,6 +35,31 @@ function irlForYearOrBefore(ref: Referentials, year: number, q: string): IrlInde
   return best;
 }
 
+/**
+ * Calcule le loyer IRL suggéré (en centimes) pour une révision anniversaire.
+ *
+ * @param baseCents      Loyer initial du bail (centimes HC).
+ * @param revisionQuarter Trimestre de référence IRL du bail (ex. "T2").
+ * @param anniversaryYear Année de l'anniversaire (ex. 2024).
+ * @param irl            Tableau des indices IRL disponibles (depuis les référentiels).
+ * @returns Loyer indexé en centimes, ou null si les indices nécessaires sont absents.
+ *
+ * Formule : loyer_n = round(loyer_0 × IRL_n / IRL_(n-1))
+ * TODO_VERIFIER [AVOCAT] : calcul itératif vs direct selon la jurisprudence applicable.
+ */
+export function irlSuggestionCents(
+  baseCents: number,
+  revisionQuarter: string,
+  anniversaryYear: number,
+  irl: IrlIndexEntry[],
+): number | null {
+  const ref: Referentials = { irl, shieldRatePct: 3.5, agencyFees: { capsByZone: { TRES_TENDUE: { feePerM2Cents: 0, edlPerM2Cents: 0 }, TENDUE: { feePerM2Cents: 0, edlPerM2Cents: 0 }, RESTE: { feePerM2Cents: 0, edlPerM2Cents: 0 } }, zoneByInsee: {} } };
+  const irlN = irlForYearOrBefore(ref, anniversaryYear, revisionQuarter);
+  const irlPrev = irlN ? irlForYearOrBefore(ref, Number(irlN.quarter.split("-")[0]) - 1, revisionQuarter) : undefined;
+  if (!irlN || !irlPrev) return null;
+  return Math.round((baseCents * irlN.value) / irlPrev.value);
+}
+
 export function evaluateIrlOvercharge(input: RuleInput): RuleResult {
   const { dossier, referentials, asOf } = input;
   const steps: ComputationStep[] = [];
