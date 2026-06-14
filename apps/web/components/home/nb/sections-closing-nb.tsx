@@ -19,7 +19,7 @@ const CAS_ZERO: ReadonlyArray<{ value: string; label: string; tone: "refund" | "
 
 function CasZeroNb() {
   return (
-    <section className="nb-band-caszero border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="nb-band-caszero border-b-3 border-nb-ink py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/60">
@@ -34,7 +34,7 @@ function CasZeroNb() {
             pour que ce soit simple pour vous aussi.
           </p>
         </Reveal>
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
+        <div className="mt-7 grid gap-6 sm:grid-cols-3">
           {CAS_ZERO.map(({ value, label, tone }, i) => (
             <Reveal key={label} delay={0.1 + i * 0.08}>
               <div className="nb-card h-full p-6">
@@ -53,7 +53,7 @@ function CasZeroNb() {
         <Reveal delay={0.3}>
           <Link
             href="/notre-histoire"
-            className="nb-card-hover mt-10 inline-flex items-center gap-2 border-3 border-nb-ink bg-paper px-6 py-3 font-nb-display text-base uppercase shadow-nb"
+            className="nb-card-hover mt-7 inline-flex items-center gap-2 border-3 border-nb-ink bg-paper px-6 py-3 font-nb-display text-base uppercase shadow-nb"
           >
             Lire notre histoire
           </Link>
@@ -94,7 +94,7 @@ const FAQ: ReadonlyArray<{ q: string; a: ReactNode }> = [
 
 function FaqNb() {
   return (
-    <section className="border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -102,7 +102,7 @@ function FaqNb() {
           </p>
           <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">Questions fréquentes</h2>
         </Reveal>
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
+        <div className="mt-7 grid gap-5 md:grid-cols-2">
           {FAQ.map(({ q, a }, i) => (
             <Reveal key={q} delay={0.1 + i * 0.08} className="h-full">
               <details className="nb-card group h-full p-0">

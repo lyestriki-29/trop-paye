@@ -10,7 +10,7 @@ import { IconArrowRight } from "@/components/home/icons";
 
 export function RegimesNb() {
   return (
-    <section className="border-b-3 border-nb-ink bg-pink py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink bg-pink py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -21,7 +21,7 @@ export function RegimesNb() {
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+        <div className="mt-8 grid gap-6 lg:grid-cols-3">
           {/* Régime 1 — gel F/G : texte prod (copy deck §1). */}
           <Reveal delay={0.08} className="lg:col-span-2">
             <article className="nb-tilt nb-card relative flex h-full flex-col p-8 sm:p-10">

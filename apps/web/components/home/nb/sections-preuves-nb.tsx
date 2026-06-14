@@ -13,7 +13,7 @@ import type { PublicStats } from "@/lib/public-stats";
 
 export function ConfianceNb({ stats }: { stats: PublicStats | null }) {
   return (
-    <section className="border-b-3 border-nb-ink bg-acid py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink bg-acid py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -31,7 +31,7 @@ export function ConfianceNb({ stats }: { stats: PublicStats | null }) {
         </Reveal>
         {stats ? (
           <Reveal delay={0.16}>
-            <div className="mt-10 border-t border-nb-ink/20 pt-8">
+            <div className="mt-7 border-t border-nb-ink/20 pt-8">
               <CompteurPublic
                 recoveredCents={stats.recoveredCents}
                 inProgressCount={stats.inProgressCount}
@@ -49,7 +49,7 @@ export function TemoignageNb() {
   if (!t) return null;
 
   return (
-    <section id="preuve" className="scroll-mt-24 border-b-3 border-nb-ink py-16 sm:py-20">
+    <section id="preuve" className="scroll-mt-24 border-b-3 border-nb-ink py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -60,7 +60,7 @@ export function TemoignageNb() {
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid items-center gap-12 lg:grid-cols-[7fr_5fr] lg:gap-16">
+        <div className="mt-8 grid items-center gap-10 lg:grid-cols-[7fr_5fr] lg:gap-14">
           <Reveal delay={0.08}>
             <figure className="relative">
               <span
