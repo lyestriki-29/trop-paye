@@ -22,7 +22,12 @@ export default defineConfig({
   test: {
     // Composants du récit (notre-histoire) : tests de comportement en jsdom
     // (pragma `@vitest-environment jsdom` par fichier) — le reste en node.
-    include: ["lib/**/*.test.ts", "app/api/**/*.test.ts", "components/**/*.test.tsx"],
+    include: [
+      "lib/**/*.test.ts",
+      "app/api/**/*.test.ts",
+      "app/diagnostic/**/*.test.ts",
+      "components/**/*.test.tsx",
+    ],
     environment: "node",
   },
 });
