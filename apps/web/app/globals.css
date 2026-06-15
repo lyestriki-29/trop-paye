@@ -572,13 +572,14 @@ body::after {
 }
 
 /* ── Tunnel diagnostic : champs nb (Phase A) ───────────────────────────── */
+/* Look nb (bord ink, fond crème, ombre dure). PAS de padding/taille ici : posés
+   par le consommateur (le composant `Field` réserve `pt-5` pour son label flottant ;
+   un padding uniforme ici le ferait chevaucher le texte saisi). */
 .nb-field {
   width: 100%;
   border: 2px solid rgb(var(--color-nb-ink));
   background: rgb(var(--color-paper));
   box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
-  padding: 11px 14px;
-  font-size: 15px;
   color: rgb(var(--color-nb-ink));
 }
 .nb-field:focus-visible { outline: 3px solid rgb(var(--color-accent)); outline-offset: 1px; }

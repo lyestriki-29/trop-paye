@@ -126,7 +126,8 @@ const MONTHS = [
   "Décembre",
 ] as const;
 
-const SELECT_CLS = "nb-field";
+// `.nb-field` ne pose plus le padding (cf. globals.css) → le select le fournit lui-même.
+const SELECT_CLS = "nb-field px-3.5 py-2.5 text-[15px]";
 
 /**
  * Mois + année (décision Lyes 2026-06-11 : pas de date exacte, le date picker
@@ -247,7 +248,7 @@ export function StepperField({
           onClick={dec}
           disabled={atMin}
           aria-label="Diminuer"
-          style={{ fontSize: "1.4rem" }}
+          style={{ fontSize: "1.4rem", padding: 0 }}
           className="nb-pill flex h-12 w-12 items-center justify-center font-black leading-none disabled:opacity-40"
         >
           −
@@ -264,7 +265,7 @@ export function StepperField({
           onClick={inc}
           disabled={atMax}
           aria-label="Augmenter"
-          style={{ fontSize: "1.4rem" }}
+          style={{ fontSize: "1.4rem", padding: 0 }}
           className="nb-pill flex h-12 w-12 items-center justify-center font-black leading-none disabled:opacity-40"
         >
           +
