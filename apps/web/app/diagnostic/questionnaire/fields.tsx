@@ -247,13 +247,15 @@ export function StepperField({
           onClick={dec}
           disabled={atMin}
           aria-label="Diminuer"
-          className="nb-pill h-12 w-12 text-xl font-black disabled:opacity-40"
+          style={{ fontSize: "1.4rem" }}
+          className="nb-pill flex h-12 w-12 items-center justify-center font-black leading-none disabled:opacity-40"
         >
           −
         </button>
         <output
           aria-live="polite"
-          className="nb-field flex h-12 min-w-[5rem] items-center justify-center px-4 font-mono tabular text-xl font-black"
+          className="flex h-12 min-w-[5rem] items-center justify-center border-2 border-ink bg-paper px-4 font-mono tabular text-2xl font-black text-ink"
+          style={{ boxShadow: "3px 3px 0 rgb(var(--color-nb-ink))" }}
         >
           {value === undefined ? "—" : suffix ? `${value} ${suffix}` : value}
         </output>
@@ -262,7 +264,8 @@ export function StepperField({
           onClick={inc}
           disabled={atMax}
           aria-label="Augmenter"
-          className="nb-pill h-12 w-12 text-xl font-black disabled:opacity-40"
+          style={{ fontSize: "1.4rem" }}
+          className="nb-pill flex h-12 w-12 items-center justify-center font-black leading-none disabled:opacity-40"
         >
           +
         </button>

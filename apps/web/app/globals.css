@@ -591,6 +591,10 @@ body::after {
 }
 .nb-pill[aria-pressed="true"] { background: rgb(var(--color-accent)); }
 .nb-pill--dashed { border-style: dashed; box-shadow: none; font-weight: 600; }
+/* Variante foncée (CTA « Continuer » / « Voir mon résultat ») : `.nb-pill` force
+   un fond clair → sans ce modifieur, un `bg-ink text-paper` donne du blanc sur
+   blanc (case vide). Ce modifieur impose fond encre + texte clair. */
+.nb-pill--ink { background: rgb(var(--color-nb-ink)); color: rgb(var(--color-paper)); }
 .nb-confirmed {
   border: 2px solid rgb(var(--color-nb-ink));
   background: rgb(var(--color-paper));

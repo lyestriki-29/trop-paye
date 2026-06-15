@@ -164,7 +164,7 @@ export function GuidedTunnel() {
         type="button"
         onClick={submit}
         disabled={submitting || !submittable}
-        className="nb-pill w-full bg-ink px-4 py-3 text-sm font-black text-paper disabled:opacity-50"
+        className="nb-pill nb-pill--ink w-full px-4 py-3 text-sm font-black disabled:opacity-50"
       >
         {submitting ? "Analyse…" : "Voir mon résultat"}
       </button>

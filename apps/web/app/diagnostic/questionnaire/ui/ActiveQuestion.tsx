@@ -43,7 +43,7 @@ export function ActiveQuestion({
           <button
             type="button"
             onClick={advance}
-            className="nb-pill w-full bg-ink px-4 py-2.5 text-sm font-black text-paper"
+            className="nb-pill nb-pill--ink w-full px-4 py-2.5 text-sm font-black"
           >
             Continuer
           </button>
