@@ -17,7 +17,7 @@ export function BoosterChecklist({
       {items.map((item) => (
         <label
           key={item.id}
-          className="flex cursor-pointer items-start gap-3 rounded-lg border border-line px-4 py-3 text-sm hover:border-ink/30"
+          className="flex cursor-pointer items-start gap-3 border-2 border-ink bg-paper px-4 py-3 text-sm transition-transform hover:-translate-y-0.5"
         >
           <input
             type="checkbox"

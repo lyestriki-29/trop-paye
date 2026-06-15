@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { brand, formatEUR } from "@troppaye/shared";
-import { Button } from "@/components/ui/Button";
 
 /** Glyphe Lucide « share-2 » inliné (lucide-react absent du workspace). */
 function IconShare({ className }: { className?: string }) {
@@ -52,10 +51,14 @@ export function ShareActions({ amountCents }: { amountCents: number }) {
   return (
     <div className="mt-4 flex flex-col items-center gap-2">
       {/* TODO_COPY — libellé du bouton de partage (hors copy deck). */}
-      <Button variant="ghost" onClick={share} className="w-full">
+      <button
+        type="button"
+        onClick={share}
+        className="nb-pill flex w-full items-center justify-center gap-2 border-2 border-ink bg-paper px-4 py-3 text-sm font-black text-ink"
+      >
         <IconShare className="h-4 w-4" />
         Partager mon résultat
-      </Button>
+      </button>
       <p aria-live="polite" className="min-h-4 text-xs text-ink/55">
         {/* TODO_COPY — confirmation de copie (hors copy deck). */}
         {copied ? "Lien copié dans le presse-papiers." : ""}
