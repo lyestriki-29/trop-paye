@@ -71,12 +71,17 @@ function VerdictCardNb() {
   );
 }
 
-/** Chiffres d'appui (factuels) — strip pleine largeur de page. */
+/**
+ * Strip — faits chocs sur le marché locatif (réveil « ça peut être moi »). Les
+ * points conversion (0 €, 2 min, −194 €) sont déjà dits ailleurs (hero, barème).
+ * ⚠️ TODO_VERIFIER : sourcer/figer « 1 sur 3 » (encadrement Paris) et « ~5 M »
+ * (passoires F/G) avant prod. « 1 sur 6 » = SDES ; prescription = constante.
+ */
 const STRIP: ReadonlyArray<{ value: string; label: string }> = [
-  { value: "1 sur 6", label: "logement loué a un loyer illégal (source : SDES)" },
-  { value: "24/08/2022", label: "loyers des passoires F/G gelés depuis cette date" },
+  { value: "1 sur 6", label: "logement loué à un loyer illégal (source : SDES)" },
+  { value: "1 sur 3", label: "annonce au-dessus du loyer encadré à Paris" },
+  { value: "~5 M", label: "de passoires thermiques F/G, où le loyer est gelé" },
   { value: `${PRESCRIPTION_YEARS} ans`, label: "de trop-perçu récupérable (prescription)" },
-  { value: "25 %", label: "de commission, au succès. Rien récupéré ? Rien payé." },
 ];
 
 /** Strip de chiffres — pleine largeur de page (bord à bord). */
