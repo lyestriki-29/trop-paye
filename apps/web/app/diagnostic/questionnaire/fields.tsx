@@ -211,6 +211,66 @@ export function MonthYearField({
   );
 }
 
+/**
+ * Stepper numérique (− valeur +) pour une saisie EXACTE d'un entier (ex. pièces).
+ * Valeur indéfinie tant que l'utilisateur n'a pas agi (affiche « — ») ; le premier
+ * clic pose le minimum. `min`/`max` bornent ; `max` sert aussi de garde-fou.
+ */
+export function StepperField({
+  label,
+  hint,
+  value,
+  onChange,
+  min = 1,
+  max = 50,
+  suffix,
+}: {
+  label: string;
+  hint?: string;
+  value: number | undefined;
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
+  suffix?: string;
+}) {
+  const inc = () => onChange(value === undefined ? min : Math.min(max, value + 1));
+  const dec = () => onChange(value === undefined ? min : Math.max(min, value - 1));
+  const atMin = value !== undefined && value <= min;
+  const atMax = value !== undefined && value >= max;
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-ink/80">{label}</legend>
+      <div className="mt-2.5 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={dec}
+          disabled={atMin}
+          aria-label="Diminuer"
+          className="nb-pill h-12 w-12 text-xl font-black disabled:opacity-40"
+        >
+          −
+        </button>
+        <output
+          aria-live="polite"
+          className="nb-field flex h-12 min-w-[5rem] items-center justify-center px-4 font-mono tabular text-xl font-black"
+        >
+          {value === undefined ? "—" : suffix ? `${value} ${suffix}` : value}
+        </output>
+        <button
+          type="button"
+          onClick={inc}
+          disabled={atMax}
+          aria-label="Augmenter"
+          className="nb-pill h-12 w-12 text-xl font-black disabled:opacity-40"
+        >
+          +
+        </button>
+      </div>
+      {hint ? <p className="mt-1.5 text-xs text-ink/50">{hint}</p> : null}
+    </fieldset>
+  );
+}
+
 export interface Choice<T extends string> {
   value: T;
   label: string;

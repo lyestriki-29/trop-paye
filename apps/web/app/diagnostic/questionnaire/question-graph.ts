@@ -148,9 +148,10 @@ export const QUESTIONS: Question[] = [
     id: "rooms",
     chapter: "housing",
     render: RoomsQ,
-    autoAdvance: true,
-    isAnswered: (d) => d.roomCount !== undefined || d.roomCountUnknown === true,
-    summary: (d) => (d.roomCountUnknown ? "Pièces : ?" : `${d.roomCount} pièce(s)`),
+    // Stepper = saisie libre → bouton « Continuer » (pas d'avance auto).
+    autoAdvance: false,
+    isAnswered: (d) => d.roomCount !== undefined,
+    summary: (d) => (d.roomCount !== undefined ? `${d.roomCount} pièce(s)` : "—"),
   },
   {
     id: "shared",

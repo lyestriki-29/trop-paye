@@ -25,8 +25,9 @@ export const diagnosticSchema = z
     lon: z.number().min(-180).max(180).optional(),
     surfaceM2: z.number().positive().max(10000).optional(),
     furnished: z.boolean().optional(),
-    /** Nombre de pièces principales (1 à 4 ; 4 = « 4 et plus ») — clé du barème d'encadrement. */
-    roomCount: z.number().int().min(1).max(4).optional(),
+    /** Nombre de pièces principales (valeur exacte, ≥ 1 ; le barème d'encadrement
+        regroupe « 4 et plus » côté résolution). Plafond de sûreté anti-payload forgé. */
+    roomCount: z.number().int().min(1).max(50).optional(),
     /** Époque de construction (fourchette) — clé du barème d'encadrement. */
     constructionPeriod: z.enum(["BEFORE_1946", "1946_1970", "1971_1990", "AFTER_1990"]).optional(),
     /** Colocation (LOT 1.3) : toggle étape 2. */

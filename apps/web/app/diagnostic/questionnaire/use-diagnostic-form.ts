@@ -27,10 +27,8 @@ export interface DiagnosticDraft {
   address?: AddressSuggestion;
   surfaceM2?: number;
   furnished?: boolean;
-  /** Nombre de pièces principales (1 à 4 ; 4 = « 4 et plus ») — clé du barème d'encadrement. */
+  /** Nombre de pièces principales (valeur exacte, ≥ 1 ; le barème regroupe « 4 et plus »). */
   roomCount?: number;
-  /** « Je ne sais pas » sur le nombre de pièces (UI : pilule sélectionnée). */
-  roomCountUnknown?: boolean;
   /** Époque de construction (fourchette) — clé du barème d'encadrement. */
   constructionPeriod?: ConstructionPeriod;
   /** « Je ne sais pas » sur l'époque de construction (UI : pilule sélectionnée). */
@@ -130,7 +128,7 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
     lon: draft.address?.lon,
     surfaceM2: draft.surfaceM2,
     furnished: draft.furnished,
-    // NSP → undefined (le champ « unknown » reste local à l'UI, jamais envoyé).
+    // Valeur exacte (≥ 1) ou undefined si non saisie ; le barème regroupe « 4 et plus ».
     roomCount: draft.roomCount,
     constructionPeriod: draft.constructionPeriod,
     isShared: draft.isShared,

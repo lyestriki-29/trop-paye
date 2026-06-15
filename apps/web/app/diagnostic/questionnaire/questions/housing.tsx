@@ -1,7 +1,7 @@
 "use client";
 
 import type { StepProps } from "../use-diagnostic-form";
-import { ChoiceField, TextField } from "../fields";
+import { ChoiceField, StepperField, TextField } from "../fields";
 
 /**
  * Surface habitable (extraite de `HousingStep`). Pré-remplissable par la cascade
@@ -40,35 +40,15 @@ export function FurnishedQ({ draft, setField }: StepProps) {
   );
 }
 
-/** Nombre de pièces principales (pilule + « je ne sais pas », extraite de `HousingStep`). */
+/** Nombre de pièces principales : saisie EXACTE au stepper (au-delà de 4 autorisé). */
 export function RoomsQ({ draft, setField }: StepProps) {
   return (
-    <ChoiceField
+    <StepperField
       label="Combien de pièces principales ?"
       hint="Séjour et chambres ; cuisine et salle de bain ne comptent pas."
-      choices={[
-        { value: "1", label: "1" },
-        { value: "2", label: "2" },
-        { value: "3", label: "3" },
-        { value: "4", label: "4 et +" },
-        { value: "nsp", label: "Je ne sais pas" },
-      ]}
-      value={
-        draft.roomCountUnknown
-          ? "nsp"
-          : draft.roomCount === undefined
-            ? undefined
-            : (String(draft.roomCount) as "1" | "2" | "3" | "4")
-      }
-      onChange={(v) => {
-        if (v === "nsp") {
-          setField("roomCountUnknown", true);
-          setField("roomCount", undefined);
-        } else {
-          setField("roomCount", Number(v));
-          setField("roomCountUnknown", false);
-        }
-      }}
+      value={draft.roomCount}
+      onChange={(v) => setField("roomCount", v)}
+      min={1}
     />
   );
 }

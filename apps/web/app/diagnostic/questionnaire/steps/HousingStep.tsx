@@ -1,7 +1,7 @@
 "use client";
 
 import type { StepProps } from "../use-diagnostic-form";
-import { ChoiceField, TextField } from "../fields";
+import { ChoiceField, StepperField, TextField } from "../fields";
 
 export function HousingStep({ draft, setField }: StepProps) {
   return (
@@ -30,35 +30,15 @@ export function HousingStep({ draft, setField }: StepProps) {
         onChange={(v) => setField("furnished", v === "yes")}
       />
 
-      {/* Pièces + époque (encadrement des loyers) : clés du barème. « Je ne sais
-          pas » accepté — le barème ne se résout alors pas, sans bloquer le tunnel.
+      {/* Pièces + époque (encadrement des loyers) : clés du barème. Pièces en saisie
+          exacte (> 4 autorisé) ; non saisi = barème non résolu, sans bloquer le tunnel.
           TODO_COPY — libellés brouillon. */}
-      <ChoiceField
+      <StepperField
         label="Combien de pièces principales ?"
         hint="Séjour et chambres ; cuisine et salle de bain ne comptent pas."
-        choices={[
-          { value: "1", label: "1" },
-          { value: "2", label: "2" },
-          { value: "3", label: "3" },
-          { value: "4", label: "4 et +" },
-          { value: "nsp", label: "Je ne sais pas" },
-        ]}
-        value={
-          draft.roomCountUnknown
-            ? "nsp"
-            : draft.roomCount === undefined
-              ? undefined
-              : (String(draft.roomCount) as "1" | "2" | "3" | "4")
-        }
-        onChange={(v) => {
-          if (v === "nsp") {
-            setField("roomCountUnknown", true);
-            setField("roomCount", undefined);
-          } else {
-            setField("roomCount", Number(v));
-            setField("roomCountUnknown", false);
-          }
-        }}
+        value={draft.roomCount}
+        onChange={(v) => setField("roomCount", v)}
+        min={1}
       />
 
       <ChoiceField

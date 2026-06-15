@@ -58,7 +58,8 @@ export interface DossierSnapshot {
   leaseSignedAt?: string;
   furnished?: boolean;
   surfaceM2?: number;
-  /** Nombre de pièces principales (1 à 4 ; 4 = « 4 et plus ») — clé du barème d'encadrement. */
+  /** Nombre de pièces principales (valeur exacte, ≥ 1) — clé du barème d'encadrement
+      (qui regroupe « 4 et plus » à la résolution). */
   roomCount?: number;
   /** Époque de construction (fourchette) — clé du barème d'encadrement. */
   constructionPeriod?: ConstructionPeriod;
