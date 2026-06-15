@@ -235,7 +235,8 @@ export function StepperField({
 }) {
   const inc = () => onChange(value === undefined ? min : Math.min(max, value + 1));
   const dec = () => onChange(value === undefined ? min : Math.max(min, value - 1));
-  const atMin = value !== undefined && value <= min;
+  // Tant que rien n'est saisi (« — »), on amorce par « + » : « − » reste inactif.
+  const atMin = value === undefined || value <= min;
   const atMax = value !== undefined && value >= max;
   return (
     <fieldset>
