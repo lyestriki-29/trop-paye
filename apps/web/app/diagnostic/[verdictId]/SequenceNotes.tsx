@@ -17,7 +17,7 @@ export function ConfidenceNote({
 }) {
   if (confidence === "HIGH") {
     return (
-      <div className="rounded-card bg-paper-2 p-5">
+      <div className="border-2 border-ink bg-paper p-5">
         <p className="text-sm font-semibold text-refund-text">Confiance élevée</p>
         {/* TODO_COPY : variante sans n° de DPE (le deck suppose « DPE n° {num} »). */}
         <p className="mt-1 text-sm leading-relaxed text-ink/70">
@@ -36,7 +36,7 @@ export function ConfidenceNote({
     );
   }
   return (
-    <div className="rounded-card bg-paper-2 p-5">
+    <div className="border-2 border-ink bg-paper p-5">
       <p className="text-sm font-semibold text-ink/70">Confiance moyenne</p>
       {/* TODO_COPY : {pièce} = « une quittance de loyer » (le moteur n'expose pas la pièce exacte). */}
       <p className="mt-1 text-sm leading-relaxed text-ink/70">
@@ -53,7 +53,7 @@ export function PrescriptionNote({ prescription }: { prescription: PrescriptionI
     <p
       className={
         prescription.urgent
-          ? "rounded-field border border-line bg-paper-2 px-4 py-3 text-sm leading-relaxed text-ink/80"
+          ? "border-2 border-ink bg-paper px-4 py-3 text-sm leading-relaxed text-ink/80"
           : "px-1 text-xs leading-relaxed text-ink/50"
       }
     >

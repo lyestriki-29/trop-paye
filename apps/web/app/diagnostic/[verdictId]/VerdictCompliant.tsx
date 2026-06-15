@@ -8,7 +8,7 @@ import { IconHandCoins, IconSearch } from "@/components/home/icons";
  */
 export function VerdictCompliant({ addressLabel }: { addressLabel: string }) {
   return (
-    <section className="reveal-1 rounded-card border border-line bg-paper p-7 shadow-xl sm:p-10">
+    <section className="nb-card reveal-1 rounded-none p-7 sm:p-10">
       <p className="font-mono text-[11px] uppercase tracking-widest text-ink/55">
         {/* TODO_COPY — kicker hors deck. */}
         Diagnostic terminé
@@ -23,14 +23,14 @@ export function VerdictCompliant({ addressLabel }: { addressLabel: string }) {
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="reveal-2 rounded-card bg-paper-2 p-5">
+        <div className="reveal-2 border-2 border-ink bg-paper p-5">
           <IconSearch aria-hidden className="h-5 w-5 text-ink/60" />
           <p className="mt-3 text-sm leading-relaxed text-ink/80">
             Activez l&apos;alerte gratuite : si votre loyer augmente un jour, nous vérifierons
             automatiquement.
           </p>
         </div>
-        <div className="reveal-3 rounded-card bg-paper-2 p-5">
+        <div className="reveal-3 border-2 border-ink bg-paper p-5">
           <IconHandCoins aria-hidden className="h-5 w-5 text-ink/60" />
           <Button
             href="#depot-garantie"

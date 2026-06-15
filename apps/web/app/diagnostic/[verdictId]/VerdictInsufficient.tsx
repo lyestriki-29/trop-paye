@@ -21,7 +21,7 @@ export function VerdictInsufficient({
     .filter((label): label is string => Boolean(label));
 
   return (
-    <section className="reveal-1 rounded-card border border-line bg-paper p-7 shadow-xl sm:p-10">
+    <section className="nb-card reveal-1 rounded-none p-7 sm:p-10">
       {/* TODO_COPY — titre, chapeau et libellés de cet état (hors copy deck). */}
       <p className="font-mono text-[11px] uppercase tracking-widest text-ink/55">
         Diagnostic à compléter
@@ -41,7 +41,7 @@ export function VerdictInsufficient({
           {missing.map((label) => (
             <li
               key={label}
-              className="flex items-baseline gap-3 rounded-field bg-paper-2 px-4 py-3 text-sm text-ink/80"
+              className="flex items-baseline gap-3 border-2 border-ink bg-paper px-4 py-3 text-sm text-ink/80"
             >
               <span aria-hidden className="font-mono text-ink/45">
                 →
