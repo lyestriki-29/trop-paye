@@ -8,7 +8,7 @@ import { useDiagnosticForm } from "./use-diagnostic-form";
 import { CHAPTERS, QUESTIONS, canSubmit } from "./question-graph";
 import {
   applicableQuestions,
-  firstUnansweredId,
+  initialActiveId,
   nextQuestionId,
   resolveActiveId,
   revealOrder,
@@ -17,7 +17,6 @@ import { ActiveQuestion } from "./ui/ActiveQuestion";
 import { ChapterRail } from "./ui/ChapterRail";
 import { AnticipationBar } from "./ui/AnticipationBar";
 import { DossierPanel } from "./ui/DossierPanel";
-import { RecapQ } from "./questions/recap";
 
 const STORAGE = "tp_diagnostic_active_v1";
 
@@ -81,14 +80,11 @@ export function GuidedTunnel() {
     } catch {
       /* private mode : on repart du calcul */
     }
-    // L'id restauré doit être APPLICABLE au draft courant (pas seulement exister
-    // dans QUESTIONS) : sinon "recap" reste valide, sinon on recalcule.
-    const valid =
-      saved &&
-      (saved === "recap" || applicableQuestions(QUESTIONS, draft).some((q) => q.id === saved))
-        ? saved
-        : null;
-    setActiveId(valid ?? firstUnansweredId(QUESTIONS, draft) ?? "recap");
+    // `recap` n'est restauré que si le dossier est SOUMETTABLE : un "recap"
+    // périmé (session précédente) ne doit pas enfermer un nouveau visiteur au
+    // récap. Sinon : id de question restauré s'il est applicable, à défaut la
+    // 1re non répondue (cf. initialActiveId).
+    setActiveId(initialActiveId(QUESTIONS, draft, saved, canSubmit(draft)));
     setReady(true);
   }, [hydrated, ready, draft]);
 
@@ -186,18 +182,26 @@ export function GuidedTunnel() {
     <div className="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
       <TunnelHeaderNb step={Math.max(1, stepNo)} total={CHAPTERS.length} />
 
-      <div className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-4 px-4 py-4 lg:min-h-0 lg:grid-cols-[1fr_22rem] lg:gap-6 lg:py-6">
-        {/* Colonne gauche : progression + question active SEULE. */}
+      <div
+        className={`mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-4 px-4 py-4 lg:min-h-0 lg:gap-6 lg:py-6${
+          isRecap ? "" : " lg:grid-cols-[1fr_22rem]"
+        }`}
+      >
+        {/* Colonne gauche : progression + question active (ou récap pleine largeur). */}
         <main className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
           <ChapterRail activeId={activeId} draft={draft} />
           <AnticipationBar draft={draft} />
 
           {isRecap ? (
-            <div
-              className="nb-card rounded-none border-3 border-ink p-4"
-              style={{ backgroundColor: "#FFF7E0", boxShadow: "4px 4px 0 rgb(var(--color-nb-ink))" }}
-            >
-              <RecapQ draft={draft} setField={setField} />
+            // Récap final : la synthèse du dossier ET le CTA passent au centre,
+            // pleine largeur (le rail de droite est masqué pour éviter le doublon).
+            <div className="flex min-h-0 flex-1 flex-col gap-3">
+              <p className="text-sm text-ink/70">
+                Vérifiez vos réponses puis lancez le diagnostic.
+              </p>
+              <div className="min-h-0 flex-1">
+                <DossierPanel rows={dossierRows} footer={dossierFooter} />
+              </div>
             </div>
           ) : active ? (
             <ActiveQuestion
@@ -210,8 +214,8 @@ export function GuidedTunnel() {
           ) : null}
         </main>
 
-        {/* Colonne droite : panneau dossier éditable + CTA en bas. */}
-        <DossierPanel rows={dossierRows} footer={dossierFooter} />
+        {/* Colonne droite : panneau dossier éditable + CTA (masqué sur le récap). */}
+        {isRecap ? null : <DossierPanel rows={dossierRows} footer={dossierFooter} />}
       </div>
     </div>
   );
