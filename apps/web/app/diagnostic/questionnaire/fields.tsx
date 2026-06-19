@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { Field } from "@/components/ui/Field";
 
 /**
@@ -141,6 +141,7 @@ export function MonthYearField({
   value,
   onChange,
   fromYear = 1989,
+  now = new Date(),
 }: {
   label: string;
   hint?: string;
@@ -148,19 +149,45 @@ export function MonthYearField({
   value: string;
   onChange: (v: string) => void;
   fromYear?: number;
+  /** Horloge injectable (tests) ; sinon « maintenant ». */
+  now?: Date;
 }) {
-  const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
-  const month = value ? Number(value.slice(5, 7)) : 0;
-  const year = value ? Number(value.slice(0, 4)) : 0;
+
+  // État partiel interne : mois et année indépendants, pour un choix dans
+  // n'importe quel ordre. Initialisé depuis la valeur ISO contrôlée.
+  const [month, setMonth] = useState(value ? Number(value.slice(5, 7)) : 0);
+  const [year, setYear] = useState(value ? Number(value.slice(0, 4)) : 0);
+
+  // Resync sur changement EXTERNE complet (édition d'une réponse) ; une valeur
+  // vide n'écrase pas une sélection partielle en cours de saisie.
+  useEffect(() => {
+    if (value) {
+      setMonth(Number(value.slice(5, 7)));
+      setYear(Number(value.slice(0, 4)));
+    }
+  }, [value]);
+
   const years: number[] = [];
   for (let y = currentYear; y >= fromYear; y -= 1) years.push(y);
 
-  // Sélection partielle tolérée : la valeur ne sort que complète (mois ET année).
-  const emit = (m: number, y: number) => {
+  // N'émet vers le parent qu'une date complète (mois ET année) ; sinon vide.
+  const commit = (m: number, y: number) => {
     if (m >= 1 && y >= fromYear) onChange(`${y}-${String(m).padStart(2, "0")}-01`);
     else onChange("");
+  };
+
+  const pickMonth = (m: number) => {
+    setMonth(m);
+    commit(m, year);
+  };
+  const pickYear = (y: number) => {
+    // Mois devenu futur pour l'année courante → on le purge.
+    const m = y === currentYear && month > currentMonth ? 0 : month;
+    setMonth(m);
+    setYear(y);
+    commit(m, y);
   };
 
   return (
@@ -170,7 +197,7 @@ export function MonthYearField({
         <select
           aria-label="Mois"
           value={month || ""}
-          onChange={(e) => emit(Number(e.target.value), year || currentYear)}
+          onChange={(e) => pickMonth(Number(e.target.value))}
           className={SELECT_CLS}
         >
           <option value="" disabled>
@@ -180,7 +207,7 @@ export function MonthYearField({
             <option
               key={m}
               value={i + 1}
-              disabled={(year || currentYear) === currentYear && i + 1 > currentMonth}
+              disabled={year === currentYear && i + 1 > currentMonth}
             >
               {m}
             </option>
@@ -189,12 +216,7 @@ export function MonthYearField({
         <select
           aria-label="Année"
           value={year || ""}
-          onChange={(e) => {
-            const y = Number(e.target.value);
-            // Mois futur devenu invalide après changement d'année → on le purge.
-            const m = y === currentYear && month > currentMonth ? 0 : month;
-            emit(m, y);
-          }}
+          onChange={(e) => pickYear(Number(e.target.value))}
           className={`${SELECT_CLS} font-mono tabular`}
         >
           <option value="" disabled>

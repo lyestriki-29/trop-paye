@@ -26,6 +26,7 @@ export default defineConfig({
       "lib/**/*.test.ts",
       "app/api/**/*.test.ts",
       "app/diagnostic/**/*.test.ts",
+      "app/diagnostic/**/*.test.tsx",
       "components/**/*.test.tsx",
     ],
     environment: "node",
