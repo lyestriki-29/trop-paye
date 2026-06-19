@@ -11,6 +11,31 @@ export function firstUnansweredId(graph: Question[], d: DiagnosticDraft): string
   return applicableQuestions(graph, d).find((q) => !q.isAnswered(d))?.id ?? null;
 }
 
+/**
+ * Choisit l'`activeId` initial à l'hydratation, depuis l'id éventuellement
+ * restauré du localStorage. `recap` n'est restauré que si le dossier est
+ * réellement soumettable (`submittable`) : sinon un `recap` périmé (laissé par
+ * une session précédente) enfermerait un nouveau visiteur au récap au lieu de
+ * l'emmener à la première question. Un id de question n'est restauré que s'il
+ * est applicable au dossier courant ; à défaut, on repart de la 1re non
+ * répondue (ou "recap" si tout est déjà répondu).
+ */
+export function initialActiveId(
+  graph: Question[],
+  d: DiagnosticDraft,
+  saved: string | null,
+  submittable: boolean,
+): string {
+  if (
+    saved &&
+    ((saved === "recap" && submittable) ||
+      applicableQuestions(graph, d).some((q) => q.id === saved))
+  ) {
+    return saved;
+  }
+  return firstUnansweredId(graph, d) ?? "recap";
+}
+
 export function nextQuestionId(
   graph: Question[],
   d: DiagnosticDraft,
