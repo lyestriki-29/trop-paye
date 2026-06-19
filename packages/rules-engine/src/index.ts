@@ -1,6 +1,6 @@
 export * from "./types";
 export { evaluateDpeFreeze } from "./rules/dpe-freeze";
-export { evaluateIrlOvercharge } from "./rules/irl-overcharge";
+export { evaluateIrlOvercharge, irlSuggestionCents } from "./rules/irl-overcharge";
 export { evaluateDepositLate } from "./rules/deposit-late";
 export { evaluateDepositCap } from "./rules/deposit-cap";
 export { evaluateAgencyFeesCap } from "./rules/agency-fees-cap";
@@ -30,3 +30,4 @@ export {
   ccToHcCents,
   estimateMonthlyChargesCents,
 } from "./internal/charges";
+export { constructionPeriodFromYear } from "./construction";

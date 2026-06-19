@@ -7,7 +7,6 @@ import type { AddressSuggestion } from "@/lib/providers/geo";
 import { submitDiagnostic } from "@/app/diagnostic/actions";
 
 const STORAGE_KEY = "tp_diagnostic_draft_v1";
-const STEP_KEY = "tp_diagnostic_step_v1";
 
 export interface DpeDraft {
   class: string;
@@ -168,36 +167,22 @@ function buildPayload(draft: DiagnosticDraft): Record<string, unknown> {
 export function useDiagnosticForm() {
   const router = useRouter();
   const [draft, setDraft] = useState<DiagnosticDraft>(EMPTY);
-  const [stepIndex, setStepIndex] = useState(0);
   const [hydrated, setHydrated] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Restaure brouillon + étape après le montage (évite tout mismatch d'hydratation SSR).
-  // L'étape n'est restaurée que si un brouillon existe (sinon retour à l'étape 0).
+  // Restaure le brouillon après le montage (évite tout mismatch d'hydratation SSR).
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         setDraft({ ...EMPTY, ...(JSON.parse(raw) as DiagnosticDraft) });
-        const savedStep = Number.parseInt(localStorage.getItem(STEP_KEY) ?? "", 10);
-        if (Number.isInteger(savedStep) && savedStep >= 0) setStepIndex(savedStep);
       }
     } catch {
       /* brouillon illisible : on repart à vide */
     }
     setHydrated(true);
   }, []);
-
-  // Persiste l'étape courante.
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      localStorage.setItem(STEP_KEY, String(stepIndex));
-    } catch {
-      /* non bloquant */
-    }
-  }, [stepIndex, hydrated]);
 
   // Autosave débouncé (évite une écriture localStorage à chaque frappe).
   useEffect(() => {
@@ -230,12 +215,11 @@ export function useDiagnosticForm() {
     }
     try {
       localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(STEP_KEY);
     } catch {
       /* non bloquant */
     }
     router.push(`/diagnostic/${res.verdictId}`);
   }, [draft, router]);
 
-  return { draft, setField, stepIndex, setStepIndex, hydrated, submit, submitting, error };
+  return { draft, setField, hydrated, submit, submitting, error };
 }
