@@ -10,18 +10,26 @@ import { IconArrowRight } from "@/components/home/icons";
 
 export function RegimesNb() {
   return (
-    <section className="border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="border-b-3 border-nb-ink bg-pink py-14 sm:py-18">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
-          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
-            Pièce n°03 · Les règles
-          </p>
-          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)]">
-            Trois règles. Trois façons de <span className="nb-mark">trop payer</span>.
-          </h2>
+          <div className="grid gap-x-12 gap-y-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+            <div>
+              <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
+                Pièce n°05 · Les règles
+              </p>
+              <h2 className="mt-3 text-[clamp(28px,4.5vw,52px)]">
+                Trois règles. Trois façons de <span className="nb-mark">trop payer</span>.
+              </h2>
+            </div>
+            <p className="max-w-xl font-nb-body text-xl font-medium leading-relaxed text-nb-ink/90">
+              Votre dossier relève d&apos;au moins un de ces trois régimes. Chacun a sa base
+              légale et sa façon de récupérer le trop-perçu, ou de vous orienter.
+            </p>
+          </div>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+        <div className="mt-10 grid gap-8 lg:grid-cols-3">
           {/* Régime 1 — gel F/G : texte prod (copy deck §1). */}
           <Reveal delay={0.08} className="lg:col-span-2">
             <article className="nb-tilt nb-card relative flex h-full flex-col p-8 sm:p-10">
@@ -47,7 +55,7 @@ export function RegimesNb() {
               <div className="mt-auto pt-7">
                 <a
                   href="/diagnostic"
-                  className="nb-card-hover group inline-flex items-center gap-2 border-3 border-nb-ink bg-accent px-6 py-3 font-nb-display text-base uppercase shadow-nb focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nb-ink focus-visible:ring-offset-2"
+                  className="nb-card-hover group inline-flex items-center gap-2 border-3 border-nb-ink bg-nb-ink px-6 py-3 font-nb-display text-base uppercase text-cream shadow-nb focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nb-ink focus-visible:ring-offset-2"
                 >
                   Vérifier mon DPE
                   <IconArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -68,7 +76,7 @@ export function RegimesNb() {
             </article>
           </Reveal>
 
-          <div className="grid gap-6">
+          <div className="grid gap-8">
             {/* Régime 2 — bouclier 3,5 % : TODO_COPY / TODO_VERIFIER avant prod. */}
             <Reveal delay={0.16}>
               <article className="nb-tilt nb-card flex h-full flex-col p-7">

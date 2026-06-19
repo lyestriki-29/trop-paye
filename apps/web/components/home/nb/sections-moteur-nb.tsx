@@ -47,18 +47,18 @@ const PIPELINE: ReadonlyArray<Etape> = [
 
 export function MoteurNb() {
   return (
-    <section className="border-b-3 border-nb-ink py-16 sm:py-20">
+    <section className="nb-dark border-b-3 border-nb-ink py-12 sm:py-14">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
-          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
+          <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-cream/45">
             Pièce n°02 · L&apos;instruction
           </p>
-          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)]">
+          <h2 className="mt-3 max-w-3xl text-[clamp(28px,4.5vw,52px)] text-cream">
             Votre dossier est <span className="nb-mark">instruit</span>, pas estimé.
           </h2>
         </Reveal>
 
-        <ol className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <ol className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {PIPELINE.map(({ num, title, source, text, meta }, i) => (
             <Reveal key={num} delay={0.08 + i * 0.08} className="h-full">
               <li className="nb-tilt nb-card flex h-full flex-col p-6">
@@ -79,7 +79,7 @@ export function MoteurNb() {
         </ol>
 
         <Reveal delay={0.4}>
-          <p className="mt-10 max-w-2xl border-l-[6px] border-violet bg-paper p-4 nb-mono text-xs leading-relaxed text-nb-ink/70 shadow-nb-sm">
+          <p className="mt-7 max-w-2xl border-l-[6px] border-violet bg-paper p-4 nb-mono text-xs leading-relaxed text-nb-ink/70 shadow-nb-sm">
             Chaque verdict cite sa règle, sa base légale et son calcul complet. Rien n&apos;est
             affirmé qui ne soit traçable.
           </p>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Reveal } from "@/components/home/Reveal";
 import { CtaFinalNb } from "@/components/home/nb/CtaFinalNb";
-import { EtapesNb } from "@/components/home/nb/sections-etapes-nb";
 import { FAQ_COMPLETE } from "@/components/public/FaqComplete";
 import { PageHeroNb } from "@/components/public/PageHeroNb";
+import { ParcoursNb } from "@/components/public/ParcoursNb";
 import { PublicShell } from "@/components/ui/PublicShell";
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ const faqJsonLd = {
 /** Barème néubrutaliste (#bareme) — copy deck §1 : 0 € d'avance, 25 % au succès. */
 function BaremeNb() {
   return (
-    <section id="bareme" className="scroll-mt-24 border-b-3 border-nb-ink py-16 sm:py-20">
+    <section id="bareme" className="scroll-mt-24 border-b-3 border-nb-ink bg-menthe py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <Reveal>
           <p aria-hidden className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/55">
@@ -100,6 +100,7 @@ export default function CommentCaMarchePage() {
   return (
     <PublicShell>
       <PageHeroNb
+        band="bg-violet"
         kicker="TropPayé · Le parcours"
         title={
           <>
@@ -108,7 +109,7 @@ export default function CommentCaMarchePage() {
         }
         lede="Vérifiez votre loyer en 2 minutes. Si on ne récupère rien, vous ne payez rien."
       />
-      <EtapesNb />
+      <ParcoursNb />
       <BaremeNb />
       <FaqNb />
       <CtaFinalNb />

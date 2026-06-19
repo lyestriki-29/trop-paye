@@ -8,21 +8,26 @@
   --color-ink: 42 33 24; /* #2A2118 */
   --color-paper: 255 254 251; /* #FFFEFB */
   --color-paper-2: 250 244 236; /* #FAF4EC */
-  --color-refund: 12 143 99; /* #0C8F63 */
+  --color-refund: 15 169 104; /* #0FA968 — vert vif aligné maquettes nb */
   --color-refund-text: 10 115 81; /* #0A7351 */
   --color-stamp: 214 69 69; /* #D64545 */
   --color-line: 234 225 214; /* #EAE1D6 */
-  --color-accent: 255 216 77; /* #FFD84D — le surligneur jaune */
+  --color-accent: 255 122 26; /* #FF7A1A — ORANGE, couleur principale nb (= acid) */
 
   /* Néubrutalisme — site PUBLIC uniquement. Additif : ces canaux ne sont
      consommés que sous le scope `.nb`, l'espace/admin n'y touchent pas.
      PASTEL aligné charte (choix Lyes 2026-06-13 : nos couleurs, pas LP3 ;
      tout flashy → pâle). Bords/ombres = ink CHAUD de la charte, pas de noir pur. */
   --color-cream: 250 244 236; /* = paper-2 : fond néubrutaliste chaud */
-  --color-nb-ink: 42 33 24; /* = ink charte : bords + texte chauds (ex-#121212) */
-  --color-violet: 203 191 239; /* lavande pâle (ex-flashy #7B61FF) */
-  --color-pink: 244 205 217; /* rose pâle (ex-flashy #FF5C8A) */
-  --color-acid: 255 216 77; /* = accent : jaune DOUX charte (ex-acide #E8FF38) */
+  --color-nb-ink: 36 29 21; /* #241D15 — encre nb plus dense (palette + de couleur) */
+  /* Palette « + de couleur » (itération 2026-06-14 §4). Scopée `.nb`, additive. */
+  --color-violet: 183 164 242; /* #B7A4F2 lavande */
+  --color-pink: 255 138 160; /* #FF8AA0 corail */
+  --color-acid: 255 122 26; /* #FF7A1A — orange (= accent, couleur principale) */
+  --color-menthe: 127 227 180; /* #7FE3B4 */
+  --color-ciel: 134 210 245; /* #86D2F5 */
+  --color-orange: 255 154 61; /* #FF9A3D */
+  --color-vert: 15 169 104; /* #0FA968 vert d'accent (≠ refund #0C8F63, montants) */
 }
 
 html {
@@ -245,6 +250,8 @@ body::after {
   /* Fond travaillé UNIFIÉ (cohérence demandée Lyes 2026-06-13) : une seule
      grille de points fine sur tout le scope. Les sections crème sont
      transparentes → elles héritent toutes du même motif (fini le patchwork). */
+  /* Fond crème chaud (demande Lyes), grille de points ténue ; les bandes de
+     section couvrent l'essentiel du scope. */
   background-color: rgb(var(--color-cream));
   background-image: radial-gradient(
     rgb(var(--color-nb-ink) / 0.05) 1.2px,
@@ -425,6 +432,7 @@ body::after {
   text-transform: uppercase;
   letter-spacing: -0.01em;
   line-height: 0.95;
+  text-wrap: balance; /* coupe les titres proprement (fini les orphelins). */
 }
 
 /* Mono : libellés techniques, montants, kickers. */
@@ -463,9 +471,9 @@ body::after {
   text-underline-offset: 3px;
 }
 
-/* Carte dure : bord plein 3px + ombre dure portée. */
+/* Carte dure : bord plein 3px + ombre dure portée. Fond crème (demande Lyes). */
 .nb-card {
-  background-color: rgb(var(--color-paper));
+  background-color: rgb(var(--color-cream));
   border: 3px solid rgb(var(--color-nb-ink));
   box-shadow: 6px 6px 0 rgb(var(--color-nb-ink));
 }

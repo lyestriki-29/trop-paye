@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { ClosingNb } from "@/components/home/nb/sections-closing-nb";
+import { CasZeroNb, ClosingNb } from "@/components/home/nb/sections-closing-nb";
 import { EtapesNb } from "@/components/home/nb/sections-etapes-nb";
 import { HeroNb, TickerNb } from "@/components/home/nb/sections-hero-nb";
-import { MoteurNb } from "@/components/home/nb/sections-moteur-nb";
-import { ConfianceNb, TemoignageNb } from "@/components/home/nb/sections-preuves-nb";
+import { TemoignageNb } from "@/components/home/nb/sections-preuves-nb";
 import { RegimesNb } from "@/components/home/nb/sections-regimes-nb";
 import { ResultatsNb } from "@/components/home/nb/sections-resultats-nb";
 import { FAQ_COMPLETE } from "@/components/public/FaqComplete";
@@ -30,8 +29,8 @@ const faqJsonLd = {
 
 /**
  * Home — DA néubrutaliste pastel « Vivante » (arbitrage Lyes 2026-06-13),
- * promue depuis /design-lab. Preuve chiffrée tôt (résultats), puis méthode,
- * règles, moteur, confiance, témoignage, cas zéro + FAQ + CTA.
+ * promue depuis /design-lab. Preuve chiffrée tôt (résultats), notre histoire
+ * (fondateur), méthode + témoignage Kilian, règles, FAQ + CTA.
  */
 export default function Home() {
   return (
@@ -39,11 +38,10 @@ export default function Home() {
       <TickerNb />
       <HeroNb />
       <ResultatsNb />
+      <CasZeroNb />
       <EtapesNb />
-      <RegimesNb />
-      <MoteurNb />
-      <ConfianceNb stats={null} />
       <TemoignageNb />
+      <RegimesNb />
       <ClosingNb />
       <script
         type="application/ld+json"

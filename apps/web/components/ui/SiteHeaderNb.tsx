@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { brand } from "@troppaye/shared";
+import { LogoNb } from "@/components/ui/LogoNb";
 
 /**
  * En-tête public néubrutaliste — sticky, bord dur 3px, vraies pages en nav,
@@ -48,12 +49,8 @@ export function SiteHeaderNb() {
   return (
     <header className="sticky top-0 z-50 border-b-3 border-nb-ink bg-cream/95 backdrop-blur">
       <div className="mx-auto flex max-w-container items-center justify-between gap-6 px-6 py-3.5">
-        <Link
-          href="/"
-          aria-label={`${brand.name} — accueil`}
-          className="font-nb-display text-xl uppercase tracking-tight"
-        >
-          {brand.name}
+        <Link href="/" aria-label={`${brand.name} — accueil`}>
+          <LogoNb />
         </Link>
         <nav
           aria-label="Navigation principale"
@@ -63,7 +60,7 @@ export function SiteHeaderNb() {
             <Link
               key={href}
               href={href}
-              className="nb-mono text-xs font-semibold uppercase tracking-wider text-nb-ink/70 transition hover:text-nb-ink"
+              className="font-nb-body text-sm font-semibold uppercase tracking-wide text-nb-ink/70 transition hover:text-nb-ink"
             >
               {label}
             </Link>
@@ -72,13 +69,13 @@ export function SiteHeaderNb() {
         <div className="hidden items-center gap-4 lg:flex">
           <Link
             href="/login"
-            className="nb-mono text-xs font-semibold uppercase tracking-wider text-nb-ink/70 transition hover:text-nb-ink"
+            className="font-nb-body text-sm font-semibold uppercase tracking-wide text-nb-ink/70 transition hover:text-nb-ink"
           >
             Se connecter
           </Link>
           <Link
             href="/diagnostic"
-            className="nb-card-hover border-3 border-nb-ink bg-accent px-4 py-2 font-nb-display text-sm uppercase shadow-nb-sm"
+            className="nb-card-hover border-3 border-nb-ink bg-nb-ink px-4 py-2 font-nb-display text-sm uppercase text-cream shadow-nb-sm"
           >
             {brand.hero.cta}
           </Link>
@@ -88,7 +85,7 @@ export function SiteHeaderNb() {
           aria-expanded={open}
           aria-controls="menu-mobile-nb"
           onClick={() => setOpen((o) => !o)}
-          className="border-3 border-nb-ink bg-paper p-1.5 text-nb-ink shadow-nb-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nb-ink lg:hidden"
+          className="border-3 border-nb-ink bg-cream p-1.5 text-nb-ink shadow-nb-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nb-ink lg:hidden"
         >
           <IconBurger open={open} />
           <span className="sr-only">{open ? "Fermer le menu" : "Ouvrir le menu"}</span>
@@ -115,7 +112,7 @@ export function SiteHeaderNb() {
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="nb-mono text-sm font-semibold uppercase tracking-wider text-nb-ink/70"
+              className="font-nb-body text-sm font-semibold uppercase tracking-wide text-nb-ink/70"
             >
               Se connecter
             </Link>
@@ -124,7 +121,7 @@ export function SiteHeaderNb() {
             <Link
               href="/diagnostic"
               onClick={() => setOpen(false)}
-              className="block border-3 border-nb-ink bg-accent px-4 py-3 text-center font-nb-display text-base uppercase shadow-nb-sm"
+              className="block border-3 border-nb-ink bg-nb-ink px-4 py-3 text-center font-nb-display text-base uppercase text-cream shadow-nb-sm"
             >
               {brand.hero.cta}
             </Link>

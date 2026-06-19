@@ -7,11 +7,11 @@ import { HeroAddress } from "@/components/home/HeroAddress";
  */
 export function CtaFinalNb() {
   return (
-    <section className="nb-band-final border-t-3 border-nb-ink py-16 sm:py-24">
+    <section className="nb-band-final bg-orange border-t-3 border-nb-ink py-16 sm:py-20">
       <div className="mx-auto max-w-container px-6">
         <div className="flex flex-wrap items-start justify-between gap-8">
           <h2 className="max-w-2xl text-[clamp(32px,5vw,60px)]">{brand.baseline}</h2>
-          <span className="nb-tag bg-paper text-nb-ink">0 € d&apos;avance</span>
+          <span className="nb-tag bg-cream text-nb-ink">0 € d&apos;avance</span>
         </div>
         <div className="mt-10">
           <HeroAddress />
