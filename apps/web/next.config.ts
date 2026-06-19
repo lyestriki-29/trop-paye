@@ -16,9 +16,19 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: { "/api/og/[verdictId]": ["./assets/fonts/**/*"] },
   // Le moteur et la marque sont des packages TS du monorepo → à transpiler.
   transpilePackages: ["@troppaye/shared", "@troppaye/rules-engine"],
-  // /a-propos → /notre-histoire (arbitrage Lyes 2026-06-11 : une seule page récit).
+  // Redirections 308 pour les pages retirées (évite 404 + préserve le SEO).
   async redirects() {
-    return [{ source: "/a-propos", destination: "/notre-histoire", permanent: true }];
+    return [
+      // /a-propos → /notre-histoire (arbitrage Lyes 2026-06-11 : une seule page récit).
+      { source: "/a-propos", destination: "/notre-histoire", permanent: true },
+      // /resultats supprimée → section #resultats de la home (Lyes 2026-06-13).
+      { source: "/resultats", destination: "/#resultats", permanent: true },
+      // /guides retirés (→ futur PDF mails de bienvenue) → home (Lyes 2026-06-14).
+      { source: "/guides", destination: "/", permanent: true },
+      { source: "/guides/:slug", destination: "/", permanent: true },
+      // /methode retirée (→ futur espace client) → home (Lyes 2026-06-14).
+      { source: "/methode", destination: "/", permanent: true },
+    ];
   },
   images: { remotePatterns: [] },
   // NB : cacheComponents (use cache) sera activé plus tard, uniquement sur les

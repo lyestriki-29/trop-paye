@@ -13,6 +13,16 @@
   --color-stamp: 214 69 69; /* #D64545 */
   --color-line: 234 225 214; /* #EAE1D6 */
   --color-accent: 255 216 77; /* #FFD84D — le surligneur jaune */
+
+  /* Néubrutalisme — site PUBLIC uniquement. Additif : ces canaux ne sont
+     consommés que sous le scope `.nb`, l'espace/admin n'y touchent pas.
+     PASTEL aligné charte (choix Lyes 2026-06-13 : nos couleurs, pas LP3 ;
+     tout flashy → pâle). Bords/ombres = ink CHAUD de la charte, pas de noir pur. */
+  --color-cream: 250 244 236; /* = paper-2 : fond néubrutaliste chaud */
+  --color-nb-ink: 42 33 24; /* = ink charte : bords + texte chauds (ex-#121212) */
+  --color-violet: 203 191 239; /* lavande pâle (ex-flashy #7B61FF) */
+  --color-pink: 244 205 217; /* rose pâle (ex-flashy #FF5C8A) */
+  --color-acid: 255 216 77; /* = accent : jaune DOUX charte (ex-acide #E8FF38) */
 }
 
 html {
@@ -219,4 +229,390 @@ body::after {
     rgb(var(--color-ink) / 0.75) 9px 12px,
     transparent 12px 16px
   );
+}
+
+/* ============================================================
+   NÉUBRUTALISME — site PUBLIC uniquement (réf. LP3).
+   Tout est scopé sous `.nb` : /espace, /admin, /diagnostic, /mandat
+   ne portent jamais cette classe, donc rien ne déborde sur leur DA
+   « dossier d'instruction ». Palette hybride confiance : on garde
+   refund/accent de la charte, on ajoute violet/pink/acid + la grammaire
+   dure (bords 3px, ombres pleines, capitales, stickers pivotés).
+   ============================================================ */
+.nb {
+  font-family: var(--font-nb-body), system-ui, sans-serif;
+  color: rgb(var(--color-nb-ink));
+  /* Fond travaillé UNIFIÉ (cohérence demandée Lyes 2026-06-13) : une seule
+     grille de points fine sur tout le scope. Les sections crème sont
+     transparentes → elles héritent toutes du même motif (fini le patchwork). */
+  background-color: rgb(var(--color-cream));
+  background-image: radial-gradient(
+    rgb(var(--color-nb-ink) / 0.05) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
+
+  /* Variables de thème (déclinaison « Douce » par défaut). Les modificateurs
+     `.nb--temperee` / `.nb--editoriale` ne surchargent que ces variables —
+     les sections lisent ces vars, donc on bascule la DA sans toucher au JSX. */
+  --nb-mark-bg: var(--color-accent); /* surligneur emphatique */
+  --nb-mark-fg: var(--color-nb-ink);
+  --nb-badge-bg: var(--color-violet); /* badge d'étape */
+  --nb-badge-fg: var(--color-nb-ink);
+  --nb-band-bg: var(--color-accent); /* bandeau CTA final */
+  --nb-band-fg: var(--color-nb-ink);
+  --nb-caszero-bg: var(--color-violet); /* bloc cas zéro */
+}
+
+/* ----------------------------------------------------------------
+   3 NIVEAUX D'ANIMATION (palette Douce validée pour les trois).
+   Vivante = base `.nb`. Kinetic / Maximal AJOUTENT des effets, tous
+   progressifs (@supports animation-timeline) et coupés en reduced-motion.
+   ---------------------------------------------------------------- */
+
+/* — Vivante (base) — stickers qui « tombent » en place au montage. */
+.nb-sticker {
+  animation: nb-drop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes nb-drop {
+  from {
+    opacity: 0;
+    translate: 0 -14px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Tampon « Trop payé » — masqué par défaut, imprimé en Maximal. */
+.nb-stamp {
+  display: none;
+}
+
+/* Barre de progression de lecture — masquée hors Kinetic / Maximal. */
+.nb-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 5px;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background-color: rgb(var(--color-refund));
+  border-bottom: 2px solid rgb(var(--color-nb-ink));
+  z-index: 90;
+  display: none;
+}
+
+/* — Kinetic — marquee rapide + parallax stickers + barre de progression. */
+.nb--kinetic .v3-marquee-track {
+  animation-duration: 18s;
+}
+@supports (animation-timeline: scroll()) {
+  .nb--kinetic .nb-progress,
+  .nb--maximal .nb-progress {
+    display: block;
+    animation: nb-progress-grow linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+@keyframes nb-progress-grow {
+  to {
+    transform: scaleX(1);
+  }
+}
+@supports (animation-timeline: view()) {
+  .nb--kinetic .nb-sticker,
+  .nb--maximal .nb-sticker {
+    animation: nb-parallax linear both;
+    animation-timeline: view();
+    animation-range: cover;
+  }
+  .nb--maximal .nb-tilt {
+    animation: nb-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+}
+@keyframes nb-parallax {
+  from {
+    translate: 0 22px;
+  }
+  to {
+    translate: 0 -22px;
+  }
+}
+@keyframes nb-rise {
+  from {
+    scale: 0.95;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+/* — Maximal — typo XXL + tampon imprimé au scroll. */
+.nb--maximal h1 {
+  font-size: clamp(56px, 11vw, 132px);
+}
+.nb--maximal .nb-stamp {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-nb-display), system-ui, sans-serif;
+  color: rgb(var(--color-stamp));
+  border: 4px solid rgb(var(--color-stamp));
+  border-radius: 6px;
+  padding: 0.2rem 0.7rem;
+  rotate: -9deg;
+  opacity: 0.9;
+}
+@supports (animation-timeline: view()) {
+  .nb--maximal .nb-stamp {
+    animation: nb-stamp-in linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 70%;
+  }
+}
+@keyframes nb-stamp-in {
+  from {
+    opacity: 0;
+    scale: 1.8;
+    rotate: -24deg;
+  }
+  to {
+    opacity: 0.9;
+    scale: 1;
+    rotate: -9deg;
+  }
+}
+
+/* Bandeaux thématisés (lisent les vars de déclinaison) — même grille de points
+   posée sur la couleur, pour rester « lié » au reste de la page. */
+.nb-band-final {
+  background-color: rgb(var(--nb-band-bg));
+  color: rgb(var(--nb-band-fg));
+  background-image: radial-gradient(
+    rgb(var(--color-nb-ink) / 0.07) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
+}
+.nb-band-caszero {
+  background-color: rgb(var(--nb-caszero-bg));
+  background-image: radial-gradient(
+    rgb(var(--color-nb-ink) / 0.07) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
+}
+
+/* Bande sombre (confiance) : points clairs sur fond ink — même trame, négatif. */
+.nb-dark {
+  background-color: rgb(var(--color-nb-ink));
+  background-image: radial-gradient(
+    rgb(var(--color-cream) / 0.07) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 24px 24px;
+}
+
+/* Titres : Archivo Black, capitales, interlignage serré (signature LP3). */
+.nb h1,
+.nb h2,
+.nb h3,
+.nb .nb-title {
+  font-family: var(--font-nb-display), system-ui, sans-serif;
+  font-weight: 400; /* Archivo Black est déjà « black ». */
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+/* Mono : libellés techniques, montants, kickers. */
+.nb-mono {
+  font-family: var(--font-nb-mono), ui-monospace, monospace;
+}
+
+/* Prose d'article (guides) : titres lisibles, PAS en capitales Archivo. */
+.nb-prose h1,
+.nb-prose h2,
+.nb-prose h3,
+.nb-prose h4 {
+  font-family: var(--font-nb-body), system-ui, sans-serif;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.nb-prose h2 {
+  font-size: 1.6rem;
+  margin-top: 2rem;
+}
+.nb-prose h3 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+}
+.nb-prose p,
+.nb-prose li {
+  margin-top: 0.85rem;
+  line-height: 1.7;
+  color: rgb(var(--color-nb-ink) / 0.82);
+}
+.nb-prose a {
+  color: rgb(var(--color-refund));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Carte dure : bord plein 3px + ombre dure portée. */
+.nb-card {
+  background-color: rgb(var(--color-paper));
+  border: 3px solid rgb(var(--color-nb-ink));
+  box-shadow: 6px 6px 0 rgb(var(--color-nb-ink));
+}
+
+/* Effet « appui » au survol (liens/boutons/cartes cliquables) : opt-in. */
+@media (hover: hover) {
+  .nb-card-hover {
+    transition:
+      transform 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  .nb-card-hover:hover {
+    transform: translate(3px, 3px);
+    box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
+  }
+  /* Carte « vivante » : léger relèvement + ombre creusée au survol. */
+  .nb-tilt {
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+  .nb-tilt:hover {
+    transform: translate(-2px, -3px) rotate(-0.6deg);
+    box-shadow: 10px 10px 0 rgb(var(--color-nb-ink));
+  }
+}
+
+/* Surligneur pivoté pour mots-clés dans les titres (couleur = var de thème). */
+.nb-mark {
+  display: inline-block;
+  padding: 0 0.18em;
+  background-color: rgb(var(--nb-mark-bg));
+  color: rgb(var(--nb-mark-fg));
+  border: 2px solid rgb(var(--color-nb-ink));
+  box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
+  transform: rotate(-1.5deg);
+}
+/* Pastels clairs → texte ink (lisible). Seul le vert refund garde un texte clair. */
+.nb-mark--violet {
+  background-color: rgb(var(--color-violet));
+  color: rgb(var(--color-nb-ink));
+}
+.nb-mark--pink {
+  background-color: rgb(var(--color-pink));
+  color: rgb(var(--color-nb-ink));
+}
+.nb-mark--acid {
+  background-color: rgb(var(--color-acid));
+}
+.nb-mark--refund {
+  background-color: rgb(var(--color-refund));
+  color: rgb(var(--color-paper));
+}
+
+/* Badge mono — visuel commun au tag inline (droit) et au sticker (pivoté). */
+.nb-tag,
+.nb-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-nb-mono), monospace;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 0.35rem 0.6rem;
+  background-color: rgb(var(--color-acid));
+  border: 3px solid rgb(var(--color-nb-ink));
+  box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
+}
+/* Sticker = tag pivoté posé en absolute (hero, cartes : ancêtre `relative`). */
+.nb-sticker {
+  position: absolute;
+  transform: rotate(-6deg);
+}
+.nb-sticker--right {
+  transform: rotate(7deg);
+}
+
+/* Badge d'étape numéroté, rond, pivoté. */
+.nb-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  font-family: var(--font-nb-display), system-ui, sans-serif;
+  font-size: 1.5rem;
+  color: rgb(var(--nb-badge-fg));
+  background-color: rgb(var(--nb-badge-bg));
+  border: 3px solid rgb(var(--color-nb-ink));
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
+  transform: rotate(-4deg);
+}
+
+/* Bande pleine largeur (full-bleed) : casse le conteneur pour un aplat. */
+.nb-band {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: clamp(1rem, 5vw, 4rem);
+}
+
+/* Fonds durs néubrutalistes (décoratifs, aria-hidden si besoin). */
+.nb-dots {
+  background-image: radial-gradient(
+    rgb(var(--color-nb-ink) / 0.18) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 22px 22px;
+}
+.nb-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(var(--color-nb-ink) / 0.07) 0 10px,
+    transparent 10px 20px
+  );
+}
+.nb-grid-hard {
+  background-image:
+    linear-gradient(rgb(var(--color-nb-ink) / 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--color-nb-ink) / 0.1) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Accessibilité : pas de rotation/translation animée si mouvement réduit. */
+@media (prefers-reduced-motion: reduce) {
+  .nb-mark,
+  .nb-sticker,
+  .nb-sticker--right,
+  .nb-step-badge {
+    transform: none;
+  }
+  .nb-card-hover,
+  .nb-tilt {
+    transition: none;
+  }
+  .nb-tilt:hover {
+    transform: none;
+  }
+  /* Animations néubrutalistes (drop, parallax, pop, stamp, progress) coupées. */
+  .nb-sticker,
+  .nb-stamp,
+  .nb-tilt {
+    animation: none;
+  }
+  .nb-progress {
+    display: none;
+  }
 }
