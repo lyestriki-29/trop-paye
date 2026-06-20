@@ -5,6 +5,7 @@ import { verifySignatureProof } from "@/lib/providers/signature";
 import { Amount } from "@/components/Amount";
 import { RuleCard } from "@/app/diagnostic/[verdictId]/RuleCard";
 import { frenchDate } from "@/lib/format-date";
+import { pieceKindLabel, pieceStatusLabel } from "@/lib/espace/piece-labels";
 import { AdminActions } from "./AdminActions";
 
 export const dynamic = "force-dynamic";
@@ -146,8 +147,8 @@ export default async function AdminDossierPage({ params }: { params: Promise<{ i
                     rel="noreferrer"
                     className="flex justify-between rounded-field border border-line bg-paper px-3 py-2 text-sm hover:border-ink/40"
                   >
-                    <span>{p.kind}</span>
-                    <span className="text-ink/45">{p.status}</span>
+                    <span>{pieceKindLabel(p.kind)}</span>
+                    <span className={pieceStatusLabel(p.status).tone}>{pieceStatusLabel(p.status).text}</span>
                   </a>
                 </li>
               ))}

@@ -42,9 +42,12 @@ export function DossierTimeline({ status, actions }: DossierTimelineProps) {
             >
               {m.label}
               {m.state === "current" && (
-                <span className="ml-2 rounded-badge bg-accent/15 px-2 py-0.5 text-xs font-normal text-ink/70">
-                  en cours
-                </span>
+                <>
+                  {" "}
+                  <span className="ml-1 rounded-badge bg-accent/15 px-2 py-0.5 text-xs font-normal text-ink/70">
+                    en cours
+                  </span>
+                </>
               )}
             </p>
 
