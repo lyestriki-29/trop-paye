@@ -214,6 +214,30 @@ test("A ne peut PAS lire les verdicts de B (traversée transitive owns_dossier �
   expect(data).toEqual([]);
 });
 
+test("A ne peut PAS lire les callback_requests de B (traversée transitive owns_dossier → [])", async () => {
+  // Un rappel de B inséré en service_role (bypass RLS) ; nettoyé par la cascade du dossier en afterAll.
+  const { data: row } = await admin
+    .from("callback_requests")
+    .insert({ dossier_id: dossierBId, phone: "0600000000", subject: "secret B", preferred_slot: "ASAP", status: "PENDING" })
+    .select("id")
+    .single();
+  expect(row).toBeTruthy();
+
+  const a = await signedInAnonClient(USER_A_EMAIL);
+  const { data, error } = await a.from("callback_requests").select("id").eq("dossier_id", dossierBId);
+  expect(error).toBeNull();
+  expect(data).toEqual([]);
+});
+
+test("A ne peut PAS créer un callback_request sur le dossier de B (INSERT → erreur)", async () => {
+  const a = await signedInAnonClient(USER_A_EMAIL);
+  const { error } = await a
+    .from("callback_requests")
+    .insert({ dossier_id: dossierBId, phone: "0611111111", subject: "intrusion", preferred_slot: "ASAP" });
+  // with check (owns_dossier(B)) faux → violation de policy : error non nul.
+  expect(error).not.toBeNull();
+});
+
 test("payout_details est deny-all : A ne voit RIEN, même pour son propre dossier", async () => {
   const a = await signedInAnonClient(USER_A_EMAIL);
   const { data, error } = await a.from("payout_details").select("id").eq("dossier_id", dossierAId);
