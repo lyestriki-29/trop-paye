@@ -7,30 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -160,6 +140,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      callback_requests: {
+        Row: {
+          created_at: string
+          dossier_id: string
+          handled_at: string | null
+          id: string
+          phone: string
+          preferred_slot: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          dossier_id: string
+          handled_at?: string | null
+          id?: string
+          phone: string
+          preferred_slot: string
+          status?: string
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          dossier_id?: string
+          handled_at?: string | null
+          id?: string
+          phone?: string
+          preferred_slot?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "callback_requests_dossier_id_fkey"
+            columns: ["dossier_id"]
+            isOneToOne: false
+            referencedRelation: "dossiers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dossiers: {
         Row: {
@@ -1137,9 +1158,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       action_type: [
@@ -1179,4 +1197,3 @@ export const Constants = {
     },
   },
 } as const
-
