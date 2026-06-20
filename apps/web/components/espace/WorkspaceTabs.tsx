@@ -16,7 +16,7 @@ export function WorkspaceTabs({ dossierId, tabs }: { dossierId: string; tabs: Ta
   const pathname = usePathname();
   const base = `/espace/${dossierId}`;
   return (
-    <nav className="flex gap-1 overflow-x-auto border-b border-line" aria-label="Onglets du dossier">
+    <nav className="flex gap-1.5 overflow-x-auto py-4" aria-label="Onglets du dossier">
       {tabs.map((t) => {
         const href = t.segment ? `${base}/${t.segment}` : base;
         const active = t.segment ? pathname.startsWith(href) : pathname === base;
@@ -25,13 +25,13 @@ export function WorkspaceTabs({ dossierId, tabs }: { dossierId: string; tabs: Ta
             key={t.key}
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`relative whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors ${
-              active ? "border-b-2 border-ink text-ink" : "text-ink/55 hover:text-ink"
+            className={`nb-pill relative whitespace-nowrap px-4 py-2 text-xs font-bold uppercase tracking-wide ${
+              active ? "nb-pill--ink" : "nb-pill--dashed"
             }`}
           >
             {t.label}
             {t.flag ? (
-              <span className="absolute right-1 top-2 h-1.5 w-1.5 rounded-full bg-stamp" aria-label="action requise" />
+              <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full border border-nb-ink bg-stamp" aria-label="action requise" />
             ) : null}
           </Link>
         );

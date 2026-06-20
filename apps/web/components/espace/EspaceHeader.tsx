@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
+import { LogoNb } from "@/components/ui/LogoNb";
 
 export function EspaceHeader({
   email,
@@ -16,20 +17,23 @@ export function EspaceHeader({
 }) {
   const [open, setOpen] = useState<null | "notif" | "contact">(null);
   return (
-    <header className="flex items-center justify-between border-b border-line bg-paper px-4 py-3">
-      <Link href="/espace" className="font-display text-lg font-extrabold tracking-display">
-        TropPayé
+    <header className="flex items-center justify-between gap-4 border-b-2 border-nb-ink bg-paper px-4 py-3">
+      <Link href="/espace" className="flex items-center gap-3" aria-label="Mes dossiers">
+        <LogoNb size={34} />
+        <span className="nb-mono hidden text-xs uppercase tracking-widest text-nb-ink/70 sm:inline">
+          Mon dossier
+        </span>
       </Link>
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={() => setOpen(open === "notif" ? null : "notif")}
-          className="relative rounded-field px-3 py-2 text-sm text-ink/70 hover:bg-paper-2"
+          className="nb-pill nb-pill--dashed relative px-3 py-1.5 text-xs"
           aria-label="Notifications"
         >
           🔔
           {activityCount > 0 ? (
-            <span className="absolute -right-0 -top-0 min-w-4 rounded-full bg-stamp px-1 text-[10px] text-paper">
+            <span className="absolute -right-1.5 -top-1.5 min-w-4 rounded-full border border-nb-ink bg-stamp px-1 text-[10px] text-paper">
               {activityCount}
             </span>
           ) : null}
@@ -37,11 +41,11 @@ export function EspaceHeader({
         <button
           type="button"
           onClick={() => setOpen(open === "contact" ? null : "contact")}
-          className="rounded-field px-3 py-2 text-sm text-ink/70 hover:bg-paper-2"
+          className="nb-pill nb-pill--dashed px-3 py-1.5 text-xs"
         >
           Contact
         </button>
-        <Link href="/espace/compte" className="rounded-field px-3 py-2 text-sm text-ink/70 hover:bg-paper-2">
+        <Link href="/espace/compte" className="nb-pill nb-pill--dashed nb-mono px-3 py-1.5 text-[11px] normal-case">
           {email ?? "Mon compte"}
         </Link>
       </div>

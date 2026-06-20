@@ -21,6 +21,10 @@ export interface QuittanceCardProps {
   spotlight?: boolean;
   /** Bord inférieur de ticket perforé (premium v2.1 — reçus, preuves). */
   perforated?: boolean;
+  /** Variante DA « quittance » (nb) : surface `nb-card` (bord 3px + ombre dure). */
+  nb?: boolean;
+  /** Pied détachable : perforation pointillée + code-barres (scope `.nb`). */
+  footerBarcode?: string | boolean;
   className?: string;
 }
 
@@ -33,16 +37,21 @@ export function QuittanceCard({
   children,
   spotlight = false,
   perforated = false,
+  nb = false,
+  footerBarcode,
   className,
 }: QuittanceCardProps) {
+  // Surface : sobre charte (`rounded-card border`) ou reçu dur nb (`nb-card`).
+  const surface = nb
+    ? "nb-card bg-paper"
+    : `rounded-card border border-line bg-paper ${perforated ? "receipt-edge rounded-b-none border-b-0 pb-3" : ""}`;
+  // Filets/labels : encre nb sous scope `.nb`, encre charte sinon.
+  const rule = nb ? "border-nb-ink/15" : "border-line";
+  const monoMuted = nb ? "text-nb-ink/55" : "text-ink/55";
   return (
-    <section
-      className={`overflow-hidden rounded-card border border-line bg-paper ${
-        perforated ? "receipt-edge rounded-b-none border-b-0 pb-3" : ""
-      } ${className ?? ""}`}
-    >
+    <section className={`overflow-hidden ${surface} ${className ?? ""}`}>
       <header
-        className={`flex items-center justify-between gap-4 border-b border-line bg-paper-2 py-3 font-mono text-[11px] uppercase tracking-widest text-ink/55 ${spotlight ? "px-7 sm:px-12" : "px-5"}`}
+        className={`flex items-center justify-between gap-4 border-b ${rule} ${nb ? "" : "bg-paper-2"} py-3 font-mono text-[11px] uppercase tracking-widest ${monoMuted} ${spotlight ? "px-7 sm:px-12" : "px-5"}`}
       >
         <span>{reference}</span>
         <span>{kind}</span>
@@ -57,7 +66,7 @@ export function QuittanceCard({
                 className={
                   row.highlight
                     ? "-mx-2 flex items-baseline justify-between gap-6 rounded-field bg-accent px-2 py-2.5"
-                    : "flex items-baseline justify-between gap-6 border-b border-dashed border-line py-2.5"
+                    : `flex items-baseline justify-between gap-6 border-b border-dashed ${rule} py-2.5`
                 }
               >
                 <dt
@@ -79,14 +88,24 @@ export function QuittanceCard({
           </dl>
         ) : null}
         {total ? (
-          <div className="mt-4 flex items-end justify-between gap-6 border-t-2 border-ink pt-4">
-            <p className="text-sm font-medium text-ink/80">{total.label}</p>
+          <div className={`mt-4 flex items-end justify-between gap-6 border-t-2 ${nb ? "border-nb-ink" : "border-ink"} pt-4`}>
+            <p className={`text-sm font-medium ${nb ? "text-nb-ink/80" : "text-ink/80"}`}>{total.label}</p>
             <p className="tabular whitespace-nowrap font-mono text-xl font-medium text-refund-text">
               {formatEUR(total.cents, { decimals: true })}
             </p>
           </div>
         ) : null}
         {children}
+        {footerBarcode ? (
+          <div className="mt-6 border-t-2 border-dashed border-nb-ink/40 pt-3">
+            <div className="v3-barcode h-9 w-full" aria-hidden />
+            {typeof footerBarcode === "string" ? (
+              <p className="nb-mono mt-2 text-center text-[10px] tracking-[0.3em] text-nb-ink/45">
+                {footerBarcode}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </section>
   );

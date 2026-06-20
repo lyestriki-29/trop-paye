@@ -37,8 +37,10 @@ export default async function DossierLayout({
     { key: "versement", label: "Versement", segment: "versement" },
   ];
 
+  // Fond crème hérité du scope `.nb` (layout racine espace) — pas de `bg-paper`
+  // ici, sinon il masquerait la grille de points.
   return (
-    <div className="min-h-screen bg-paper">
+    <div>
       <EspaceHeader email={user.email ?? null} activityCount={feed.length} notifications={<NotificationsPanel events={feed} />} contact={<ContactDialog />} />
       <div className="mx-auto max-w-container px-4">
         <WorkspaceTabs dossierId={dossierId} tabs={tabs} />
