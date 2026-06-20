@@ -122,8 +122,10 @@ export function BoostersModule({
   };
 
   return (
-    <section className="mt-10 rounded-card border border-line bg-paper p-6 sm:p-8">
-      <h2 className="font-display text-lg font-bold">Vérifications complémentaires</h2>
+    <section className="nb-card mt-10 rounded-none p-6 sm:p-8">
+      <h2 className="font-nb-display text-lg font-black uppercase tracking-wide">
+        Vérifications complémentaires
+      </h2>
       <p className="mt-1 text-sm text-ink/60">
         Facultatif — 30 secondes pour vérifier d&apos;autres abus courants. Votre verdict est
         recalculé si quelque chose est trouvé.
@@ -191,7 +193,7 @@ export function BoostersModule({
       </div>
 
       {hasInput ? (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-card bg-paper-2 p-4">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-2 border-ink bg-paper p-4">
           <p className="text-sm text-ink/70">
             {delta > 0 ? (
               <>

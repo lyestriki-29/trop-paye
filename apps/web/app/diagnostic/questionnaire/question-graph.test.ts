@@ -26,7 +26,7 @@ function fullDraft(): DiagnosticDraft {
     },
     surfaceM2: 42,
     furnished: false,
-    roomCount: 2,
+    roomCount: 5, // saisie exacte > 4 (le barème regroupe « 4 et plus » côté moteur)
     constructionPeriod: "1946_1970",
     isShared: false,
     dpe: { class: "D", date: "2022-05-01", source: "ADEME_API", surfaceM2: 42 },

@@ -15,7 +15,7 @@ export function VerdictUnquantified({
   addressLabel: string;
 }) {
   return (
-    <section className="reveal-1 rounded-card border border-line bg-paper p-7 shadow-xl sm:p-10">
+    <section className="nb-card reveal-1 rounded-none p-7 sm:p-10">
       {/* TODO_COPY [AVOCAT] — titre et chapeau hors copy deck. */}
       <p className="font-mono text-[11px] uppercase tracking-widest text-ink/55">
         Diagnostic terminé
@@ -41,7 +41,7 @@ export function VerdictUnquantified({
         {signals.map((signal, i) => (
           <li
             key={i}
-            className="flex gap-3 rounded-card border border-line bg-paper-2 p-4 text-sm leading-relaxed text-ink/80"
+            className="flex gap-3 border-2 border-ink bg-paper p-4 text-sm leading-relaxed text-ink/80"
           >
             <span aria-hidden className="text-stamp">
               ⚑
@@ -51,7 +51,7 @@ export function VerdictUnquantified({
         ))}
       </ul>
 
-      <div className="reveal-3 mt-7 rounded-card bg-paper-2 p-5">
+      <div className="reveal-3 mt-7 border-2 border-ink bg-paper p-5">
         {/* TODO_COPY — intitulé du bloc ; la phrase partenaire vient du copy deck §1 (FAQ). */}
         <p className="font-display font-bold">Et maintenant ?</p>
         <p className="mt-1 text-sm leading-relaxed text-ink/70">

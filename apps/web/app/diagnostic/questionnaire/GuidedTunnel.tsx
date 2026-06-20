@@ -3,34 +3,54 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { brand } from "@troppaye/shared";
-import { Logo } from "@/components/brand/Logo";
-import { Button } from "@/components/ui/Button";
+import { LogoNb } from "@/components/ui/LogoNb";
 import { useDiagnosticForm } from "./use-diagnostic-form";
 import { CHAPTERS, QUESTIONS, canSubmit } from "./question-graph";
 import {
   applicableQuestions,
-  firstUnansweredId,
+  initialActiveId,
   nextQuestionId,
   resolveActiveId,
   revealOrder,
 } from "./reveal-state";
-import { ConfirmedBlock } from "./ui/ConfirmedBlock";
 import { ActiveQuestion } from "./ui/ActiveQuestion";
 import { ChapterRail } from "./ui/ChapterRail";
 import { AnticipationBar } from "./ui/AnticipationBar";
-import { RecapQ } from "./questions/recap";
+import { DossierPanel } from "./ui/DossierPanel";
 
 const STORAGE = "tp_diagnostic_active_v1";
 
-/** Chrome allégé du tunnel : logo + « Étape X sur Y » (repris de Questionnaire). */
-function TunnelHeader({ step, total }: { step: number; total: number }) {
+/** Libellés courts par champ pour le panneau dossier (fallback : titre de chapitre). */
+const FIELD_LABEL: Record<string, string> = {
+  address: "Adresse",
+  dpe: "DPE",
+  surface: "Surface",
+  construction: "Époque",
+  furnished: "Meublé",
+  rooms: "Pièces",
+  shared: "Colocation",
+  tenantCount: "Colocataires",
+  rentBasis: "Base loyer",
+  rentMode: "Mode loyer",
+  currentRent: "Loyer actuel",
+  initialRent: "Loyer de départ",
+  charges: "Charges",
+  deposit: "Dépôt",
+  supplement: "Complément",
+  leaseDate: "Signature du bail",
+  revisionClause: "Clause de révision",
+  revisionHistory: "Hausses",
+};
+
+/** Chrome nb du tunnel : logo tampon + badge violet « Étape X sur Y ». */
+function TunnelHeaderNb({ step, total }: { step: number; total: number }) {
   return (
-    <header className="border-b border-line/70 bg-paper">
-      <div className="mx-auto flex max-w-xl items-center justify-between gap-4 px-6 py-4">
-        <Link href="/" aria-label={`${brand.name} — accueil`}>
-          <Logo className="text-xl" />
+    <header className="shrink-0 border-b-[3px] border-ink">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+        <Link href="/" aria-label={`${brand.name} — accueil`} className="flex items-center">
+          <LogoNb size={44} />
         </Link>
-        <p className="tabular font-mono text-xs uppercase tracking-widest text-ink/55">
+        <p className="border-2 border-ink bg-violet px-3 py-1 font-mono text-xs font-black uppercase tracking-widest text-ink">
           Étape {step} sur {total}
         </p>
       </div>
@@ -60,14 +80,11 @@ export function GuidedTunnel() {
     } catch {
       /* private mode : on repart du calcul */
     }
-    // L'id restauré doit être APPLICABLE au draft courant (pas seulement exister
-    // dans QUESTIONS) : sinon "recap" reste valide, sinon on recalcule.
-    const valid =
-      saved &&
-      (saved === "recap" || applicableQuestions(QUESTIONS, draft).some((q) => q.id === saved))
-        ? saved
-        : null;
-    setActiveId(valid ?? firstUnansweredId(QUESTIONS, draft) ?? "recap");
+    // `recap` n'est restauré que si le dossier est SOUMETTABLE : un "recap"
+    // périmé (session précédente) ne doit pas enfermer un nouveau visiteur au
+    // récap. Sinon : id de question restauré s'il est applicable, à défaut la
+    // 1re non répondue (cf. initialActiveId).
+    setActiveId(initialActiveId(QUESTIONS, draft, saved, canSubmit(draft)));
     setReady(true);
   }, [hydrated, ready, draft]);
 
@@ -106,9 +123,9 @@ export function GuidedTunnel() {
 
   if (!hydrated || !ready) {
     return (
-      <div className="min-h-screen bg-paper">
-        <TunnelHeader step={1} total={CHAPTERS.length} />
-        <main className="mx-auto max-w-xl px-6 py-10">
+      <div className="flex min-h-screen flex-col">
+        <TunnelHeaderNb step={1} total={CHAPTERS.length} />
+        <main className="mx-auto w-full max-w-6xl px-4 py-10">
           <p className="text-ink/50">Chargement…</p>
         </main>
       </div>
@@ -120,75 +137,86 @@ export function GuidedTunnel() {
   const activeChapter = active?.chapter ?? "address";
   const stepNo = CHAPTERS.findIndex((c) => c.id === activeChapter) + 1;
   const isRecap = activeId === "recap";
-  const peekId = activeId ? nextQuestionId(QUESTIONS, draft, activeId) : null;
   const submittable = canSubmit(draft);
 
+  // Dossier = toutes les questions applicables RÉPONDUES, hors la question active
+  // (éditée à gauche) et hors recap. Chaque ligne rouvre sa question à gauche.
+  const dossierRows = applicableQuestions(QUESTIONS, draft)
+    .filter((q) => q.id !== "recap" && q.id !== activeId && q.isAnswered(draft))
+    .map((q) => ({
+      id: q.id,
+      label: FIELD_LABEL[q.id] ?? chapterLabel(q.chapter),
+      value: q.summary(draft),
+      prefilled: q.prefilled?.(draft),
+      onEdit: () => {
+        editingRef.current = q.id;
+        setActiveId(q.id);
+      },
+    }));
+
+  const dossierFooter = (
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
+        onClick={submit}
+        disabled={submitting || !submittable}
+        className="nb-pill nb-pill--ink w-full px-4 py-3 text-sm font-black disabled:opacity-50"
+      >
+        {submitting ? "Analyse…" : "Voir mon résultat"}
+      </button>
+      {error ? (
+        <p role="alert" className="text-sm text-stamp">
+          {error}
+        </p>
+      ) : null}
+      {!submittable ? (
+        // TODO_COPY — hint « complétez … » repris de l'ancien tunnel.
+        <p className="text-xs text-ink/50">
+          Complétez les informations manquantes pour lancer le diagnostic.
+        </p>
+      ) : null}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-paper">
-      <TunnelHeader step={Math.max(1, stepNo)} total={CHAPTERS.length} />
-      <main className="mx-auto max-w-xl px-6 py-10">
-        <ChapterRail activeId={activeId} draft={draft} />
-        <div className="mt-6">
+    <div className="flex min-h-screen flex-col lg:h-screen lg:overflow-hidden">
+      <TunnelHeaderNb step={Math.max(1, stepNo)} total={CHAPTERS.length} />
+
+      <div
+        className={`mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 gap-4 px-4 py-4 lg:min-h-0 lg:gap-6 lg:py-6${
+          isRecap ? "" : " lg:grid-cols-[1fr_22rem]"
+        }`}
+      >
+        {/* Colonne gauche : progression + question active (ou récap pleine largeur). */}
+        <main className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
+          <ChapterRail activeId={activeId} draft={draft} />
           <AnticipationBar draft={draft} />
-        </div>
 
-        <div className="mt-6 flex flex-col gap-3">
-          {reveal.map((q, idx) => {
-            const last = idx === reveal.length - 1;
-            if (!last) {
-              return (
-                <ConfirmedBlock
-                  key={q.id}
-                  label={chapterLabel(q.chapter)}
-                  value={q.summary(draft)}
-                  prefilled={q.prefilled?.(draft)}
-                  onEdit={() => {
-                    editingRef.current = q.id;
-                    setActiveId(q.id);
-                  }}
-                />
-              );
-            }
-            if (isRecap) return null; // recap rendu ci-dessous (avec submit)
-            return (
-              <ActiveQuestion
-                key={q.id}
-                question={q}
-                draft={draft}
-                setField={setField}
-                advance={advance}
-              />
-            );
-          })}
-        </div>
-
-        {/* Aperçu discret de la question suivante (hors recap). */}
-        {!isRecap && peekId && (
-          <p className="nb-ghost mt-3 px-4 py-2 text-xs text-ink/45">
-            ↓ question suivante
-          </p>
-        )}
-
-        {isRecap && (
-          <div className="mt-6 flex flex-col gap-4">
-            <RecapQ draft={draft} setField={setField} />
-            <Button onClick={submit} disabled={submitting || !submittable}>
-              {submitting ? "Analyse…" : "Voir mon résultat"}
-            </Button>
-            {error ? (
-              <p role="alert" className="text-sm text-stamp">
-                {error}
+          {isRecap ? (
+            // Récap final : la synthèse du dossier ET le CTA passent au centre,
+            // pleine largeur (le rail de droite est masqué pour éviter le doublon).
+            <div className="flex min-h-0 flex-1 flex-col gap-3">
+              <p className="text-sm text-ink/70">
+                Vérifiez vos réponses puis lancez le diagnostic.
               </p>
-            ) : null}
-            {!submittable ? (
-              // TODO_COPY — hint « complétez … » repris de l'ancien tunnel.
-              <p className="text-xs text-ink/50">
-                Complétez les informations manquantes pour lancer le diagnostic.
-              </p>
-            ) : null}
-          </div>
-        )}
-      </main>
+              <div className="min-h-0 flex-1">
+                <DossierPanel rows={dossierRows} footer={dossierFooter} />
+              </div>
+            </div>
+          ) : active ? (
+            <ActiveQuestion
+              key={active.id}
+              question={active}
+              draft={draft}
+              setField={setField}
+              advance={advance}
+            />
+          ) : null}
+        </main>
+
+        {/* Colonne droite : panneau dossier éditable + CTA (masqué sur le récap). */}
+        {isRecap ? null : <DossierPanel rows={dossierRows} footer={dossierFooter} />}
+      </div>
     </div>
   );
 }

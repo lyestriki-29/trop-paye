@@ -163,8 +163,10 @@ export function DepositModule({
   };
 
   return (
-    <section id="depot-garantie" className="mt-10 rounded-card border border-line bg-paper p-6 sm:p-8">
-      <h2 className="font-display text-lg font-bold">Dépôt de garantie</h2>
+    <section id="depot-garantie" className="nb-card mt-10 rounded-none p-6 sm:p-8">
+      <h2 className="font-nb-display text-lg font-black uppercase tracking-wide">
+        Dépôt de garantie
+      </h2>
       <p className="mt-1 text-sm text-ink/60">
         Mini-vérification facultative — brouillon, à valider.
       </p>
@@ -214,7 +216,7 @@ export function DepositModule({
         ) : null}
         <MoneyField label="Montant retenu avec justificatif (facultatif)" cents={answers.justifiedRetentionCents} onChange={(c) => set("justifiedRetentionCents", c)} />
       </div>
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-card bg-paper-2 p-4">
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-2 border-ink bg-paper p-4">
         <p className="text-sm text-ink/70">
           {previewDelta !== null && previewDelta > 0 ? (
             <>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { Field } from "@/components/ui/Field";
 
 /**
@@ -126,7 +126,8 @@ const MONTHS = [
   "Décembre",
 ] as const;
 
-const SELECT_CLS = "nb-field";
+// `.nb-field` ne pose plus le padding (cf. globals.css) → le select le fournit lui-même.
+const SELECT_CLS = "nb-field px-3.5 py-2.5 text-[15px]";
 
 /**
  * Mois + année (décision Lyes 2026-06-11 : pas de date exacte, le date picker
@@ -140,6 +141,7 @@ export function MonthYearField({
   value,
   onChange,
   fromYear = 1989,
+  now = new Date(),
 }: {
   label: string;
   hint?: string;
@@ -147,19 +149,45 @@ export function MonthYearField({
   value: string;
   onChange: (v: string) => void;
   fromYear?: number;
+  /** Horloge injectable (tests) ; sinon « maintenant ». */
+  now?: Date;
 }) {
-  const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
-  const month = value ? Number(value.slice(5, 7)) : 0;
-  const year = value ? Number(value.slice(0, 4)) : 0;
+
+  // État partiel interne : mois et année indépendants, pour un choix dans
+  // n'importe quel ordre. Initialisé depuis la valeur ISO contrôlée.
+  const [month, setMonth] = useState(value ? Number(value.slice(5, 7)) : 0);
+  const [year, setYear] = useState(value ? Number(value.slice(0, 4)) : 0);
+
+  // Resync sur changement EXTERNE complet (édition d'une réponse) ; une valeur
+  // vide n'écrase pas une sélection partielle en cours de saisie.
+  useEffect(() => {
+    if (value) {
+      setMonth(Number(value.slice(5, 7)));
+      setYear(Number(value.slice(0, 4)));
+    }
+  }, [value]);
+
   const years: number[] = [];
   for (let y = currentYear; y >= fromYear; y -= 1) years.push(y);
 
-  // Sélection partielle tolérée : la valeur ne sort que complète (mois ET année).
-  const emit = (m: number, y: number) => {
+  // N'émet vers le parent qu'une date complète (mois ET année) ; sinon vide.
+  const commit = (m: number, y: number) => {
     if (m >= 1 && y >= fromYear) onChange(`${y}-${String(m).padStart(2, "0")}-01`);
     else onChange("");
+  };
+
+  const pickMonth = (m: number) => {
+    setMonth(m);
+    commit(m, year);
+  };
+  const pickYear = (y: number) => {
+    // Mois devenu futur pour l'année courante → on le purge.
+    const m = y === currentYear && month > currentMonth ? 0 : month;
+    setMonth(m);
+    setYear(y);
+    commit(m, y);
   };
 
   return (
@@ -169,7 +197,7 @@ export function MonthYearField({
         <select
           aria-label="Mois"
           value={month || ""}
-          onChange={(e) => emit(Number(e.target.value), year || currentYear)}
+          onChange={(e) => pickMonth(Number(e.target.value))}
           className={SELECT_CLS}
         >
           <option value="" disabled>
@@ -179,7 +207,7 @@ export function MonthYearField({
             <option
               key={m}
               value={i + 1}
-              disabled={(year || currentYear) === currentYear && i + 1 > currentMonth}
+              disabled={year === currentYear && i + 1 > currentMonth}
             >
               {m}
             </option>
@@ -188,12 +216,7 @@ export function MonthYearField({
         <select
           aria-label="Année"
           value={year || ""}
-          onChange={(e) => {
-            const y = Number(e.target.value);
-            // Mois futur devenu invalide après changement d'année → on le purge.
-            const m = y === currentYear && month > currentMonth ? 0 : month;
-            emit(m, y);
-          }}
+          onChange={(e) => pickYear(Number(e.target.value))}
           className={`${SELECT_CLS} font-mono tabular`}
         >
           <option value="" disabled>
@@ -205,6 +228,70 @@ export function MonthYearField({
             </option>
           ))}
         </select>
+      </div>
+      {hint ? <p className="mt-1.5 text-xs text-ink/50">{hint}</p> : null}
+    </fieldset>
+  );
+}
+
+/**
+ * Stepper numérique (− valeur +) pour une saisie EXACTE d'un entier (ex. pièces).
+ * Valeur indéfinie tant que l'utilisateur n'a pas agi (affiche « — ») ; le premier
+ * clic pose le minimum. `min`/`max` bornent ; `max` sert aussi de garde-fou.
+ */
+export function StepperField({
+  label,
+  hint,
+  value,
+  onChange,
+  min = 1,
+  max = 50,
+  suffix,
+}: {
+  label: string;
+  hint?: string;
+  value: number | undefined;
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
+  suffix?: string;
+}) {
+  const inc = () => onChange(value === undefined ? min : Math.min(max, value + 1));
+  const dec = () => onChange(value === undefined ? min : Math.max(min, value - 1));
+  // Tant que rien n'est saisi (« — »), on amorce par « + » : « − » reste inactif.
+  const atMin = value === undefined || value <= min;
+  const atMax = value !== undefined && value >= max;
+  return (
+    <fieldset>
+      <legend className="text-sm font-medium text-ink/80">{label}</legend>
+      <div className="mt-2.5 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={dec}
+          disabled={atMin}
+          aria-label="Diminuer"
+          style={{ fontSize: "1.4rem", padding: 0 }}
+          className="nb-pill flex h-12 w-12 items-center justify-center font-black leading-none disabled:opacity-40"
+        >
+          −
+        </button>
+        <output
+          aria-live="polite"
+          className="flex h-12 min-w-[5rem] items-center justify-center border-2 border-ink bg-paper px-4 font-mono tabular text-2xl font-black text-ink"
+          style={{ boxShadow: "3px 3px 0 rgb(var(--color-nb-ink))" }}
+        >
+          {value === undefined ? "—" : suffix ? `${value} ${suffix}` : value}
+        </output>
+        <button
+          type="button"
+          onClick={inc}
+          disabled={atMax}
+          aria-label="Augmenter"
+          style={{ fontSize: "1.4rem", padding: 0 }}
+          className="nb-pill flex h-12 w-12 items-center justify-center font-black leading-none disabled:opacity-40"
+        >
+          +
+        </button>
       </div>
       {hint ? <p className="mt-1.5 text-xs text-ink/50">{hint}</p> : null}
     </fieldset>

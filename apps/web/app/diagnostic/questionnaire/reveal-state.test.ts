@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   applicableQuestions,
   firstUnansweredId,
+  initialActiveId,
   nextQuestionId,
   resolveActiveId,
   revealOrder,
@@ -98,5 +99,31 @@ describe("resolveActiveId", () => {
   it("activeId null ou recap → inchangé", () => {
     expect(resolveActiveId(A, base, null, false)).toBeNull();
     expect(resolveActiveId(A, base, "recap", false)).toBe("recap");
+  });
+});
+
+describe("initialActiveId (restauration localStorage)", () => {
+  // Le bug : un "recap" laissé en localStorage par une session précédente
+  // ramenait un nouveau visiteur (dossier vide, NON soumettable) au récap au
+  // lieu de la 1re question. recap n'est restauré que si `submittable`.
+  it("recap sauvé mais dossier non soumettable → 1re non répondue", () => {
+    expect(initialActiveId(A, base, "recap", false)).toBe("a");
+  });
+  it("recap sauvé ET dossier soumettable → recap", () => {
+    expect(initialActiveId(A, base, "recap", true)).toBe("recap");
+  });
+  it("id de question applicable sauvé → restauré tel quel", () => {
+    expect(initialActiveId(A, base, "b", false)).toBe("b");
+  });
+  it("id non applicable ou inconnu → 1re non répondue", () => {
+    expect(initialActiveId(A, base, "cond", false)).toBe("a"); // cond non applicable
+    expect(initialActiveId(A, base, "zzz", false)).toBe("a"); // inconnu
+  });
+  it("rien en localStorage → 1re non répondue", () => {
+    expect(initialActiveId(A, base, null, false)).toBe("a");
+  });
+  it("tout répondu et rien sauvé → recap", () => {
+    const d = { ...base, isShared: false, surfaceM2: 38 };
+    expect(initialActiveId(A, d, null, true)).toBe("recap");
   });
 });

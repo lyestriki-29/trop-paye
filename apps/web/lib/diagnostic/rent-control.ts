@@ -125,8 +125,10 @@ export async function resolveRentControl(
     .from("encadrement_reference")
     .select("max_cents, ref_cents, min_cents, millesime, effective_from")
     .eq("code_grand_quartier", quartier.code_grand_quartier)
-    // Barème plafonné à 4 pièces (« 4 et plus ») ; un 5+ pièces ne doit pas
-    // retomber silencieusement sur zéro ligne (le schéma borne déjà à 4).
+    // Barème plafonné à 4 pièces (« 4 et plus ») : la saisie est désormais exacte
+    // (5, 6, 7…), donc on regroupe ici tout roomCount ≥ 4 sur la ligne « 4 » pour
+    // ne pas retomber silencieusement sur zéro ligne. La valeur exacte reste
+    // stockée plus bas (`rooms: roomCount`) pour l'audit trail.
     .eq("rooms", Math.min(roomCount, 4))
     .eq("construction_period", constructionPeriod)
     .eq("furnished", furnished);

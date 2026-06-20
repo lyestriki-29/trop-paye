@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { brand, formatEUR } from "@troppaye/shared";
-import { Logo } from "@/components/brand/Logo";
+import { LogoNb } from "@/components/ui/LogoNb";
 import { Button } from "@/components/ui/Button";
 import { IconArrowRight } from "@/components/home/icons";
 import type { VerdictTeaser } from "@/lib/diagnostic/verdict-teaser";
@@ -17,9 +17,9 @@ export function TeaserView({ teaser }: { teaser: VerdictTeaser }) {
   const meta = [teaser.kindLabel, teaser.city].filter(Boolean).join(" · ");
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
+    <main className="nb flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
       <Link href="/" aria-label={`${brand.name} — accueil`}>
-        <Logo className="text-2xl" />
+        <LogoNb size={64} />
       </Link>
 
       {/* TODO_COPY — accroche teaser (hors copy deck), brouillon non juridique. */}

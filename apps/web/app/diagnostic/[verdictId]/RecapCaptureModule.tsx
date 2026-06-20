@@ -44,9 +44,11 @@ export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
     email.trim().length >= 5 && (phone.trim().length === 0 || phoneConsent) && !pending;
 
   return (
-    <section className="mt-10 rounded-card border border-line bg-paper-2 p-6 sm:p-8">
+    <section className="nb-card mt-10 rounded-none p-6 sm:p-8">
       {/* TODO_COPY — titres brouillon, hors copy deck. */}
-      <h2 className="font-display text-lg font-bold">Recevez votre récap détaillé par email</h2>
+      <h2 className="font-nb-display text-lg font-black uppercase tracking-wide">
+        Recevez votre récap détaillé par email
+      </h2>
       <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink/70">
         Le calcul complet, la règle de droit appliquée et la marche à suivre, au
         format que vous pourrez relire à tête reposée. C&apos;est gratuit et sans
@@ -61,6 +63,7 @@ export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
           onChange={(e) => setEmail(e.target.value)}
           type="email"
           autoComplete="email"
+          inputClassName="nb-field"
         />
         <Field
           id="recap-phone"
@@ -69,6 +72,7 @@ export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
           onChange={(e) => setPhone(e.target.value)}
           type="tel"
           autoComplete="tel"
+          inputClassName="nb-field"
         />
         {phone.trim().length > 0 ? (
           /* Consentement SÉPARÉ téléphone — brouillon [AVOCAT], version

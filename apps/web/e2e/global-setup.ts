@@ -34,7 +34,20 @@ export default async function globalSetup(): Promise<void> {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   if (!url || !serviceKey) throw new Error("NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY manquants.");
-  if (!/127\.0\.0\.1|localhost/.test(url)) throw new Error(`Refus : Supabase hors local (${url}).`);
+  // Garde-fou : ces tests écrivent/suppriment avec la clé service-role. Local par
+  // défaut. Pour cibler un projet cloud JETABLE (gabarit, jamais la prod cliente),
+  // déclarer E2E_ALLOW_NONLOCAL_URL = l'URL EXACTE du projet visé (opt-in conscient :
+  // une autre URL, comme la future prod cliente, restera refusée par défaut).
+  const isLocal = /127\.0\.0\.1|localhost/.test(url);
+  if (!isLocal && process.env.E2E_ALLOW_NONLOCAL_URL !== url) {
+    throw new Error(
+      `Refus : Supabase hors local (${url}). Pour un cloud de test, définir E2E_ALLOW_NONLOCAL_URL=<url exacte>.`,
+    );
+  }
+  if (!isLocal) {
+    // eslint-disable-next-line no-console
+    console.warn(`⚠️  e2e en cloud : écritures destructives (création/suppression de dossiers) sur ${url}`);
+  }
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
 

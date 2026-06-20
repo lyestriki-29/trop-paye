@@ -13,37 +13,31 @@ export function ChapterRail({
   draft: DiagnosticDraft;
 }): ReactNode {
   return (
-    <nav aria-label="Progression du questionnaire" className="flex items-center gap-0">
+    <nav
+      aria-label="Progression du questionnaire"
+      className="flex w-full items-stretch gap-1.5"
+    >
       {CHAPTERS.map((chapter, i) => {
         const status = chapterStatus(QUESTIONS, draft, chapter.id, activeId);
-        const isLast = i === CHAPTERS.length - 1;
+        // Segment plein-largeur : fait = ✦ + ink, en cours = boîte accent bord ink,
+        // à venir = numéroté discret. Plus de `.nb-step-badge` (cercle qui débordait).
+        const segment =
+          status === "current"
+            ? "border-2 border-ink bg-accent text-ink"
+            : status === "done"
+              ? "border-2 border-ink bg-paper text-ink"
+              : "border-2 border-ink/20 bg-transparent text-ink/35";
 
         return (
-          <div key={chapter.id} className="flex min-w-0 items-center">
-            {/* Chapter label */}
-            <div
-              className={
-                status === "current"
-                  ? "nb-step-badge px-2.5 py-1 text-xs font-black uppercase tracking-wide"
-                  : status === "done"
-                    ? "px-2.5 py-1 text-xs font-semibold text-ink"
-                    : "px-2.5 py-1 text-xs font-semibold text-ink/35"
-              }
-              aria-current={status === "current" ? "step" : undefined}
-            >
-              {status === "done" && (
-                <span className="mr-1 text-[10px]" aria-hidden="true">✦</span>
-              )}
-              {chapter.title}
-            </div>
-
-            {/* Connector bar — not after the last chapter */}
-            {!isLast && (
-              <div
-                aria-hidden="true"
-                className={`h-[2px] w-6 shrink-0 ${status === "done" ? "bg-ink" : "bg-ink/20"}`}
-              />
-            )}
+          <div
+            key={chapter.id}
+            aria-current={status === "current" ? "step" : undefined}
+            className={`flex min-w-0 flex-1 items-center justify-center gap-1 px-2 py-1.5 text-center text-[11px] font-black uppercase tracking-wide ${segment}`}
+          >
+            <span aria-hidden="true" className="text-[10px]">
+              {status === "done" ? "✦" : i + 1}
+            </span>
+            <span className="truncate">{chapter.title}</span>
           </div>
         );
       })}

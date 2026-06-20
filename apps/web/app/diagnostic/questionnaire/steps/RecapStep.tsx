@@ -49,15 +49,7 @@ export function RecapStep({ draft }: StepProps) {
       />
       <Row
         label="Nombre de pièces"
-        value={
-          draft.roomCount !== undefined
-            ? draft.roomCount === 4
-              ? "4 et +"
-              : String(draft.roomCount)
-            : draft.roomCountUnknown
-              ? "Je ne sais pas"
-              : "—"
-        }
+        value={draft.roomCount !== undefined ? String(draft.roomCount) : "—"}
         mono
       />
       <Row

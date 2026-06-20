@@ -81,3 +81,15 @@ describe("toSnapshot — colocation (LOT 1.3)", () => {
     expect(diagnosticSchema.safeParse({ ...base, rentBasis: "SHARE" }).success).toBe(false);
   });
 });
+
+describe("toSnapshot — pièces (saisie exacte > 4)", () => {
+  it("accepte un nombre de pièces > 4 et le propage tel quel au snapshot", () => {
+    expect(diagnosticSchema.safeParse({ ...base, roomCount: 6 }).success).toBe(true);
+    expect(snapshot({ roomCount: 6 }).roomCount).toBe(6);
+  });
+
+  it("refuse 0 pièce et au-delà du plafond de sûreté", () => {
+    expect(diagnosticSchema.safeParse({ ...base, roomCount: 0 }).success).toBe(false);
+    expect(diagnosticSchema.safeParse({ ...base, roomCount: 51 }).success).toBe(false);
+  });
+});

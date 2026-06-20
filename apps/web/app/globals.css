@@ -572,13 +572,14 @@ body::after {
 }
 
 /* ── Tunnel diagnostic : champs nb (Phase A) ───────────────────────────── */
+/* Look nb (bord ink, fond crème, ombre dure). PAS de padding/taille ici : posés
+   par le consommateur (le composant `Field` réserve `pt-5` pour son label flottant ;
+   un padding uniforme ici le ferait chevaucher le texte saisi). */
 .nb-field {
   width: 100%;
   border: 2px solid rgb(var(--color-nb-ink));
   background: rgb(var(--color-paper));
   box-shadow: 3px 3px 0 rgb(var(--color-nb-ink));
-  padding: 11px 14px;
-  font-size: 15px;
   color: rgb(var(--color-nb-ink));
 }
 .nb-field:focus-visible { outline: 3px solid rgb(var(--color-accent)); outline-offset: 1px; }
@@ -591,6 +592,10 @@ body::after {
 }
 .nb-pill[aria-pressed="true"] { background: rgb(var(--color-accent)); }
 .nb-pill--dashed { border-style: dashed; box-shadow: none; font-weight: 600; }
+/* Variante foncée (CTA « Continuer » / « Voir mon résultat ») : `.nb-pill` force
+   un fond clair → sans ce modifieur, un `bg-ink text-paper` donne du blanc sur
+   blanc (case vide). Ce modifieur impose fond encre + texte clair. */
+.nb-pill--ink { background: rgb(var(--color-nb-ink)); color: rgb(var(--color-paper)); }
 .nb-confirmed {
   border: 2px solid rgb(var(--color-nb-ink));
   background: rgb(var(--color-paper));
