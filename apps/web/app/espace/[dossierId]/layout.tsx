@@ -16,9 +16,10 @@ export default async function DossierLayout({
   params: Promise<{ dossierId: string }>;
   children: React.ReactNode;
 }) {
-  const { user } = await requireAuthPage();
+  const { user, supabase } = await requireAuthPage();
   const { dossierId } = await params;
   const detail = await loadOwnedDossier(dossierId);
+  const { data: profile } = await supabase.from("profiles").select("phone").eq("id", user.id).maybeSingle();
 
   const checklist = buildStudyChecklist(detail.pieces.map((p) => ({ kind: p.kind, status: p.status })));
   const needsPieces = detail.dossier.status === "MANDATE_PENDING" && !checklist.launchable;
@@ -41,7 +42,7 @@ export default async function DossierLayout({
   // ici, sinon il masquerait la grille de points.
   return (
     <div>
-      <EspaceHeader email={user.email ?? null} activityCount={feed.length} notifications={<NotificationsPanel events={feed} />} contact={<ContactDialog />} />
+      <EspaceHeader email={user.email ?? null} activityCount={feed.length} notifications={<NotificationsPanel events={feed} />} contact={<ContactDialog dossierId={dossierId} initialPhone={profile?.phone ?? ""} />} />
       <div className="mx-auto max-w-container px-4">
         <WorkspaceTabs dossierId={dossierId} tabs={tabs} />
         <main className="py-8">{children}</main>
