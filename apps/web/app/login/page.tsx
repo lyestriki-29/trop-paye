@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import { LoginForm } from "./login-form";
+import { DevLoginButtons } from "./DevLoginButtons";
 
 /**
  * Connexion — DA « quittance » (réf. LP néubrutaliste, variante B arbitrée Lyes
@@ -29,6 +30,9 @@ export default async function LoginPage({
         <p className="mt-2 mb-6 text-sm text-nb-ink/70">Accédez au suivi de votre dossier.</p>
 
         <LoginForm next={next ?? "/espace"} />
+
+        {/* DEV uniquement : connexion démo 1 clic (caché en production). */}
+        {process.env.NODE_ENV !== "production" ? <DevLoginButtons /> : null}
 
         {/* Perforation + code-barres : le bas « se détache » comme un reçu. */}
         <div className="mt-6 border-t-2 border-dashed border-nb-ink/40 pt-3">
