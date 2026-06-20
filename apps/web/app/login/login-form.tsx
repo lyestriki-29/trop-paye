@@ -3,10 +3,12 @@
 import { useActionState } from "react";
 import { sendLoginCode, verifyLoginCode, type LoginState } from "./actions";
 
+// DA « quittance » (nb) : champ à bord dur + ombre, CTA encre, labels mono.
 const fieldClass =
-  "mt-1 w-full rounded-field border border-line bg-paper px-4 py-3 outline-none focus:border-ink focus:ring-2 focus:ring-ink/15";
+  "nb-field mt-2 block w-full px-4 py-3 text-[15px] outline-none placeholder:text-nb-ink/40";
 const submitClass =
-  "w-full rounded-field bg-ink px-6 py-3 font-medium text-paper transition-colors hover:bg-ink/90 disabled:opacity-60";
+  "nb-pill nb-pill--ink mt-1 w-full py-3 text-sm font-black uppercase tracking-wide disabled:opacity-60";
+const labelClass = "nb-mono text-xs uppercase tracking-widest text-nb-ink/60";
 
 export function LoginForm({ next }: { next: string }) {
   const [sendState, sendAction, sending] = useActionState<LoginState, FormData>(sendLoginCode, {});
@@ -23,18 +25,18 @@ export function LoginForm({ next }: { next: string }) {
   if (onCodeStep && email) {
     return (
       <div className="space-y-4">
-        <div className="rounded-card border border-line bg-paper-2 p-4">
-          <p className="text-sm text-ink/70">
-            Code envoyé à <span className="font-medium text-ink">{email}</span>. Saisissez-le
+        <div className="border-2 border-nb-ink bg-paper-2 p-4">
+          <p className="text-sm text-nb-ink/75">
+            Code envoyé à <span className="font-bold text-nb-ink">{email}</span>. Saisissez-le
             ci-dessous pour vous connecter.
           </p>
         </div>
-        {/* Étape 2 : vérification du code. */}
+        {/* Étape 2 : vérification du code — cadré comme la ligne « montant » d'un reçu. */}
         <form action={verifyAction} className="space-y-4">
           <input type="hidden" name="next" value={next} />
           <input type="hidden" name="email" value={email} />
           <label className="block">
-            <span className="text-sm font-medium text-ink/80">Code à 6 chiffres</span>
+            <span className={labelClass}>Code à 6 chiffres</span>
             <input
               type="text"
               name="code"
@@ -48,7 +50,7 @@ export function LoginForm({ next }: { next: string }) {
               className={`tabular text-center text-2xl tracking-[0.4em] ${fieldClass}`}
             />
           </label>
-          {verifyState.error ? <p className="text-sm text-stamp">{verifyState.error}</p> : null}
+          {verifyState.error ? <p className="text-sm font-medium text-stamp">{verifyState.error}</p> : null}
           <button type="submit" disabled={verifying} className={submitClass}>
             {verifying ? "Vérification…" : "Me connecter"}
           </button>
@@ -60,7 +62,7 @@ export function LoginForm({ next }: { next: string }) {
           <button
             type="submit"
             disabled={sending}
-            className="text-xs text-ink/60 underline underline-offset-2 transition hover:text-ink disabled:opacity-60"
+            className="nb-mono text-xs uppercase tracking-wide text-nb-ink/60 underline underline-offset-2 transition hover:text-nb-ink disabled:opacity-60"
           >
             {sending ? "Envoi…" : "Renvoyer un code"}
           </button>
@@ -74,7 +76,7 @@ export function LoginForm({ next }: { next: string }) {
     <form action={sendAction} className="space-y-4">
       <input type="hidden" name="next" value={next} />
       <label className="block">
-        <span className="text-sm font-medium text-ink/80">Votre email</span>
+        <span className={labelClass}>Locataire</span>
         <input
           type="email"
           name="email"
@@ -84,12 +86,12 @@ export function LoginForm({ next }: { next: string }) {
           className={fieldClass}
         />
       </label>
-      {sendState.error ? <p className="text-sm text-stamp">{sendState.error}</p> : null}
+      {sendState.error ? <p className="text-sm font-medium text-stamp">{sendState.error}</p> : null}
       <button type="submit" disabled={sending} className={submitClass}>
-        {sending ? "Envoi…" : "Recevoir mon code"}
+        {sending ? "Envoi…" : "► Recevoir mon code"}
       </button>
-      <p className="text-xs text-ink/50">
-        Pas de mot de passe. Un code à 6 chiffres, valable 30 minutes.
+      <p className="nb-mono text-[11px] text-nb-ink/50">
+        Pas de mot de passe · code à 6 chiffres · 30 min
       </p>
     </form>
   );
