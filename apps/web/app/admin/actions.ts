@@ -137,6 +137,23 @@ export async function requestPiece(dossierId: string, note: string): Promise<Adm
   return { ok: true };
 }
 
+/**
+ * Réponse LIBRE de l'opérateur au client (visible dans son espace `/espace/.../messages`).
+ * Distincte de `requestPiece` (demande typée) et `refuseDossier` (clôture) : ici message
+ * conversationnel quel que soit le statut du dossier. N'envoie pas d'email (notification
+ * branchée dans une tranche ultérieure).
+ */
+export async function sendAdminMessage(dossierId: string, body: string): Promise<AdminResult> {
+  await requireAdmin();
+  const text = body.trim();
+  if (!text) return { error: "Message vide." };
+  if (text.length > 4000) return { error: "Message trop long (4000 caractères max)." };
+  const admin = getSupabaseAdmin();
+  await admin.from("messages").insert({ dossier_id: dossierId, sender: "operator", body: text });
+  refresh(dossierId);
+  return { ok: true };
+}
+
 /** Les 4 réponses bailleur typées du PRD D2, chacune avec son effet scripté. */
 export type LandlordReplyTag =
   | "PAIEMENT"
