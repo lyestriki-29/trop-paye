@@ -11,6 +11,7 @@ import {
   tagContestation,
   recordPayment,
   advanceTime,
+  sendAdminMessage,
   type AdminResult,
   type LandlordReplyTag,
 } from "@/app/admin/actions";
@@ -41,6 +42,7 @@ export function AdminActions({
   const [agreed, setAgreed] = useState("");
   const [replyTag, setReplyTag] = useState<LandlordReplyTag>("PAIEMENT");
   const [delayDays, setDelayDays] = useState("15");
+  const [message, setMessage] = useState("");
 
   async function run(key: string, fn: () => Promise<AdminResult>) {
     setPending(key);
@@ -226,6 +228,34 @@ export function AdminActions({
           </div>
         </div>
       ) : null}
+
+      <div className="border-t border-line pt-4">
+        <label htmlFor="admin-reply" className="text-xs text-ink/60">
+          Répondre au client
+        </label>
+        <textarea
+          id="admin-reply"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          rows={3}
+          placeholder="Votre réponse, visible par le client…"
+          className="mt-1 w-full rounded-field border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-ink"
+        />
+        <button
+          type="button"
+          disabled={pending !== null || !message.trim()}
+          onClick={() =>
+            run("reply-client", async () => {
+              const res = await sendAdminMessage(dossierId, message);
+              if ("ok" in res) setMessage("");
+              return res;
+            })
+          }
+          className={`mt-2 ${NEUTRAL}`}
+        >
+          {pending === "reply-client" ? "…" : "Envoyer au client"}
+        </button>
+      </div>
 
       {!["IN_REVIEW", "RECOVERY", "ESCALATED"].includes(status) ? (
         <p className="text-sm text-ink/55">Dossier clôturé — aucune action.</p>
