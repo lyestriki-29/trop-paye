@@ -106,7 +106,7 @@ export async function getDossierAdmin(id: string): Promise<AdminDossierDetail | 
           .then((r) => r.data)
       : null,
     dossier.user_id
-      ? admin.auth.admin.getUserById(dossier.user_id).then((r) => r.data.user)
+      ? admin.auth.admin.getUserById(dossier.user_id).then((r) => r.data?.user ?? null)
       : null,
   ]);
   const client = {
