@@ -2,9 +2,11 @@ import Link from "next/link";
 import { requireAdminPage } from "@/lib/auth/guards";
 import { signOut } from "@/app/login/actions";
 import { LogoNb } from "@/components/ui/LogoNb";
+import { countPendingCallbacks } from "@/lib/admin/read";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user } = await requireAdminPage();
+  const pendingCallbacks = await countPendingCallbacks();
   // Scope `.nb` (DA « quittance ») sur le back-office — même grammaire « dossier »
   // que l'espace client (décision Lyes 2026-06-20).
   return (
@@ -20,6 +22,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <nav className="flex items-center gap-1.5 text-sm">
             <Link href="/admin" className="nb-pill nb-pill--dashed px-3 py-1.5 text-xs">Dossiers</Link>
             <Link href="/admin/courriers" className="nb-pill nb-pill--dashed px-3 py-1.5 text-xs">Courriers</Link>
+            <Link href="/admin/rappels" className="nb-pill nb-pill--dashed px-3 py-1.5 text-xs">
+              Rappels{pendingCallbacks > 0 ? ` (${pendingCallbacks})` : ""}
+            </Link>
             <Link href="/admin/funnel" className="nb-pill nb-pill--dashed px-3 py-1.5 text-xs">Funnel</Link>
             <Link href="/admin/articles" className="nb-pill nb-pill--dashed px-3 py-1.5 text-xs">Articles</Link>
             <span className="nb-mono ml-2 hidden text-xs text-nb-ink/55 sm:inline">{user.email}</span>

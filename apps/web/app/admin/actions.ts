@@ -427,3 +427,19 @@ export async function advanceTime(dossierId: string): Promise<AdminResult> {
   if (res.processed === 0) return { error: "Aucune action exécutable (séquence en pause/verrou ou terminée)." };
   return { ok: true };
 }
+
+/** Marque un rappel comme traité (PENDING → DONE). Claim atomique anti double-clic. */
+export async function markCallbackDone(id: string): Promise<AdminResult> {
+  await requireAdmin();
+  const admin = getSupabaseAdmin();
+  const { data } = await admin
+    .from("callback_requests")
+    .update({ status: "DONE", handled_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("status", "PENDING")
+    .select("id")
+    .maybeSingle();
+  if (!data) return { error: "Rappel introuvable ou déjà traité." };
+  revalidatePath("/admin/rappels");
+  return { ok: true };
+}

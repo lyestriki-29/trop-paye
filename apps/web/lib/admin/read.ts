@@ -118,3 +118,33 @@ export async function getDossierAdmin(id: string): Promise<AdminDossierDetail | 
 
   return { dossier, verdict, mandate, proof, pieces, actions, messages, funds, client };
 }
+
+export interface CallbackRow {
+  id: string;
+  dossier_id: string;
+  phone: string;
+  subject: string;
+  preferred_slot: string;
+  created_at: string;
+}
+
+/** Rappels en attente (file admin), du plus ancien au plus récent. */
+export async function listPendingCallbacks(): Promise<CallbackRow[]> {
+  const admin = getSupabaseAdmin();
+  const { data } = await admin
+    .from("callback_requests")
+    .select("id, dossier_id, phone, subject, preferred_slot, created_at")
+    .eq("status", "PENDING")
+    .order("created_at", { ascending: true });
+  return data ?? [];
+}
+
+/** Compteur de rappels en attente (badge de nav). */
+export async function countPendingCallbacks(): Promise<number> {
+  const admin = getSupabaseAdmin();
+  const { count } = await admin
+    .from("callback_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "PENDING");
+  return count ?? 0;
+}
