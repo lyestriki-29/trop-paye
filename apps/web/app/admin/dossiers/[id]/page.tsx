@@ -13,7 +13,7 @@ export default async function AdminDossierPage({ params }: { params: Promise<{ i
   const { id } = await params;
   const detail = await getDossierAdmin(id);
   if (!detail) notFound();
-  const { dossier, verdict, mandate, proof, pieces, actions, messages, funds } = detail;
+  const { dossier, verdict, mandate, proof, pieces, actions, messages, funds, client } = detail;
   const proofValid = proof
     ? verifySignatureProof({
         documentHash: proof.document_hash,
@@ -38,6 +38,40 @@ export default async function AdminDossierPage({ params }: { params: Promise<{ i
             <span className="rounded-badge bg-stamp/10 px-2 py-0.5 text-stamp">{dossier.recovery_state}</span>
           ) : null}
         </p>
+
+        <section className="mt-6 rounded-card border border-line bg-paper p-4 text-sm">
+          <h2 className="font-display font-bold">Client</h2>
+          <dl className="mt-2 space-y-1 text-ink/70">
+            <div className="flex justify-between gap-4">
+              <dt>Nom</dt>
+              <dd className="font-medium text-ink">
+                {client.firstName || client.lastName
+                  ? `${client.firstName ?? ""} ${client.lastName ?? ""}`.trim()
+                  : "—"}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt>Email</dt>
+              <dd>
+                {client.email ? (
+                  <a href={`mailto:${client.email}`} className="text-refund-text underline underline-offset-2">
+                    {client.email}
+                  </a>
+                ) : "—"}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt>Téléphone</dt>
+              <dd>
+                {client.phone ? (
+                  <a href={`tel:${client.phone}`} className="text-refund-text underline underline-offset-2">
+                    {client.phone}
+                  </a>
+                ) : "—"}
+              </dd>
+            </div>
+          </dl>
+        </section>
 
         {verdict ? (
           <section className="mt-6">
