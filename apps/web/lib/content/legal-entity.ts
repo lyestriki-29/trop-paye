@@ -22,3 +22,6 @@ export const LEGAL_ENTITY = {
   /** Médiateur de la consommation agréé (adhésion à finaliser). */
   mediateur: "{organisme}",
 } as const;
+
+/** Adresse de contact opérateur (publique) — destinataire des notifications de rappel. */
+export const CONTACT_EMAIL = "contact@troppaye.fr";
