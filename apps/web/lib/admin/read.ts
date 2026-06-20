@@ -59,6 +59,7 @@ export interface AdminDossierDetail {
   actions: ActionRow[];
   messages: MessageRow[];
   funds: FundRow[];
+  client: { firstName: string | null; lastName: string | null; phone: string | null; email: string | null };
 }
 
 /** Détail complet d'un dossier côté back-office (service_role). */
@@ -94,5 +95,26 @@ export async function getDossierAdmin(id: string): Promise<AdminDossierDetail | 
       .then((r) => r.data ?? []),
   ]);
 
-  return { dossier, verdict, mandate, proof, pieces, actions, messages, funds };
+  // Coordonnées du client (parité admin) : profil + email auth. user_id = propriétaire.
+  const [profile, authUser] = await Promise.all([
+    dossier.user_id
+      ? admin
+          .from("profiles")
+          .select("first_name, last_name, phone")
+          .eq("id", dossier.user_id)
+          .maybeSingle()
+          .then((r) => r.data)
+      : null,
+    dossier.user_id
+      ? admin.auth.admin.getUserById(dossier.user_id).then((r) => r.data.user)
+      : null,
+  ]);
+  const client = {
+    firstName: profile?.first_name ?? null,
+    lastName: profile?.last_name ?? null,
+    phone: profile?.phone ?? null,
+    email: authUser?.email ?? null,
+  };
+
+  return { dossier, verdict, mandate, proof, pieces, actions, messages, funds, client };
 }
