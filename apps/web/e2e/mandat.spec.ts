@@ -125,6 +125,9 @@ test.afterAll(async () => {
 
 // --- Test 1 : GATE — comportement actuel (MANDATE_ENABLED=false) -------------
 test("GATE : un dossier DIAGNOSED affiche la liste d'attente, pas la signature", async ({ page }) => {
+  // Symétrique au test SIGNATURE : le gate liste-d'attente n'a de sens que mandat
+  // DÉSACTIVÉ ; activé, c'est MandateForm qui s'affiche (couvert par le test 2).
+  test.skip(process.env.MANDATE_ENABLED === "true", "Gate visible seulement quand le mandat est désactivé");
   await page.goto(`/mandat/${gateDossierId}`);
 
   // Titre exact de Waitlist.tsx (liste d'attente pilote).
