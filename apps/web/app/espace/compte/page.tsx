@@ -43,10 +43,15 @@ export default async function ComptePage() {
           Vous pouvez demander l'export ou la suppression de votre compte. La suppression efface
           l'ensemble de vos données en cascade.
         </p>
-        <p className="mt-3 text-sm text-ink/45">
-          {/* TODO: implémenter l'export et la suppression de compte côté API */}
-          Cette fonctionnalité est en cours de déploiement. Contactez-nous via le bouton Contact
-          pour toute demande urgente.
+        <p className="mt-3 text-sm text-ink/60">
+          Pour exercer vos droits, écrivez-nous à{" "}
+          <a
+            href="mailto:privacy@troppaye.fr"
+            className="underline underline-offset-4 hover:text-ink"
+          >
+            privacy@troppaye.fr
+          </a>
+          . Nous traitons votre demande dans les meilleurs délais.
         </p>
       </section>
     </div>
