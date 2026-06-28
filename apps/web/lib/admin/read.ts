@@ -26,14 +26,14 @@ async function latestVerdict(dossierId: string): Promise<VerdictGlobal | null> {
   return data ? mapVerdictRow(data) : null;
 }
 
-/** File de revue : dossiers en IN_REVIEW avec résumé du verdict. */
+/** File de revue : dossiers en IN_REVIEW avec résumé du verdict, du plus récent au plus ancien. */
 export async function listDossiersForReview(): Promise<ReviewItem[]> {
   const admin = getSupabaseAdmin();
   const { data } = await admin
     .from("dossiers")
     .select("id, address_label, created_at")
     .eq("status", "IN_REVIEW")
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false });
   return Promise.all(
     (data ?? []).map(async (d) => ({ ...d, verdict: await latestVerdict(d.id) })),
   );
@@ -147,4 +147,43 @@ export async function countPendingCallbacks(): Promise<number> {
     .select("id", { count: "exact", head: true })
     .eq("status", "PENDING");
   return count ?? 0;
+}
+
+export interface PendingThread {
+  dossierId: string;
+  address: string;
+  lastBody: string;
+  lastAt: string;
+}
+
+/**
+ * Dossiers dont le DERNIER message vient du client → en attente de réponse admin.
+ * Heuristique simple (volume pilote) : on lit les messages récents et, par dossier,
+ * on regarde le plus récent ; si son émetteur est `client`, le fil attend une réponse.
+ */
+export async function listUnansweredThreads(): Promise<PendingThread[]> {
+  const admin = getSupabaseAdmin();
+  const { data: msgs } = await admin
+    .from("messages")
+    .select("dossier_id, sender, body, created_at")
+    .order("created_at", { ascending: false })
+    .limit(500);
+  const last = new Map<string, { sender: string; body: string; at: string }>();
+  for (const m of msgs ?? []) {
+    if (!m.dossier_id || last.has(m.dossier_id)) continue;
+    last.set(m.dossier_id, { sender: m.sender, body: m.body ?? "", at: m.created_at });
+  }
+  const pendingIds = [...last.entries()].filter(([, v]) => v.sender === "client").map(([id]) => id);
+  if (!pendingIds.length) return [];
+  const { data: dossiers } = await admin
+    .from("dossiers")
+    .select("id, address_label")
+    .in("id", pendingIds);
+  const addr = new Map((dossiers ?? []).map((d) => [d.id, d.address_label]));
+  return pendingIds
+    .map((id) => {
+      const v = last.get(id)!;
+      return { dossierId: id, address: addr.get(id) ?? "Adresse inconnue", lastBody: v.body, lastAt: v.at };
+    })
+    .sort((a, b) => b.lastAt.localeCompare(a.lastAt));
 }
