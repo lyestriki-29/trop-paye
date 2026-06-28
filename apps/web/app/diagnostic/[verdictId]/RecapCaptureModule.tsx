@@ -8,9 +8,10 @@ import { submitLead } from "./capture-actions";
 
 /**
  * Capture email APRÈS le verdict (inversion 2026-06-12, décision Lyes) : le
- * locataire voit d'abord son résultat complet, puis peut se faire envoyer le
- * récap détaillé par email et « avancer ensemble ». Plus de porte ni de montant
- * masqué : c'est une conversion douce, pas un péage.
+ * locataire voit d'abord son résultat complet, puis peut laisser son email pour
+ * être recontacté et « avancer ensemble ». Plus de porte ni de montant masqué :
+ * c'est une conversion douce, pas un péage. Mode waitlist (2026-06-26) : on NE
+ * promet PAS d'email auto (Brevo non branché) — recontact manuel via /admin/funnel.
  * Réutilise `submitLead` (capture-actions) ; le lead reste unique par dossier.
  * TODO_COPY [AVOCAT] : textes de consentement = brouillons à valider.
  */
@@ -47,18 +48,18 @@ export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
     <section className="nb-card mt-10 rounded-none p-6 sm:p-8">
       {/* TODO_COPY — titres brouillon, hors copy deck. */}
       <h2 className="font-nb-display text-lg font-black uppercase tracking-wide">
-        Recevez votre récap détaillé par email
+        Avançons ensemble sur votre dossier
       </h2>
       <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink/70">
-        Le calcul complet, la règle de droit appliquée et la marche à suivre, au
-        format que vous pourrez relire à tête reposée. C&apos;est gratuit et sans
-        engagement, et nous voyons ensemble comment avancer sur votre dossier.
+        Laissez-nous votre email : on revient vers vous avec la marche à suivre et
+        on voit ensemble comment avancer sur votre dossier. C&apos;est gratuit et
+        sans engagement.
       </p>
 
       <div className="mt-6 space-y-5">
         <Field
           id="recap-email"
-          label="Votre email (pour recevoir le récap)"
+          label="Votre email (pour qu'on vous recontacte)"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           type="email"
@@ -96,7 +97,7 @@ export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
       {error ? <p role="alert" className="mt-4 text-sm text-stamp">{error}</p> : null}
 
       <Button onClick={onSubmit} disabled={!canSubmit} className="mt-7 w-full sm:w-auto">
-        {pending ? "Un instant…" : "M'envoyer le récap"}
+        {pending ? "Un instant…" : "Être recontacté"}
       </Button>
 
       {/* TODO_COPY [AVOCAT] — mention de collecte (brouillon). */}

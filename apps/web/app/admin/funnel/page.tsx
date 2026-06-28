@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getLeadsQueue } from "@/lib/admin/leads-queue";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +46,9 @@ export default async function FunnelPage() {
     .select("event, src, created_at")
     .order("created_at", { ascending: false })
     .limit(30);
+
+  // File de recontact COMPLÈTE : tous les leads capturés (anonymes inclus) — cf. lib/admin/leads-queue.
+  const leadsQueue = await getLeadsQueue();
 
   // Liste d'attente ACTIONNABLE (revue 2026-06-11) : la promesse « on vous
   // recontacte sous 7 jours » a besoin d'une liste, pas d'un compteur.
@@ -111,6 +115,46 @@ export default async function FunnelPage() {
           )}
         </p>
       </div>
+
+      <h2 className="mt-8 font-display text-lg font-bold">
+        Leads capturés : à recontacter ({leadsQueue.length})
+      </h2>
+      <p className="mt-1 text-sm text-ink/55">
+        Tous les emails laissés après le verdict (table leads, capture anonyme).
+        Les plus anciens d&apos;abord.
+      </p>
+      <ul className="mt-3 space-y-2">
+        {leadsQueue.map((l) => (
+          <li
+            key={l.id}
+            className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-card border border-line bg-paper px-4 py-3 text-sm"
+          >
+            <span className="tabular font-mono text-xs text-ink/45">
+              {l.since?.slice(0, 10) ?? "?"}
+            </span>
+            <Link
+              href={`/admin/dossiers/${l.id}`}
+              className="font-medium underline-offset-2 hover:underline"
+            >
+              {l.address}
+            </Link>
+            {l.status ? (
+              <span className="rounded-badge bg-accent/40 px-2 py-0.5 font-mono text-xs">
+                {l.status}
+              </span>
+            ) : null}
+            <a href={`mailto:${l.email}`} className="font-mono text-xs text-refund-text">
+              {l.email}
+            </a>
+            {l.phone ? (
+              <span className="tabular font-mono text-xs text-ink/55">{l.phone}</span>
+            ) : null}
+          </li>
+        ))}
+        {leadsQueue.length === 0 ? (
+          <li className="text-sm text-ink/50">Aucun lead capturé pour l&apos;instant.</li>
+        ) : null}
+      </ul>
 
       <h2 className="mt-8 font-display text-lg font-bold">
         Liste d&apos;attente pilote : à recontacter ({waitlist.length})
