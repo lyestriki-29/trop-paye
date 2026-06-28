@@ -12,6 +12,7 @@ export interface ReviewItem {
   address_label: string | null;
   created_at: string;
   verdict: VerdictGlobal | null;
+  pieceCount: number;
 }
 
 async function latestVerdict(dossierId: string): Promise<VerdictGlobal | null> {
@@ -34,8 +35,21 @@ export async function listDossiersForReview(): Promise<ReviewItem[]> {
     .select("id, address_label, created_at")
     .eq("status", "IN_REVIEW")
     .order("created_at", { ascending: false });
+  const rows = data ?? [];
+  const ids = rows.map((d) => d.id);
+  const { data: pieceRows } = ids.length
+    ? await admin.from("pieces").select("dossier_id").in("dossier_id", ids)
+    : { data: [] };
+  const pieceCount = new Map<string, number>();
+  for (const p of pieceRows ?? []) {
+    pieceCount.set(p.dossier_id, (pieceCount.get(p.dossier_id) ?? 0) + 1);
+  }
   return Promise.all(
-    (data ?? []).map(async (d) => ({ ...d, verdict: await latestVerdict(d.id) })),
+    rows.map(async (d) => ({
+      ...d,
+      verdict: await latestVerdict(d.id),
+      pieceCount: pieceCount.get(d.id) ?? 0,
+    })),
   );
 }
 

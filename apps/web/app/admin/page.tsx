@@ -149,8 +149,13 @@ export default async function AdminHome() {
               >
                 <div>
                   <p className="font-medium">{d.address_label ?? "Dossier"}</p>
-                  <p className="mt-1 text-sm text-ink/55">
-                    {d.verdict ? `${d.verdict.outcome} · ${CONFIDENCE_LABEL[d.verdict.confidence]}` : "—"}
+                  <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink/55">
+                    <span>
+                      {d.verdict ? `${d.verdict.outcome} · ${CONFIDENCE_LABEL[d.verdict.confidence]}` : "—"}
+                    </span>
+                    <span className="rounded-badge bg-paper-2 px-2 py-0.5 text-xs">
+                      {d.pieceCount} pièce{d.pieceCount > 1 ? "s" : ""}
+                    </span>
                   </p>
                 </div>
                 {d.verdict ? (
