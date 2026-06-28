@@ -7,6 +7,7 @@ import { RuleCard } from "@/app/diagnostic/[verdictId]/RuleCard";
 import { frenchDate } from "@/lib/format-date";
 import { pieceKindLabel, pieceStatusLabel } from "@/lib/espace/piece-labels";
 import { AdminActions } from "./AdminActions";
+import { DossierHousingCard } from "@/components/admin/DossierHousingCard";
 
 export const dynamic = "force-dynamic";
 
@@ -73,6 +74,8 @@ export default async function AdminDossierPage({ params }: { params: Promise<{ i
             </div>
           </dl>
         </section>
+
+        <DossierHousingCard dossier={dossier} />
 
         {verdict ? (
           <section className="mt-6">
