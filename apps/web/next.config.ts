@@ -31,6 +31,11 @@ const nextConfig: NextConfig = {
     ];
   },
   images: { remotePatterns: [] },
+  // Upload de pièces (bail/quittance) via Server Action : le défaut Next de 1 Mo
+  // fait planter l'envoi d'un PDF/scan (« Body exceeded 1 MB limit »). On relève la
+  // limite — la pièce est chiffrée côté serveur (AES-256-GCM), d'où le passage par
+  // Server Action et non un upload direct vers Storage.
+  experimental: { serverActions: { bodySizeLimit: "10mb" } },
   // NB : cacheComponents (use cache) sera activé plus tard, uniquement sur les
   // surfaces publiques. Par défaut tout est dynamique : sain pour une legaltech
   // (aucune fuite de cache entre dossiers locataires).
