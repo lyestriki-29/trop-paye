@@ -192,45 +192,6 @@ export async function uploadPiece(formData: FormData): Promise<ActionResult> {
   return { ok: true };
 }
 
-const payoutSchema = z.object({
-  dossierId: z.string().uuid(),
-  holderName: z.string().trim().min(2).max(120),
-  iban: z
-    .string()
-    .transform((v) => v.replace(/\s+/g, "").toUpperCase())
-    // IBAN FR : « FR » + 2 chiffres de contrôle + 23 caractères (27 au total).
-    .pipe(z.string().regex(/^FR\d{2}[0-9A-Z]{23}$/, "IBAN français invalide")),
-});
-
-/**
- * Coordonnées de reversement (virement manuel V1) : IBAN chiffré applicativement
- * (AES-256-GCM, même clé que les pièces), table `payout_details` deny-all.
- * Sans cette saisie, `recordPayment` refuse d'encaisser (pas de WON sans pouvoir
- * reverser). Upsert : une re-saisie corrige la précédente.
- */
-export const savePayoutDetails = withAuth(payoutSchema, async (input, { user }): Promise<ActionResult> => {
-  const admin = getSupabaseAdmin();
-  const { data: dossier } = await admin
-    .from("dossiers")
-    .select("id, user_id")
-    .eq("id", input.dossierId)
-    .single();
-  if (!dossier || dossier.user_id !== user.id) return { error: "Dossier introuvable." };
-
-  const ibanEncrypted = encryptBytes(Buffer.from(input.iban, "utf8")).toString("base64");
-  const { error } = await admin
-    .from("payout_details")
-    .upsert(
-      { dossier_id: input.dossierId, holder_name: input.holderName, iban_encrypted: ibanEncrypted },
-      { onConflict: "dossier_id" },
-    );
-  if (error) return { error: "Impossible d'enregistrer les coordonnées." };
-
-  revalidatePath(`/mandat/${input.dossierId}`);
-  revalidatePath(`/espace/${input.dossierId}`, "layout");
-  return { ok: true };
-});
-
 /** Socle minimal de pièces fourni (bail + au moins une quittance) → passage en IN_REVIEW. */
 async function maybeAdvanceToReview(
   dossierId: string,

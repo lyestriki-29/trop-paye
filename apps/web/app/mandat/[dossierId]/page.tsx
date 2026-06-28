@@ -5,13 +5,11 @@ import { brand } from "@troppaye/shared";
 import { requireAuthPage } from "@/lib/auth/guards";
 import { claimDossierForUser } from "@/lib/dossier/claim";
 import { getDossierDetail } from "@/lib/dossier/read";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { env } from "@/lib/env";
 import { trackEvent } from "@/lib/track";
 import { Logo } from "@/components/brand/Logo";
 import { Confirmation } from "./Confirmation";
 import { MandateForm } from "./MandateForm";
-import { PayoutForm } from "./PayoutForm";
 import { PiecesUpload } from "./PiecesUpload";
 import { Waitlist } from "./Waitlist";
 
@@ -33,14 +31,6 @@ export default async function MandatePage({
 
   const { dossier, verdict, pieces } = detail;
   const missing = [...new Set((verdict?.results ?? []).flatMap((r) => r.missingData ?? []))];
-
-  // Coordonnées de reversement déjà saisies ? (jamais l'IBAN lui-même côté page.)
-  const { data: payout } = await getSupabaseAdmin()
-    .from("payout_details")
-    .select("id")
-    .eq("dossier_id", dossierId)
-    .maybeSingle();
-  const hasPayout = Boolean(payout);
 
   // Mesure pilote : un passage sur l'écran liste d'attente = un lead chaud à
   // recontacter. after() : ne retarde pas le rendu.
@@ -91,17 +81,10 @@ export default async function MandatePage({
               }))}
               missingData={missing}
             />
-            <PayoutForm dossierId={dossierId} alreadySaved={hasPayout} />
           </>
         ) : (
           <>
             <Confirmation dossierId={dossierId} dossierRef={dossierRef} status={dossier.status} />
-            {/* Revue 2026-06-11 : l'IBAN doit rester saisissable APRÈS le passage en
-                étude (le parcours naturel upload ses pièces puis revient) — sinon le
-                dossier gagne sans pouvoir reverser. */}
-            {!hasPayout && ["IN_REVIEW", "RECOVERY", "ESCALATED"].includes(dossier.status) ? (
-              <PayoutForm dossierId={dossierId} alreadySaved={false} />
-            ) : null}
           </>
         )}
       </main>

@@ -35,7 +35,6 @@ export default async function DossierLayout({
     { key: "pieces", label: "Pièces", segment: "pieces", flag: needsPieces },
     { key: "mandat", label: "Mandat", segment: "mandat", flag: needsMandate },
     { key: "messages", label: "Messages", segment: "messages", flag: detail.messages.some((m) => m.sender !== "client") },
-    { key: "versement", label: "Versement", segment: "versement" },
   ];
 
   // Fond crème hérité du scope `.nb` (layout racine espace) — pas de `bg-paper`

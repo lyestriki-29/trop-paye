@@ -9,6 +9,5 @@ test("l'aperçu du dossier affiche les onglets et la fourchette", async ({ page 
   await expect(tabs).toBeVisible();
   await expect(tabs.getByRole("link", { name: "Aperçu" })).toBeVisible();
   await expect(tabs.getByRole("link", { name: "Pièces" })).toBeVisible();
-  await expect(tabs.getByRole("link", { name: "Versement" })).toBeVisible();
   await expect(page.getByText(/Trop-perçu visé/i).first()).toBeVisible();
 });
