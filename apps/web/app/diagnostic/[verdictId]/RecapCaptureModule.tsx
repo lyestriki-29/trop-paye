@@ -13,7 +13,7 @@ import { submitLead } from "./capture-actions";
  * c'est une conversion douce, pas un péage. Mode waitlist (2026-06-26) : on NE
  * promet PAS d'email auto (Brevo non branché) — recontact manuel via /admin/funnel.
  * Réutilise `submitLead` (capture-actions) ; le lead reste unique par dossier.
- * TODO_COPY [AVOCAT] : textes de consentement = brouillons à valider.
+ * Copy de consentement RGPD bordée maison ; détails sur /confidentialite.
  */
 export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
   const router = useRouter();
@@ -76,8 +76,8 @@ export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
           inputClassName="nb-field"
         />
         {phone.trim().length > 0 ? (
-          /* Consentement SÉPARÉ téléphone — brouillon [AVOCAT], version
-             tracée dans leads.consent_text_version. */
+          /* Consentement SÉPARÉ téléphone — version tracée dans
+             leads.consent_text_version. */
           <label className="flex items-start gap-3 text-sm leading-relaxed text-ink/75">
             <input
               type="checkbox"
@@ -88,7 +88,7 @@ export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
             <span>
               J&apos;accepte que TropPayé me rappelle au sujet de mon dossier. Pas de
               démarchage pour autre chose, et je peux retirer ce consentement à tout
-              moment. [AVOCAT, brouillon]
+              moment.
             </span>
           </label>
         ) : null}
@@ -100,11 +100,13 @@ export function RecapCaptureModule({ verdictId }: { verdictId: string }) {
         {pending ? "Un instant…" : "Être recontacté"}
       </Button>
 
-      {/* TODO_COPY [AVOCAT] — mention de collecte (brouillon). */}
       <p className="mt-5 text-xs leading-relaxed text-ink/50">
-        Vos coordonnées servent uniquement à vous transmettre ce résultat et à suivre
-        votre dossier. Données hébergées en France, jamais revendues, supprimables sur
-        simple demande.
+        Vos coordonnées servent uniquement à vous recontacter au sujet de votre dossier.
+        Données hébergées en France, jamais revendues, supprimables sur simple demande —{" "}
+        <a href="/confidentialite" className="underline underline-offset-2 hover:text-ink">
+          en savoir plus
+        </a>
+        .
       </p>
     </section>
   );

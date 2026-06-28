@@ -145,7 +145,7 @@ export function DepositModule({
     }));
 
   const save = async () => {
-    if (!validAnswers) return setError("TODO_COPY — complétez les champs du dépôt");
+    if (!validAnswers) return setError("Complétez les champs du dépôt pour continuer.");
     setSaving(true);
     setError(null);
     const res = await submitDeposit({ verdictId, ...validAnswers });

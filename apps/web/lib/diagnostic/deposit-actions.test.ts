@@ -51,14 +51,14 @@ describe("submitDeposit", () => {
 
   it("refuse un payload invalide avant toute lecture session", async () => {
     const res = await submitDeposit({ ...VALID_PAYLOAD, verdictId: "not-a-uuid" });
-    expect(res).toEqual({ error: "TODO_COPY — saisie invalide" });
+    expect(res).toEqual({ error: "Vérifiez les informations saisies, elles semblent incorrectes." });
     expect(mocks.getSessionToken).not.toHaveBeenCalled();
   });
 
   it("refuse sans cookie de session valide", async () => {
     mocks.getSessionToken.mockResolvedValue(undefined);
     const res = await submitDeposit(VALID_PAYLOAD);
-    expect(res).toEqual({ error: "TODO_COPY — session expirée" });
+    expect(res).toEqual({ error: "Votre session a expiré. Relancez votre diagnostic." });
     expect(mocks.getSupabaseAdmin).not.toHaveBeenCalled();
   });
 
@@ -77,7 +77,7 @@ describe("submitDeposit", () => {
     mocks.getSupabaseAdmin.mockReturnValue({ from });
 
     const res = await submitDeposit(VALID_PAYLOAD);
-    expect(res).toEqual({ error: "TODO_COPY — dossier introuvable ou session expirée" });
+    expect(res).toEqual({ error: "Ce résultat est introuvable, ou votre session a expiré." });
     expect(from).toHaveBeenCalledWith("verdicts");
     expect(from).toHaveBeenCalledWith("dossiers");
   });

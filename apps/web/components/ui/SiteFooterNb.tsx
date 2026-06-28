@@ -29,6 +29,7 @@ const COLS = [
     links: [
       { label: "Se connecter", href: "/login" },
       { label: "Vérifier mon loyer", href: "/diagnostic" },
+      { label: "Confidentialité", href: "/confidentialite" },
       { label: "Mentions légales", href: "/legal" },
     ],
   },

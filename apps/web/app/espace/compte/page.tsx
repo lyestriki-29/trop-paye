@@ -46,10 +46,10 @@ export default async function ComptePage() {
         <p className="mt-3 text-sm text-ink/60">
           Pour exercer vos droits, écrivez-nous à{" "}
           <a
-            href="mailto:privacy@troppaye.fr"
+            href="mailto:contact@troppaye.fr"
             className="underline underline-offset-4 hover:text-ink"
           >
-            privacy@troppaye.fr
+            contact@troppaye.fr
           </a>
           . Nous traitons votre demande dans les meilleurs délais.
         </p>

@@ -15,7 +15,7 @@ const RATE_MAX_PER_IP = 20; // IP partagées (NAT, campus) : plafond plus large 
 
 // Même message pour « verdict inexistant » et « cookie d'un autre dossier » :
 // pas d'oracle d'existence sur les UUID de verdicts.
-const NOT_FOUND_ERROR = "TODO_COPY — dossier introuvable ou session expirée";
+const NOT_FOUND_ERROR = "Ce résultat est introuvable, ou votre session a expiré.";
 
 /**
  * Capture email+téléphone AVANT verdict (porte sur `/diagnostic/[verdictId]`).
@@ -27,27 +27,27 @@ const NOT_FOUND_ERROR = "TODO_COPY — dossier introuvable ou session expirée";
 export async function submitLead(raw: unknown): Promise<SubmitLeadResult> {
   // 1. Validation zod (verdictId uuid, email strict, téléphone FR normalisé).
   const parsed = leadSchema.safeParse(raw);
-  if (!parsed.success) return { error: "TODO_COPY — saisie invalide" };
+  if (!parsed.success) return { error: "Vérifiez votre adresse email, elle semble incorrecte." };
 
   // 2. Consentement SÉPARÉ pour le téléphone : fourni sans case cochée = refus.
   if (parsed.data.phone && !parsed.data.phoneConsent) {
-    return { error: "TODO_COPY [AVOCAT] — consentement téléphone requis" };
+    return { error: "Pour qu'on puisse vous rappeler, merci de cocher la case d'accord." };
   }
 
   // 3. Session anonyme : sans cookie, inutile d'aller plus loin.
   const token = await getSessionToken();
-  if (!token) return { error: "TODO_COPY — session expirée" };
+  if (!token) return { error: "Votre session a expiré. Relancez votre diagnostic." };
 
   // 4. Rate-limit AVANT toute requête DB — par session puis par IP (clés en
   //    mémoire éphémères, jamais loguées ni persistées). Backstop dur : index
   //    unique leads(dossier_id).
   if (!checkRateLimit(`lead:s:${token}`, RATE_MAX_PER_SESSION, RATE_WINDOW_MS)) {
-    return { error: "TODO_COPY — trop de tentatives, réessayez plus tard" };
+    return { error: "Trop de tentatives. Réessayez dans quelques minutes." };
   }
   const forwardedFor = (await headers()).get("x-forwarded-for");
   const ip = forwardedFor?.split(",")[0]?.trim() || "unknown";
   if (!checkRateLimit(`lead:ip:${ip}`, RATE_MAX_PER_IP, RATE_WINDOW_MS)) {
-    return { error: "TODO_COPY — trop de tentatives, réessayez plus tard" };
+    return { error: "Trop de tentatives. Réessayez dans quelques minutes." };
   }
 
   // 5. Ownership : verdict → dossier → session_token === cookie (cf. verdict-read.ts).
@@ -82,7 +82,7 @@ export async function submitLead(raw: unknown): Promise<SubmitLeadResult> {
     { onConflict: "dossier_id" },
   );
   // Message brut volontairement non propagé (détails internes / PII possibles).
-  if (error) return { error: "TODO_COPY — enregistrement impossible, réessayez" };
+  if (error) return { error: "Enregistrement impossible pour l'instant. Réessayez dans un moment." };
 
   // Jalon funnel PRD §5 — l'événement ne porte AUCUNE PII (dossier_id + src seulement).
   await trackEvent("email_capture", { dossierId: verdict.dossier_id });

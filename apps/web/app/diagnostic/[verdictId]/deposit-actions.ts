@@ -17,8 +17,8 @@ const RATE_MAX_PER_SESSION = 10;
 const RATE_MAX_PER_IP = 40;
 
 const submitSchema = z.object({ verdictId: z.string().regex(UUID_RE) }).and(depositAnswersSchema);
-const NOT_FOUND_ERROR = "TODO_COPY — dossier introuvable ou session expirée";
-const INVALID_ERROR = "TODO_COPY — saisie invalide";
+const NOT_FOUND_ERROR = "Ce résultat est introuvable, ou votre session a expiré.";
+const INVALID_ERROR = "Vérifiez les informations saisies, elles semblent incorrectes.";
 
 export type SubmitDepositResult = { verdictId: string } | { error: string };
 
@@ -26,7 +26,6 @@ export type SubmitDepositResult = { verdictId: string } | { error: string };
  * Persistance AUTORITAIRE du mini-tunnel dépôt (LOT 3). Le client ne fournit
  * que les réponses ; le serveur refait le merge PUR, relance le moteur et
  * insère un verdict versionné. Ownership par cookie `tp_session` uniquement.
- * TODO_COPY — messages brouillon.
  */
 export async function submitDeposit(raw: unknown): Promise<SubmitDepositResult> {
   const parsed = submitSchema.safeParse(raw);
@@ -34,14 +33,14 @@ export async function submitDeposit(raw: unknown): Promise<SubmitDepositResult> 
   const { verdictId, ...answers } = parsed.data;
 
   const token = await getSessionToken();
-  if (!token) return { error: "TODO_COPY — session expirée" };
+  if (!token) return { error: "Votre session a expiré. Relancez votre diagnostic." };
   if (!checkRateLimit(`deposit:s:${token}`, RATE_MAX_PER_SESSION, RATE_WINDOW_MS)) {
-    return { error: "TODO_COPY — trop de tentatives, réessayez plus tard" };
+    return { error: "Trop de tentatives. Réessayez dans quelques minutes." };
   }
   const forwardedFor = (await headers()).get("x-forwarded-for");
   const ip = forwardedFor?.split(",")[0]?.trim() || "unknown";
   if (!checkRateLimit(`deposit:ip:${ip}`, RATE_MAX_PER_IP, RATE_WINDOW_MS)) {
-    return { error: "TODO_COPY — trop de tentatives, réessayez plus tard" };
+    return { error: "Trop de tentatives. Réessayez dans quelques minutes." };
   }
 
   const admin = getSupabaseAdmin();
@@ -78,7 +77,7 @@ export async function submitDeposit(raw: unknown): Promise<SubmitDepositResult> 
     .from("dossiers")
     .update({ engine_snapshot: snapshot as unknown as Json })
     .eq("id", v.dossier_id);
-  if (sErr) return { error: "TODO_COPY — enregistrement impossible, réessayez" };
+  if (sErr) return { error: "Enregistrement impossible pour l'instant. Réessayez dans un moment." };
 
   const { data: inserted, error: vErr } = await admin
     .from("verdicts")
@@ -94,7 +93,7 @@ export async function submitDeposit(raw: unknown): Promise<SubmitDepositResult> 
     })
     .select("id")
     .single();
-  if (vErr || !inserted) return { error: "TODO_COPY — enregistrement impossible, réessayez" };
+  if (vErr || !inserted) return { error: "Enregistrement impossible pour l'instant. Réessayez dans un moment." };
 
   await trackEvent("deposit_tunnel_applique", { dossierId: v.dossier_id });
   return { verdictId: inserted.id };
