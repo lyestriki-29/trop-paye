@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-/** Version du texte de consentement affiché — à figer avec le copy deck [AVOCAT]. */
-export const LEAD_CONSENT_VERSION = "TODO_COPY-capture-v1";
+/** Version du texte de consentement affiché (traçabilité RGPD) : incrémenter
+ *  à chaque modification du texte montré au visiteur. */
+export const LEAD_CONSENT_VERSION = "capture-waitlist-2026-06";
 
 /** Finalité déclarée du traitement (colonne `leads.purpose`, traçabilité RGPD). */
 export const LEAD_PURPOSE = "envoi_resultat";
