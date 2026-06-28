@@ -51,15 +51,39 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   } catch {
     return new NextResponse("Document illisible", { status: 422 });
   }
-  // Contenu UPLOADÉ par l'utilisateur : on force le téléchargement (jamais de rendu inline)
-  // + anti-sniffing + sandbox, pour neutraliser tout XSS stocké (ex. HTML déguisé en pièce).
+  // Aperçu sûr : on rend INLINE uniquement les types sans script exécutable (PDF +
+  // images raster), reconnus par leur SIGNATURE binaire — jamais par l'extension
+  // (falsifiable). Tout le reste (HTML, SVG, inconnu) reste en téléchargement forcé.
+  // `Content-Security-Policy: sandbox` + `nosniff` neutralisent tout XSS stocké même inline.
   const safeName = (piece.kind || "piece").replace(/[^a-z0-9_-]/gi, "");
+  const previewType = sniffPreviewableType(plain);
   return new NextResponse(new Uint8Array(plain), {
     headers: {
-      "Content-Type": "application/octet-stream",
-      "Content-Disposition": `attachment; filename="${safeName}"`,
+      "Content-Type": previewType ?? "application/octet-stream",
+      "Content-Disposition": `${previewType ? "inline" : "attachment"}; filename="${safeName}"`,
       "X-Content-Type-Options": "nosniff",
       "Content-Security-Policy": "sandbox",
     },
   });
+}
+
+/**
+ * Type MIME d'aperçu SÛR si le contenu est un PDF ou une image raster (aucun script
+ * exécutable), reconnu par sa signature binaire (magic bytes). null = type non
+ * prévisualisable en sécurité (HTML, SVG, inconnu) → téléchargement forcé.
+ */
+function sniffPreviewableType(buf: Buffer): string | null {
+  if (buf.length >= 5 && buf.toString("latin1", 0, 5) === "%PDF-") return "application/pdf";
+  if (buf.length >= 8 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) {
+    return "image/png";
+  }
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return "image/jpeg";
+  if (
+    buf.length >= 12 &&
+    buf.toString("latin1", 0, 4) === "RIFF" &&
+    buf.toString("latin1", 8, 12) === "WEBP"
+  ) {
+    return "image/webp";
+  }
+  return null;
 }
