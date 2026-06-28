@@ -104,8 +104,8 @@ function StripNb() {
 
 export function HeroNb() {
   return (
-    <section className="relative overflow-hidden border-b-3 border-nb-ink bg-cream">
-      <div className="relative mx-auto max-w-container px-6 py-8 sm:py-10">
+    <section className="relative flex min-h-[calc(100svh_-_var(--chrome-h))] flex-col overflow-hidden border-b-3 border-nb-ink bg-cream">
+      <div className="relative mx-auto flex w-full max-w-container flex-1 items-center px-6 py-8 sm:py-10">
         <div className="grid items-center gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-stretch lg:gap-12">
           <div>
             <p className="nb-mono text-xs font-semibold uppercase tracking-widest text-nb-ink/65">
@@ -171,6 +171,7 @@ export function TickerNb() {
   return (
     <div
       aria-hidden="true"
+      data-chrome-ticker
       className="v3-marquee border-b-3 border-nb-ink bg-nb-ink py-3 text-cream"
     >
       <div className="v3-marquee-track">

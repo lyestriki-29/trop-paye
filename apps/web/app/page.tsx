@@ -6,6 +6,7 @@ import { TemoignageNb } from "@/components/home/nb/sections-preuves-nb";
 import { RegimesNb } from "@/components/home/nb/sections-regimes-nb";
 import { ResultatsNb } from "@/components/home/nb/sections-resultats-nb";
 import { FAQ_COMPLETE } from "@/components/public/FaqComplete";
+import { ChromeHeightSync } from "@/components/ui/ChromeHeightSync";
 import { PublicShell } from "@/components/ui/PublicShell";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
@@ -35,6 +36,7 @@ const faqJsonLd = {
 export default function Home() {
   return (
     <PublicShell>
+      <ChromeHeightSync />
       <TickerNb />
       <HeroNb />
       <ResultatsNb />

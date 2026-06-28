@@ -28,6 +28,10 @@
   --color-ciel: 134 210 245; /* #86D2F5 */
   --color-orange: 255 154 61; /* #FF9A3D */
   --color-vert: 15 169 104; /* #0FA968 vert d'accent (≠ refund #0C8F63, montants) */
+
+  /* Hauteur du chrome au-dessus de la hero (header sticky + ticker). Défaut SSR ;
+     ChromeHeightSync la mesure et l'écrase en live → hero plein écran PILE. */
+  --chrome-h: 108px;
 }
 
 html {
