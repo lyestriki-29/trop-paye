@@ -34,6 +34,7 @@ apps/web/e2e/.auth/
 Thumbs.db
 
 # Tooling
+.claude/
 .tokenade/
 .planning/
 *.log
