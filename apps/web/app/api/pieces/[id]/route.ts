@@ -54,7 +54,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   // Aperçu sûr : on rend INLINE uniquement les types sans script exécutable (PDF +
   // images raster), reconnus par leur SIGNATURE binaire — jamais par l'extension
   // (falsifiable). Tout le reste (HTML, SVG, inconnu) reste en téléchargement forcé.
-  // `Content-Security-Policy: sandbox` + `nosniff` neutralisent tout XSS stocké même inline.
+  // Défense en profondeur du rendu inline :
+  //  - `nosniff` : le navigateur respecte le Content-Type déclaré et ne re-sniffe pas
+  //    un PDF/image en text/html → un polyglotte HTML déguisé n'est jamais exécuté.
+  //  - `sandbox` SANS allow-same-origin : origine opaque. Même si un PDF embarque du JS
+  //    (/OpenAction), il ne peut pas toucher cookies/session du site (le viewer en
+  //    désactive l'essentiel par ailleurs). La CSP ne « neutralise » pas le JS PDF
+  //    lui-même — c'est l'isolation d'origine qui protège la session.
+  //  - `no-store` : la pièce est déchiffrée à la volée ; on ne la laisse JAMAIS en
+  //    cache disque/proxy (RGPD, poste partagé) — d'autant plus en aperçu inline.
   const safeName = (piece.kind || "piece").replace(/[^a-z0-9_-]/gi, "");
   const previewType = sniffPreviewableType(plain);
   return new NextResponse(new Uint8Array(plain), {
@@ -63,6 +71,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       "Content-Disposition": `${previewType ? "inline" : "attachment"}; filename="${safeName}"`,
       "X-Content-Type-Options": "nosniff",
       "Content-Security-Policy": "sandbox",
+      "Cache-Control": "no-store",
     },
   });
 }

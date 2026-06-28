@@ -34,7 +34,10 @@ export function DossierHousingCard({ dossier }: { dossier: DossierRow }) {
   if (current != null) rows.push({ label: "Loyer actuel", value: <Amount cents={current} /> });
   if (initial != null) rows.push({ label: "Loyer de départ", value: <Amount cents={initial} /> });
   if (gap != null && gap !== 0) {
-    rows.push({ label: "Écart de loyer", value: <Amount cents={gap} /> });
+    rows.push({
+      label: gap > 0 ? "Hausse de loyer" : "Baisse de loyer",
+      value: <Amount cents={Math.abs(gap)} />,
+    });
   }
 
   if (rows.length === 0) return null;
